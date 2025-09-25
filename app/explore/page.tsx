@@ -1,0 +1,344 @@
+"use client"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CodeSnippet } from "@shared/api"
+import {
+    BookmarkPlus,
+    ExternalLink,
+    Heart,
+    Search,
+    Star
+} from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import SnippetCard from '../components/SnippetCard'
+
+export default function ExplorePage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [snippets, setSnippets] = useState<CodeSnippet[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "")
+  const [totalCount, setTotalCount] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedLanguage, setSelectedLanguage] = useState('all')
+  const [sortBy, setSortBy] = useState('trending')
+  const [featuredSnippets, setFeaturedSnippets] = useState<CodeSnippet[]>([])
+
+  useEffect(() => {
+    fetchSnippets()
+    fetchFeaturedSnippets()
+  }, [searchParams, selectedCategory, selectedLanguage, sortBy])
+
+  const fetchSnippets = async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams()
+      const q = searchParams.get("query")
+      if (q) params.set("query", q)
+      if (selectedLanguage !== 'all') params.set("language", selectedLanguage)
+      if (selectedCategory !== 'all') params.set("category", selectedCategory)
+      if (sortBy !== 'trending') params.set("sortBy", sortBy)
+      
+      const res = await fetch(`/api/snippets?${params.toString()}`, { cache: "no-store" })
+      if (!res.ok) {
+        setSnippets([])
+        setTotalCount(0)
+        return
+      }
+      const data = await res.json()
+      if (Array.isArray(data.snippets)) {
+        setSnippets(data.snippets)
+        setTotalCount(data.total || data.snippets.length)
+      } else {
+        setSnippets([])
+        setTotalCount(0)
+      }
+    } catch (e) {
+      console.error(e)
+      setSnippets([])
+      setTotalCount(0)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchFeaturedSnippets = async () => {
+    try {
+      const res = await fetch('/api/snippets?featured=true&limit=3', { cache: "no-store" })
+      if (res.ok) {
+        const data = await res.json()
+        if (Array.isArray(data.snippets)) {
+          setFeaturedSnippets(data.snippets.slice(0, 3))
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch featured snippets:', e)
+      // Keep empty array as fallback
+    }
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    const params = new URLSearchParams(searchParams.toString())
+    if (searchQuery.trim()) {
+      params.set("query", searchQuery.trim())
+    } else {
+      params.delete("query")
+    }
+    router.push(`/explore?${params.toString()}`)
+  }
+
+  const handleFilterChange = () => {
+    fetchSnippets()
+  }
+
+  const categories = [
+    'All', 'React', 'Vue', 'Angular', 'Frontend', 'Backend', 'Mobile', 
+    'Data Science', 'Machine Learning', 'Database', 'DevOps', 'UI/UX'
+  ]
+
+  const languages = [
+    'All', 'JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'Go', 
+    'Rust', 'PHP', 'Ruby', 'Swift', 'Kotlin', 'Dart', 'CSS', 'SQL'
+  ]
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array(6).fill(0).map((_, i) => (
+              <div key={i} className="h-64 bg-muted rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold">Explore Code Snippets</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          {searchParams.get("query")
+            ? `Search results for "${searchParams.get("query")}" (${totalCount} found)`
+            : "Discover amazing code snippets shared by the community. Find solutions, get inspired, and share your own creations."}
+        </p>
+      </div>
+
+      {/* Search and Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Search className="mr-2 h-5 w-5" />
+            Search & Filter
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Search snippets, tags, or descriptions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-11"
+              />
+            </div>
+            <Select value={selectedCategory} onValueChange={(value) => {
+              setSelectedCategory(value)
+              handleFilterChange()
+            }}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map(category => (
+                  <SelectItem key={category} value={category.toLowerCase()}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedLanguage} onValueChange={(value) => {
+              setSelectedLanguage(value)
+              handleFilterChange()
+            }}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map(language => (
+                  <SelectItem key={language} value={language.toLowerCase()}>
+                    {language}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={sortBy} onValueChange={(value) => {
+              setSortBy(value)
+              handleFilterChange()
+            }}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="trending">Trending</SelectItem>
+                <SelectItem value="recent">Most Recent</SelectItem>
+                <SelectItem value="popular">Most Liked</SelectItem>
+                <SelectItem value="views">Most Viewed</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button type="submit">
+              <Search className="mr-2 h-4 w-4" />
+              Search
+            </Button>
+          </form>
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>Found {totalCount} snippets</span>
+            <span>Showing results for "{searchQuery || 'all snippets'}"</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Featured Snippets */}
+      {featuredSnippets.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Star className="h-5 w-5 text-yellow-500" />
+            <h2 className="text-2xl font-bold">Featured Snippets</h2>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {featuredSnippets.map((snippet) => (
+              <div key={snippet.id} className="relative">
+                <SnippetCard 
+                  snippet={snippet} 
+                  onPurchaseComplete={fetchSnippets}
+                />
+                <div className="absolute -top-2 -right-2 z-10">
+                  <Badge className="bg-yellow-500 text-yellow-50 shadow-lg">
+                    <Star className="w-3 h-3 mr-1" />
+                    Featured
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* All Snippets */}
+      <Tabs defaultValue="grid" className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">All Snippets</h2>
+          <TabsList>
+            <TabsTrigger value="grid">Grid View</TabsTrigger>
+            <TabsTrigger value="list">List View</TabsTrigger>
+          </TabsList>
+        </div>
+        
+        <TabsContent value="grid" className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {snippets.length > 0 ? (
+              snippets.map((snippet) => (
+                <SnippetCard 
+                  key={snippet.id} 
+                  snippet={snippet} 
+                  onPurchaseComplete={fetchSnippets} 
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground text-lg">No code snippets found.</p>
+                {searchParams.get("query") && (
+                  <p className="text-muted-foreground/60 mt-2">Try adjusting your search terms.</p>
+                )}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="list" className="space-y-4">
+          {snippets.length > 0 ? (
+            snippets.map((snippet) => (
+              <Card key={snippet.id} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="text-lg font-semibold">{snippet.title}</h3>
+                            <Badge variant="secondary">{snippet.language}</Badge>
+                          </div>
+                          <p className="text-muted-foreground">{snippet.description}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src="" alt={snippet.author} />
+                              <AvatarFallback>{snippet.author?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm font-medium">{snippet.author}</span>
+                          </div>
+                          <span className="text-sm text-muted-foreground">{new Date(snippet.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <div className="flex space-x-2">
+                          <Button size="sm">
+                            <ExternalLink className="mr-2 h-3 w-3" />
+                            View
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Heart className="h-3 w-3" />
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <BookmarkPlus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-1">
+                        {snippet.tags?.map((tag: string) => (
+                          <Badge key={tag} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        )) || []}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-lg">No code snippets found.</p>
+              {searchParams.get("query") && (
+                <p className="text-muted-foreground/60 mt-2">Try adjusting your search terms.</p>
+              )}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Load More */}
+      <div className="text-center">
+        <Button variant="outline" size="lg">
+          Load More Snippets
+        </Button>
+      </div>
+    </div>
+  )
+}
