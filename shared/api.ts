@@ -27,6 +27,8 @@ export interface CodeSnippet {
   language: string;
   framework?: string;
   downloads: number;
+  likes?: number;
+  views?: number;
   createdAt: string;
   updatedAt: string;
   /** Optional aggregated favorites count */

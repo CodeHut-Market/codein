@@ -11,6 +11,7 @@ import { CodeSnippet } from "@shared/api";
 import { AnimatePresence, motion } from "framer-motion";
 import { Grid, Heart, List, Search, SortAsc, SortDesc, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 interface FavoriteItem {
   id: string;
@@ -36,6 +37,7 @@ export default function FavoritesPage() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Demo favorites data - fallback for when API is not available
   const demoFavorites: CodeSnippet[] = [
@@ -93,6 +95,15 @@ export default function FavoritesPage() {
   ];
 
   useEffect(() => {
+    // Get current user
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    
+    getCurrentUser();
     loadFavorites();
   }, []);
 
@@ -128,14 +139,15 @@ export default function FavoritesPage() {
         language: fav.snippet.language,
         tags: fav.snippet.tags || [],
         author: fav.snippet.profiles?.username || 'Unknown',
-        authorId: fav.snippet.author_id,
+        authorId: (fav.snippet as any).author_id || fav.snippet.authorId,
         downloads: fav.snippet.downloads || 0,
-        likes: fav.snippet.likes || 0,
+        likes: (fav.snippet as any).likes || 0,
+        views: (fav.snippet as any).views || 0,
         rating: 4.5, // TODO: Calculate from actual ratings
         price: 0, // TODO: Get from actual pricing data
         framework: fav.snippet.language, // TODO: Map to actual framework
-        createdAt: fav.snippet.created_at,
-        updatedAt: fav.snippet.updated_at,
+        createdAt: (fav.snippet as any).created_at || fav.snippet.createdAt,
+        updatedAt: (fav.snippet as any).updated_at || fav.snippet.updatedAt,
       }));
       
       setFavorites(formattedFavorites);
@@ -309,7 +321,12 @@ export default function FavoritesPage() {
                     <Checkbox checked={selectedItems.includes(snippet.id)} onCheckedChange={() => toggleSelectItem(snippet.id)} className="bg-background border-2" />
                   </div>
                   <div className="absolute top-3 right-3 z-10">
-                    <FavoriteButton snippetId={snippet.id} userId={userId} initialIsFavorited variant="ghost" className="bg-background/80 backdrop-blur-sm" />
+                    <FavoriteButton 
+                      snippetId={snippet.id} 
+                      userId={userId || undefined} 
+                      variant="ghost" 
+                      className="bg-background/80 backdrop-blur-sm" 
+                    />
                   </div>
                   <SnippetCard snippet={snippet} />
                 </motion.div>

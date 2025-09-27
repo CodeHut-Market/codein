@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ThemeToggle } from "../../client/components/ThemeToggle";
+import ThemeToggle from "../../client/components/ThemeToggle";
 import { Button } from "../../client/components/ui/button";
 import { Card, CardContent } from "../../client/components/ui/card";
 import { Checkbox } from "../../client/components/ui/checkbox";
