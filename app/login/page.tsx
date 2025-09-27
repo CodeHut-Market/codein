@@ -16,11 +16,37 @@ export default function LoginPage() {
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault()
+		if (!email || !password) return
+
 		setIsLoading(true)
-		// Placeholder: implement email/password auth if desired
-		await new Promise((resolve) => setTimeout(resolve, 800))
-		setIsLoading(false)
-		console.log("[login] Attempted with:", { email, password })
+		setOauthError(null)
+
+		if (!isSupabaseEnabled()) {
+			console.log("[mock] Email login attempted:", { email })
+			setIsLoading(false)
+			return
+		}
+
+		try {
+			const { data, error } = await supabase!.auth.signInWithPassword({
+				email,
+				password,
+			})
+
+			if (error) {
+				throw error
+			}
+
+			if (data.user) {
+				// Redirect to dashboard or wherever you want
+				window.location.href = '/dashboard'
+			}
+		} catch (error: any) {
+			console.error('Login error:', error)
+			setOauthError(error.message || 'Failed to sign in')
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
 	const [oauthLoading, setOauthLoading] = useState<string | null>(null);

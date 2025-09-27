@@ -1,14 +1,14 @@
 "use client"
 
 import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Eye,
-  EyeOff,
-  Rocket,
-  User,
-  X
+    ArrowLeft,
+    ArrowRight,
+    Check,
+    Eye,
+    EyeOff,
+    Rocket,
+    User,
+    X
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -215,15 +215,19 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      // Import Supabase helpers
+      const { authHelpers, isSupabaseEnabled } = await import("../lib/supabaseClient");
+      
+      if (!isSupabaseEnabled()) {
+        throw new Error("Authentication service is not configured. Please check your environment variables.");
+      }
+
+      // Sign up with Supabase
+      const { data, error } = await authHelpers.signUp(
+        formData.email.trim(),
+        formData.password,
+        {
           username: formData.username.trim(),
-          email: formData.email.trim(),
-          password: formData.password,
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
           bio: formData.bio,
@@ -242,23 +246,22 @@ export default function SignupPage() {
             showEmail: formData.showEmail,
           },
           subscribeNewsletter: formData.subscribeNewsletter,
-        }),
-      });
+        }
+      );
 
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (parseError) {
-        console.error("Response parsing error:", parseError);
-        throw new Error(`Server returned invalid response (${response.status}). Please try again.`);
+      if (error) {
+        throw new Error(error.message);
       }
 
-      if (!response.ok) {
-        throw new Error(responseData.message || "Signup failed");
+      if (data?.user) {
+        // Check if user needs email confirmation
+        if (!data.session) {
+          router.push("/login?message=Please check your email and click the confirmation link to complete your registration.");
+        } else {
+          // User is automatically signed in, redirect to dashboard
+          router.push("/dashboard?welcome=true");
+        }
       }
-
-      // For now, just redirect to login until auth context is set up
-      router.push("/login?message=Account created successfully! Please log in.");
     } catch (error) {
       console.error("Signup error:", error);
       setError(error instanceof Error ? error.message : "Signup failed");
