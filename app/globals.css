@@ -263,3 +263,24 @@
 .animate-terminal-cursor {
   animation: terminal-cursor 1s step-end infinite;
 }
+
+/* Ripple Theme Toggle Animations */
+@keyframes ripple-expand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation-fill-mode: forwards;
+}

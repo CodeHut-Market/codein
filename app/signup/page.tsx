@@ -13,13 +13,13 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import ThemeToggle from "../../client/components/ThemeToggle";
 import { Button } from "../../client/components/ui/button";
 import { Card, CardContent } from "../../client/components/ui/card";
 import { Checkbox } from "../../client/components/ui/checkbox";
 import { Input } from "../../client/components/ui/input";
 import { Label } from "../../client/components/ui/label";
 import { Progress } from "../../client/components/ui/progress";
+import RippleThemeToggle from "../../components/RippleThemeToggle";
 
 interface PasswordValidation {
   length: boolean;
@@ -812,7 +812,7 @@ export default function SignupPage() {
               </Link>
             </div>
             <div className="flex items-center gap-4">
-              <ThemeToggle />
+              <RippleThemeToggle size="sm" />
               <div className="text-sm text-muted-foreground">
                 Already have an account?{" "}
                 <Link href="/login" className="text-primary hover:underline">
