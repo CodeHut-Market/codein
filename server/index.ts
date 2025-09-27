@@ -5,60 +5,67 @@ import { handleDemo } from "./routes/demo";
 
 // Import database functions
 import {
-  initializeTables,
-  testConnection as testOldConnection,
+    initializeTables,
+    testConnection as testOldConnection,
 } from "./config/db";
 import { pool, testConnection } from "./db/database";
 
 // Import all route handlers
 import {
-  createCodeSnippet,
-  deleteCodeSnippet,
-  getPopularSnippets,
-  getSnippetById,
-  getSnippets,
-  getSnippetsByAuthor,
-  updateCodeSnippet,
+    createCodeSnippet,
+    deleteCodeSnippet,
+    getPopularSnippets,
+    getSnippetById,
+    getSnippets,
+    getSnippetsByAuthor,
+    updateCodeSnippet,
 } from "./routes/snippets";
 
 import {
-  getAllUsers,
-  getTopAuthors,
-  getUserById,
-  getUserByUsername,
+    getAllUsers,
+    getTopAuthors,
+    getUserById,
+    getUserByUsername,
 } from "./routes/users";
 
 import {
-  checkPurchaseStatus,
-  getSnippetPurchaseStats,
-  getUserPurchases,
-  purchaseSnippet,
+    checkPurchaseStatus,
+    getSnippetPurchaseStats,
+    getUserPurchases,
+    purchaseSnippet,
 } from "./routes/purchases";
 
 import {
-  getSearchFilters,
-  getSearchSuggestions,
-  globalSearch,
+    getSearchFilters,
+    getSearchSuggestions,
+    globalSearch,
 } from "./routes/search";
 
 import { getMarketplaceStats, getTrendingData } from "./routes/stats";
 
 import {
-  authenticateToken,
-  changePassword,
-  demoLogin,
-  getActiveSessions,
-  getCurrentUser,
-  login,
-  logout,
-  refreshToken,
-  signup,
+    authenticateToken,
+    changePassword,
+    demoLogin,
+    getActiveSessions,
+    getCurrentUser,
+    login,
+    logout,
+    refreshToken,
+    signup,
 } from "./routes/auth";
 import { requireAdmin } from "./utils/auth";
 
 // Import payment routes
 import { getFavoriteStatusHandler, toggleFavoriteHandler } from "./routes/favorites";
 import paymentRoutes from "./routes/payments";
+
+// Import web search routes
+import {
+    checkPlagiarism,
+    checkWebSearchHealth,
+    performWebSearch,
+} from "./routes/websearch";
 
 export function createServer() {
   const app = express();
@@ -101,6 +108,11 @@ export function createServer() {
   app.get("/api/search", globalSearch);
   app.get("/api/search/suggestions", getSearchSuggestions);
   app.get("/api/search/filters", getSearchFilters);
+
+  // Web Search API (Langsearch.com)
+  app.post("/api/websearch", authenticateToken, performWebSearch);
+  app.post("/api/plagiarism/check", authenticateToken, checkPlagiarism);
+  app.get("/api/websearch/health", checkWebSearchHealth);
 
   // Stats API
   app.get("/api/stats", getMarketplaceStats);

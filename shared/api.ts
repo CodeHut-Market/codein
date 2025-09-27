@@ -313,3 +313,79 @@ export interface ThemePreferences {
   reducedMotion: boolean;
   compactMode: boolean;
 }
+
+/**
+ * Web Search API Types (Langsearch.com)
+ */
+export interface WebSearchRequest {
+  query: string;
+  num_results?: number;
+  language?: string;
+  search_type?: 'web' | 'news' | 'images' | 'videos';
+}
+
+export interface WebSearchResult {
+  title: string;
+  url: string;
+  snippet: string;
+  published_date?: string;
+  domain?: string;
+}
+
+export interface WebSearchResponse {
+  success: boolean;
+  data: {
+    results: WebSearchResult[];
+    total_results: number;
+    search_time: number;
+    query: string;
+  };
+  meta: {
+    timestamp: string;
+    service: string;
+  };
+}
+
+/**
+ * Plagiarism Detection API Types
+ */
+export interface PlagiarismCheckRequest {
+  content: string;
+  language?: string;
+  threshold?: number;
+}
+
+export interface PlagiarismMatch {
+  url: string;
+  title: string;
+  similarity_score: number;
+  matched_text: string[];
+}
+
+export interface PlagiarismCheckResponse {
+  success: boolean;
+  data: {
+    is_plagiarized: boolean;
+    confidence_score: number;
+    matched_sources: PlagiarismMatch[];
+    original_score: number;
+  };
+  meta: {
+    timestamp: string;
+    service: string;
+    content_length: number;
+    threshold_used: number;
+  };
+}
+
+/**
+ * Web Search Service Health Check
+ */
+export interface WebSearchHealthResponse {
+  status: 'ok' | 'error' | 'disabled';
+  response_time?: number;
+  service?: string;
+  configured: boolean;
+  message?: string;
+  timestamp: string;
+}
