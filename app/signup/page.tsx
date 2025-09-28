@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../client/components/ui/button";
 import { Card, CardContent } from "../../client/components/ui/card";
 import { Checkbox } from "../../client/components/ui/checkbox";
@@ -20,6 +20,7 @@ import { Input } from "../../client/components/ui/input";
 import { Label } from "../../client/components/ui/label";
 import { Progress } from "../../client/components/ui/progress";
 import RippleThemeToggle from "../../components/RippleThemeToggle";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface PasswordValidation {
   length: boolean;
@@ -64,6 +65,7 @@ interface OnboardingData {
 
 export default function SignupPage() {
   const router = useRouter();
+  const { signUp, user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -77,6 +79,13 @@ export default function SignupPage() {
     special: false,
   });
   const [isUsernameValid, setIsUsernameValid] = useState(true);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const [formData, setFormData] = useState<OnboardingData>({
     username: "",
@@ -215,38 +224,35 @@ export default function SignupPage() {
     setError("");
 
     try {
-      // Import Supabase helpers
-      const { authHelpers, isSupabaseEnabled } = await import("../lib/supabaseClient");
-      
-      if (!isSupabaseEnabled()) {
-        throw new Error("Authentication service is not configured. Please check your environment variables.");
-      }
+      // Create user metadata
+      const metadata = {
+        username: formData.username.trim(),
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        full_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+        bio: formData.bio,
+        location: formData.location,
+        website: formData.website,
+        primary_language: formData.primaryLanguage,
+        interests: formData.interests,
+        experience_level: formData.experienceLevel,
+        goals: formData.goals,
+        preferences: {
+          emailNotifications: formData.emailNotifications,
+          browserNotifications: formData.browserNotifications,
+          weeklyDigest: formData.weeklyDigest,
+          marketingEmails: formData.marketingEmails,
+          profileVisibility: formData.profileVisibility,
+          showEmail: formData.showEmail,
+        },
+        subscribe_newsletter: formData.subscribeNewsletter,
+      };
 
-      // Sign up with Supabase
-      const { data, error } = await authHelpers.signUp(
+      // Sign up with auth context
+      const { data, error } = await signUp(
         formData.email.trim(),
         formData.password,
-        {
-          username: formData.username.trim(),
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          bio: formData.bio,
-          location: formData.location,
-          website: formData.website,
-          primaryLanguage: formData.primaryLanguage,
-          interests: formData.interests,
-          experienceLevel: formData.experienceLevel,
-          goals: formData.goals,
-          preferences: {
-            emailNotifications: formData.emailNotifications,
-            browserNotifications: formData.browserNotifications,
-            weeklyDigest: formData.weeklyDigest,
-            marketingEmails: formData.marketingEmails,
-            profileVisibility: formData.profileVisibility,
-            showEmail: formData.showEmail,
-          },
-          subscribeNewsletter: formData.subscribeNewsletter,
-        }
+        metadata
       );
 
       if (error) {

@@ -3,74 +3,80 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
-import { useState } from "react";
-import { getRedirectURL, isSupabaseEnabled, supabase } from "../lib/supabaseClient";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function LoginPage() {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const { signIn, signInWithProvider, user } = useAuth();
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [isLoading, setIsLoading] = useState(false)
+	const [showPassword, setShowPassword] = useState(false)
+	const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+	const [authError, setAuthError] = useState<string | null>(null);
+
+	// Check for error in URL params
+	useEffect(() => {
+		const error = searchParams?.get('error');
+		if (error) {
+			setAuthError(decodeURIComponent(error));
+		}
+	}, [searchParams]);
+
+	// Redirect if already logged in
+	useEffect(() => {
+		if (user) {
+			router.push('/dashboard');
+		}
+	}, [user, router]);
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (!email || !password) return
-
-		setIsLoading(true)
-		setOauthError(null)
-
-		if (!isSupabaseEnabled()) {
-			console.log("[mock] Email login attempted:", { email })
-			setIsLoading(false)
-			return
+		if (!email || !password) {
+			setAuthError("Please enter both email and password");
+			return;
 		}
 
+		setIsLoading(true)
+		setAuthError(null)
+
 		try {
-			const { data, error } = await supabase!.auth.signInWithPassword({
-				email,
-				password,
-			})
+			const { data, error } = await signIn(email.trim(), password);
 
 			if (error) {
 				throw error
 			}
 
 			if (data.user) {
-				// Redirect to dashboard or wherever you want
-				window.location.href = '/dashboard'
+				// Redirect to dashboard
+				router.push('/dashboard');
 			}
 		} catch (error: any) {
 			console.error('Login error:', error)
-			setOauthError(error.message || 'Failed to sign in')
+			setAuthError(error.message || 'Failed to sign in. Please check your credentials.');
 		} finally {
 			setIsLoading(false)
 		}
 	}
 
-	const [oauthLoading, setOauthLoading] = useState<string | null>(null);
-	const [oauthError, setOauthError] = useState<string | null>(null);
-
 	const handleSocialLogin = async (provider: 'google' | 'github') => {
-		if(!isSupabaseEnabled()) {
-			console.log('[mock] Social login', provider);
-			return;
-		}
 		try {
-			setOauthError(null);
+			setAuthError(null);
 			setOauthLoading(provider);
 
-			const { error } = await supabase!.auth.signInWithOAuth({ 
-				provider,
-				options: {
-					redirectTo: `${getRedirectURL()}auth/callback`
-				}
-			});
-			if(error) throw error;
+			const { data, error } = await signInWithProvider(provider);
+			
+			if (error) throw error;
 		} catch(e:any){
-			setOauthError(e.message || 'OAuth sign-in failed');
-		} finally { setOauthLoading(null); }
+			setAuthError(e.message || 'OAuth sign-in failed');
+			setOauthLoading(null);
+		}
 	}
 
 	return (
@@ -132,16 +138,58 @@ export default function LoginPage() {
 					<CardDescription className="font-sans">Sign in to your account to continue</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-6">
+					{authError && (
+						<div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+							<p className="text-red-700 dark:text-red-400 text-sm">{authError}</p>
+						</div>
+					)}
+
 					<form onSubmit={handleLogin} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="email" className="text-sm font-medium font-sans">Email Address</Label>
-							<Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e)=>setEmail(e.target.value)} required className="border-white/40 bg-white/10 placeholder:text-card-foreground/50 py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15" />
+							<Input 
+								id="email" 
+								type="email" 
+								placeholder="Enter your email" 
+								value={email} 
+								onChange={(e)=>setEmail(e.target.value)} 
+								required 
+								className="border-white/40 bg-white/10 placeholder:text-card-foreground/50 py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15" 
+							/>
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="password" className="text-sm font-medium font-sans">Password</Label>
-							<Input id="password" type="password" placeholder="Enter your password" value={password} onChange={(e)=>setPassword(e.target.value)} required className="border-white/40 bg-white/10 placeholder:text-card-foreground/50 py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15" />
+							<div className="relative">
+								<Input 
+									id="password" 
+									type={showPassword ? "text" : "password"}
+									placeholder="Enter your password" 
+									value={password} 
+									onChange={(e)=>setPassword(e.target.value)} 
+									required 
+									className="border-white/40 bg-white/10 placeholder:text-card-foreground/50 py-3 pr-10 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15" 
+								/>
+								<button
+									type="button"
+									className="absolute inset-y-0 right-0 pr-3 flex items-center text-card-foreground/60 hover:text-card-foreground"
+									onClick={() => setShowPassword(!showPassword)}
+								>
+									{showPassword ? (
+										<EyeOff className="h-4 w-4" />
+									) : (
+										<Eye className="h-4 w-4" />
+									)}
+								</button>
+							</div>
 						</div>
-						<Button type="submit" className="w-full ripple-effect hover-lift font-sans font-bold py-5" style={{backgroundColor:'#0C115B',color:'white'}} disabled={isLoading}>{isLoading? 'Signing In...' : 'Sign In'}</Button>
+						<Button 
+							type="submit" 
+							className="w-full ripple-effect hover-lift font-sans font-bold py-5" 
+							style={{backgroundColor:'#0C115B',color:'white'}} 
+							disabled={isLoading}
+						>
+							{isLoading ? 'Signing In...' : 'Sign In'}
+						</Button>
 					</form>
 					<div className="relative flex justify-center text-xs uppercase">
 						<span className="px-2 font-sans text-card-foreground/60">Or continue with</span>
@@ -153,10 +201,9 @@ export default function LoginPage() {
 						<Button variant="outline" onClick={()=>handleSocialLogin('github')} disabled={oauthLoading==='github'} className="w-full glass-effect border-white/30 hover-lift ripple-effect font-sans hover:bg-white/20">
 							{oauthLoading==='github' ? 'Redirecting…' : 'Continue with GitHub'}
 						</Button>
-						{oauthError && <p className="text-xs text-red-500 text-center">{oauthError}</p>}
 					</div>
 					<div className="text-center">
-						<a href="#" className="text-sm font-sans text-card-foreground/70 hover:text-card-foreground transition-colors">Forgot your password?</a>
+						<Link href="/reset-password" className="text-sm font-sans text-card-foreground/70 hover:text-card-foreground transition-colors">Forgot your password?</Link>
 					</div>
 				</CardContent>
 			</Card>
