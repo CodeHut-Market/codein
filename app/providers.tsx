@@ -1,15 +1,24 @@
 "use client";
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import React from 'react';
+import { ToastProvider } from '../components/ToastProvider';
 import { AuthProvider } from '../contexts/AuthContext';
+
 // Central place to compose all client-side context providers (Theme, Auth, Notifications, etc.)
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider>
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <AuthProvider>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </AuthProvider>
-    </ThemeProvider>
+    </NextThemesProvider>
   );
 }

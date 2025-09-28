@@ -1,11 +1,19 @@
 "use client"
 
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { BookOpen, Code, DollarSign, Heart, Home, LogOut, Menu, Play, Search, Upload, User, Users, X } from 'lucide-react';
+import { BookOpen, ChevronDown, Code, CreditCard, DollarSign, Heart, Home, LogOut, Menu, Play, Search, Settings, Upload, User, Users, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { isSupabaseEnabled, supabase } from '../app/lib/supabaseClient';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../client/components/ui/dropdown-menu';
 import RippleThemeToggle from './RippleThemeToggle';
 
 interface NavigationProps {
@@ -112,20 +120,56 @@ export default function Navigation({ className }: NavigationProps) {
             {isLoading ? (
               <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
             ) : user ? (
-              <div className="relative">
-                <button
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent"
-                  onClick={() => {/* Add dropdown logic here if needed */}}
-                >
-                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
-                    {getUserInitials(user)}
-                  </div>
-                  <span className="hidden sm:block text-sm font-medium">
-                    {getUserDisplayName(user)}
-                  </span>
-                </button>
-                {/* You can add a dropdown menu here if needed */}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent transition-colors">
+                    <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
+                      {getUserInitials(user)}
+                    </div>
+                    <span className="hidden sm:block text-sm font-medium">
+                      {getUserDisplayName(user)}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{getUserDisplayName(user)}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Profile Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/billing" className="cursor-pointer">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Billing</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-2">
                 <Link href="/login">

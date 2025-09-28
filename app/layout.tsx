@@ -3,9 +3,8 @@ import { Inter } from "next/font/google"
 import type React from "react"
 import Footer from "../components/Footer"
 import Navigation from "../components/Navigation"
-import { ThemeProvider } from "../components/ThemeProvider"
-import { ToastProvider } from "../components/ToastProvider"
 import "./globals.css"
+import Providers from "./providers"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,20 +27,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} antialiased`} suppressHydrationWarning>
       <body className="font-sans min-h-screen bg-background text-foreground flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ToastProvider>
-            <Navigation />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </ToastProvider>
-        </ThemeProvider>
+        <Providers>
+          <Navigation />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   )
