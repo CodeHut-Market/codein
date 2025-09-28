@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isSupabaseEnabled, supabase } from '../../lib/supabaseClient';
 import { listSnippets } from '../../lib/repositories/snippetsRepo';
+import { isSupabaseEnabled, supabase } from '../../lib/supabaseClient';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,13 +8,26 @@ export async function GET(request: NextRequest) {
     if (isSupabaseEnabled()) {
       try {
         // Get actual stats from Supabase
-        const [snippetsCount, usersCount, downloadsSum] = await Promise.all([
-          supabase!.from('snippets').select('*', { count: 'exact', head: true }),
-          supabase!.from('profiles').select('*', { count: 'exact', head: true }).catch(() => ({ count: 0 })),
-          supabase!.from('snippets').select('downloads').then(({ data }) => 
-            data?.reduce((sum, item) => sum + (item.downloads || 0), 0) || 0
-          ).catch(() => 0)
-        ]);
+        const snippetsResult = await supabase!.from('snippets').select('*', { count: 'exact', head: true });
+        const snippetsCount = snippetsResult.count || 0;
+        
+        let usersCount = 0;
+        try {
+          const usersResult = await supabase!.from('profiles').select('*', { count: 'exact', head: true });
+          usersCount = usersResult.count || 0;
+        } catch (error) {
+          console.warn('Could not fetch users count:', error);
+        }
+
+        let downloadsSum = 0;
+        try {
+          const downloadsResult = await supabase!.from('snippets').select('downloads');
+          if (downloadsResult.data) {
+            downloadsSum = downloadsResult.data.reduce((sum, item) => sum + (item.downloads || 0), 0);
+          }
+        } catch (error) {
+          console.warn('Could not fetch downloads sum:', error);
+        }
 
         // Get language distribution
         const { data: snippetsData } = await supabase!.from('snippets').select('language, downloads');
@@ -29,7 +42,7 @@ export async function GET(request: NextRequest) {
           });
         });
 
-        const totalSnippets = snippetsCount.count || 0;
+        const totalSnippets = snippetsCount;
         const popularLanguages = Array.from(languageStats.entries())
           .map(([name, stats]) => ({
             name,
@@ -44,7 +57,7 @@ export async function GET(request: NextRequest) {
           success: true,
           data: {
             totalSnippets,
-            totalUsers: usersCount.count || 0,
+            totalUsers: usersCount,
             totalDownloads: downloadsSum,
             totalRevenue: 0, // Would need payment records table
             averageRating: 4.6, // Would need ratings table
