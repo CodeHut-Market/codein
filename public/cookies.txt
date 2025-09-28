@@ -1,0 +1,47 @@
+# Cookie Policy
+
+**Last updated: September 28, 2025**
+
+This Cookie Policy explains how CodeHut ("we", "our", or "us") uses cookies and similar technologies to recognize you when you visit our website at https://codehutcode.vercel.app.
+
+## What are cookies?
+
+Cookies are small data files that are placed on your computer or mobile device when you visit a website. Cookies are widely used by website owners in order to make their websites work, or to work more efficiently, as well as to provide reporting information.
+
+## Why do we use cookies?
+
+We use cookies for several reasons:
+
+### Essential Cookies
+These cookies are strictly necessary to provide you with services available through our website and to use some of its features.
+
+- **Authentication**: To keep you logged in
+- **Security**: To protect against fraudulent activity
+- **Session Management**: To maintain your preferences during your visit
+
+### Analytics Cookies
+These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.
+
+- **Usage Analytics**: To understand how our site is used
+- **Performance Monitoring**: To identify and fix technical issues
+- **Feature Usage**: To improve our services
+
+### Functional Cookies
+These cookies enable the website to provide enhanced functionality and personalization.
+
+- **User Preferences**: To remember your settings
+- **Language Selection**: To display content in your preferred language
+- **Theme Selection**: To remember your dark/light mode preference
+
+## How can you control cookies?
+
+You have the right to decide whether to accept or reject cookies. You can exercise your cookie rights by setting your preferences in your browser settings.
+
+Most web browsers automatically accept cookies, but you can usually modify your browser setting to decline cookies if you prefer.
+
+## Contact Us
+
+If you have any questions about this Cookie Policy, please contact us:
+
+- Email: privacy@codehut.com
+- Website: https://codehutcode.vercel.app/contact

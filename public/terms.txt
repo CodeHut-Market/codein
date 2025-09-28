@@ -1,0 +1,140 @@
+# Terms of Service
+
+**Last updated: September 28, 2025**
+
+These Terms of Service ("Terms") govern your use of the CodeHut platform ("Service") operated by CodeHut, Inc. ("us", "we", or "our").
+
+## Acceptance of Terms
+
+By accessing or using our Service, you agree to be bound by these Terms. If you disagree with any part of these terms, then you may not access the Service.
+
+## Description of Service
+
+CodeHut is a platform for discovering, sharing, and managing code snippets. Our Service allows users to:
+
+- Upload and share code snippets
+- Discover code snippets from other users
+- Organize favorites and collections
+- Purchase premium code snippets
+- Access documentation and tutorials
+
+## User Accounts
+
+### Account Creation
+- You must provide accurate and complete information when creating an account
+- You are responsible for maintaining the confidentiality of your account credentials
+- You must notify us immediately of any unauthorized use of your account
+
+### Account Responsibilities
+- You are responsible for all activities that occur under your account
+- You must not share your account with others
+- You must comply with all applicable laws and regulations
+
+## Content Guidelines
+
+### User Content
+- You retain ownership of content you upload to our Service
+- You grant us a license to use, display, and distribute your content on the platform
+- You are responsible for ensuring you have the right to share the content you upload
+
+### Prohibited Content
+You may not upload content that:
+- Infringes on intellectual property rights
+- Contains malicious code or security vulnerabilities
+- Violates applicable laws or regulations
+- Is spam, offensive, or inappropriate
+
+### Content Removal
+We reserve the right to remove content that violates these Terms or our community guidelines.
+
+## Premium Services
+
+### Purchases
+- Premium code snippets may be purchased through our platform
+- All purchases are final unless otherwise specified
+- Refunds may be provided at our discretion for legitimate cases
+
+### Payment Processing
+- Payments are processed by third-party providers
+- You agree to provide accurate billing information
+- You are responsible for all charges incurred on your account
+
+## Intellectual Property
+
+### Our Rights
+- The CodeHut platform, including design, logos, and functionality, is our intellectual property
+- You may not copy, modify, or distribute our platform without permission
+
+### User Rights
+- You retain ownership of your original code snippets
+- By uploading content, you grant other users the right to view and use your content as intended by the platform features
+
+## Privacy
+
+Your privacy is important to us. Please review our Privacy Policy, which governs how we collect, use, and protect your information.
+
+## Limitation of Liability
+
+To the maximum extent permitted by law:
+
+- Our Service is provided "as is" without warranties
+- We are not liable for any indirect, incidental, or consequential damages
+- Our total liability is limited to the amount you paid for our services
+
+## Indemnification
+
+You agree to indemnify and hold us harmless from any claims, damages, or expenses arising from:
+
+- Your use of the Service
+- Your violation of these Terms
+- Your violation of any rights of another party
+
+## Termination
+
+### Your Rights
+- You may terminate your account at any time
+- Upon termination, your right to use the Service ceases immediately
+
+### Our Rights
+We may terminate or suspend your account if:
+- You violate these Terms
+- You engage in fraudulent or illegal activity
+- We discontinue the Service
+
+## Changes to Terms
+
+We may modify these Terms at any time. We will notify users of material changes by:
+
+- Posting updated Terms on our website
+- Sending email notifications to registered users
+- Displaying notices on the platform
+
+Continued use of the Service after changes constitutes acceptance of the new Terms.
+
+## Governing Law
+
+These Terms are governed by the laws of the State of California, United States, without regard to conflict of law principles.
+
+## Dispute Resolution
+
+Any disputes arising from these Terms or your use of the Service will be resolved through:
+
+1. **Informal Resolution**: Good faith effort to resolve disputes directly
+2. **Arbitration**: Binding arbitration if informal resolution fails
+3. **Jurisdiction**: Courts of California for any matters not subject to arbitration
+
+## Contact Information
+
+If you have questions about these Terms:
+
+- Email: legal@codehut.com
+- Website: https://codehutcode.vercel.app/contact
+- Address: CodeHut, Inc., 123 Tech Street, San Francisco, CA 94105
+
+## Severability
+
+If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full force and effect.
+
+## Entire Agreement
+
+These Terms, along with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and CodeHut regarding the Service.

@@ -1,0 +1,35 @@
+# Accessibility Statement
+
+At CodeHut, we are committed to ensuring digital accessibility for people with disabilities. We are continually improving the user experience for everyone and applying the relevant accessibility standards.
+
+## Conformance Status
+
+We strive to conform to level AA of the Web Content Accessibility Guidelines (WCAG) 2.1. These guidelines explain how to make web content accessible to people with a wide array of disabilities.
+
+## Measures to Support Accessibility
+
+CodeHut takes the following measures to ensure accessibility:
+- Include accessibility throughout our internal policies
+- Integrate accessibility into our procurement practices  
+- Provide continual accessibility training for our staff
+- Assign clear accessibility goals and responsibilities
+
+## Contact Information
+
+We welcome your feedback on the accessibility of CodeHut. Please let us know if you encounter accessibility barriers:
+
+- Email: accessibility@codehut.com
+- Phone: +1 (555) 123-4567
+
+We try to respond to feedback within 2 business days.
+
+## Technical Specifications
+
+Accessibility of CodeHut relies on the following technologies to work with the particular combination of web browser and any assistive technologies or plugins installed on your computer:
+
+- HTML
+- WAI-ARIA
+- CSS
+- JavaScript
+
+These technologies are relied upon for conformance with the accessibility standards used.

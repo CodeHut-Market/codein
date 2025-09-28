@@ -1,0 +1,35 @@
+# Licenses
+
+## Third-Party Licenses
+
+This project uses various third-party libraries and components. Below are the licenses for the main dependencies:
+
+### React (MIT License)
+- Copyright (c) Facebook, Inc. and its affiliates.
+- Licensed under the MIT License
+
+### Next.js (MIT License)  
+- Copyright (c) 2024 Vercel, Inc.
+- Licensed under the MIT License
+
+### TypeScript (Apache 2.0)
+- Copyright Microsoft Corporation
+- Licensed under the Apache License 2.0
+
+### Tailwind CSS (MIT License)
+- Copyright (c) Tailwind Labs, Inc.
+- Licensed under the MIT License
+
+### Supabase (Apache 2.0)
+- Copyright (c) Supabase, Inc.
+- Licensed under the Apache License 2.0
+
+### Radix UI (MIT License)
+- Copyright (c) 2022 WorkOS
+- Licensed under the MIT License
+
+## CodeHut License
+
+CodeHut is proprietary software. All rights reserved.
+
+For detailed license information for each dependency, please check the respective package documentation or the node_modules folder.

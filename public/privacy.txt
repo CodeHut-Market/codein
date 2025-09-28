@@ -1,0 +1,81 @@
+# Privacy Policy
+
+**Last updated: September 28, 2025**
+
+This Privacy Policy describes how CodeHut ("we", "our", or "us") collects, uses, and protects your information when you use our service.
+
+## Information We Collect
+
+### Personal Information
+- **Account Information**: Email address, username, profile information
+- **Authentication Data**: Login credentials and session information
+- **Payment Information**: Billing details (processed securely through third-party providers)
+
+### Usage Information
+- **Code Snippets**: Content you upload, search queries, favorited items
+- **Analytics Data**: Usage patterns, feature interactions, performance metrics
+- **Device Information**: Browser type, operating system, IP address
+
+## How We Use Your Information
+
+We use the collected information to:
+
+- **Provide Services**: Enable core functionality of the CodeHut platform
+- **Improve Experience**: Personalize content and enhance user experience
+- **Security**: Protect against fraud and maintain platform security
+- **Communication**: Send important updates and notifications
+- **Analytics**: Understand usage patterns to improve our services
+
+## Information Sharing
+
+We do not sell, trade, or rent your personal information to third parties. We may share information only in the following circumstances:
+
+- **Service Providers**: With trusted partners who help operate our service
+- **Legal Requirements**: When required by law or to protect our rights
+- **Business Transfer**: In case of merger, acquisition, or sale of assets
+- **Consent**: When you explicitly consent to sharing
+
+## Data Security
+
+We implement industry-standard security measures to protect your information:
+
+- **Encryption**: Data is encrypted in transit and at rest
+- **Access Controls**: Limited access to personal information
+- **Regular Audits**: Security practices are regularly reviewed
+- **Secure Hosting**: Infrastructure hosted on secure, compliant platforms
+
+## Your Rights
+
+You have the right to:
+
+- **Access**: Request a copy of your personal information
+- **Correct**: Update or correct inaccurate information
+- **Delete**: Request deletion of your account and associated data
+- **Export**: Download your data in a portable format
+- **Object**: Opt-out of certain data processing activities
+
+## Data Retention
+
+We retain your information only as long as necessary to provide our services and comply with legal obligations. Account data is deleted upon account closure, with some data retained for legal and security purposes.
+
+## Third-Party Services
+
+Our service integrates with third-party providers:
+
+- **Supabase**: Database and authentication services
+- **Vercel**: Hosting and deployment
+- **Analytics Providers**: Usage analytics and performance monitoring
+
+Each third party has their own privacy policy governing their collection and use of information.
+
+## Contact Us
+
+If you have questions about this Privacy Policy or your data:
+
+- Email: privacy@codehut.com
+- Website: https://codehutcode.vercel.app/contact
+- Address: CodeHut, Inc., 123 Tech Street, San Francisco, CA 94105
+
+## Changes to This Policy
+
+We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the updated policy on our website and updating the "Last updated" date.
