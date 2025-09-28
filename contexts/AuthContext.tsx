@@ -1,20 +1,8 @@
 "use client";
 
-import { createClient, Session, User } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce', // Use PKCE flow for better security with server-side callback
-  },
-});
+import { supabase } from '../app/lib/supabaseClient';
 
 // Auth context interface
 interface AuthContextType {
@@ -37,6 +25,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -70,6 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Auth methods
   const signUp = async (email: string, password: string, metadata?: any) => {
+    if (!supabase) return { data: null, error: { message: 'Supabase not initialized' } };
+    
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -85,6 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) return { data: null, error: { message: 'Supabase not initialized' } };
+    
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -97,6 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!supabase) return { error: { message: 'Supabase not initialized' } };
+    
     try {
       const { error } = await supabase.auth.signOut();
       return { error };
@@ -106,6 +105,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithProvider = async (provider: 'google' | 'github') => {
+    if (!supabase) return { data: null, error: { message: 'Supabase not initialized' } };
+    
     try {
       const redirectUrl = `${window.location.origin}/auth/callback`;
       
