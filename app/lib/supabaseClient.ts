@@ -34,7 +34,7 @@ export const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(
 			persistSession: true,
 			autoRefreshToken: true,
 			detectSessionInUrl: true,
-			flowType: 'pkce', // Use PKCE flow for better security
+			flowType: 'implicit', // Use implicit flow for better compatibility
 			storage: typeof window !== 'undefined' ? window.localStorage : undefined,
 			storageKey: 'sb-auth-token', // Custom storage key
 			debug: process.env.NODE_ENV === 'development'

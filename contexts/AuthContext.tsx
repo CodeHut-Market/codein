@@ -108,12 +108,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) return { data: null, error: { message: 'Supabase not initialized' } };
     
     try {
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -121,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       });
       
-      console.log('OAuth initiated with redirect URL:', redirectUrl, { data, error });
+      console.log('OAuth initiated for', provider, { data, error });
       return { data, error };
     } catch (error) {
       console.error('OAuth sign-in error:', error);
