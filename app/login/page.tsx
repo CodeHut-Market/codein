@@ -20,12 +20,19 @@ export default function LoginPage() {
 	const [showPassword, setShowPassword] = useState(false)
 	const [oauthLoading, setOauthLoading] = useState<string | null>(null);
 	const [authError, setAuthError] = useState<string | null>(null);
+	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-	// Check for error in URL params
+	// Check for error or message in URL params
 	useEffect(() => {
 		const error = searchParams?.get('error');
+		const message = searchParams?.get('message');
+		
 		if (error) {
 			setAuthError(decodeURIComponent(error));
+		}
+		
+		if (message) {
+			setSuccessMessage(decodeURIComponent(message));
 		}
 	}, [searchParams]);
 
@@ -51,7 +58,12 @@ export default function LoginPage() {
 			const { data, error } = await signIn(email.trim(), password);
 
 			if (error) {
-				throw error
+				// Handle specific email verification error
+				if (error.message && error.message.includes('email not confirmed')) {
+					setAuthError("Please check your email and click the confirmation link to verify your account before signing in.");
+					return;
+				}
+				throw error;
 			}
 
 			if (data.user) {
@@ -59,10 +71,20 @@ export default function LoginPage() {
 				router.push('/dashboard');
 			}
 		} catch (error: any) {
-			console.error('Login error:', error)
-			setAuthError(error.message || 'Failed to sign in. Please check your credentials.');
+			console.error('Login error:', error);
+			
+			// Handle specific error messages
+			const errorMessage = error.message || 'Failed to sign in. Please check your credentials.';
+			
+			if (errorMessage.includes('Invalid login credentials')) {
+				setAuthError("Invalid email or password. Please check your credentials and try again.");
+			} else if (errorMessage.includes('email not confirmed')) {
+				setAuthError("Please verify your email address before signing in. Check your email for a confirmation link.");
+			} else {
+				setAuthError(errorMessage);
+			}
 		} finally {
-			setIsLoading(false)
+			setIsLoading(false);
 		}
 	}
 
@@ -147,6 +169,12 @@ export default function LoginPage() {
 					<CardDescription className="font-sans">Sign in to your account to continue</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-6">
+					{successMessage && (
+						<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+							<p className="text-green-700 dark:text-green-400 text-sm">{successMessage}</p>
+						</div>
+					)}
+					
 					{authError && (
 						<div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
 							<p className="text-red-700 dark:text-red-400 text-sm">{authError}</p>

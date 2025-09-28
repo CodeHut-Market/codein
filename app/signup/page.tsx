@@ -262,11 +262,15 @@ export default function SignupPage() {
       if (data?.user) {
         // Check if user needs email confirmation
         if (!data.session) {
-          router.push("/login?message=Please check your email and click the confirmation link to complete your registration.");
+          // Email confirmation required
+          router.push("/login?message=" + encodeURIComponent("Please check your email and click the confirmation link to complete your registration."));
         } else {
           // User is automatically signed in, redirect to dashboard
           router.push("/dashboard?welcome=true");
         }
+      } else {
+        // Handle case where no user was returned
+        throw new Error("Account creation failed - no user returned");
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -519,10 +523,10 @@ export default function SignupPage() {
                     <button
                       key={lang}
                       type="button"
-                      className={`p-2 text-sm rounded-md border transition-colors ${
+                      className={`selection-button p-3 text-sm rounded-lg border-2 font-medium ${
                         formData.primaryLanguage === lang
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-background hover:bg-muted border-input'
+                          ? 'selected bg-primary text-primary-foreground border-primary shadow-md'
+                          : 'bg-background hover:bg-primary/10 hover:border-primary/50 border-input hover:shadow-sm'
                       }`}
                       onClick={() => updateFormData({ primaryLanguage: lang })}
                     >
@@ -564,43 +568,61 @@ export default function SignupPage() {
                     <button
                       key={interest}
                       type="button"
-                      className={`p-2 text-sm rounded-md border transition-colors ${
+                      className={`selection-button p-3 text-sm rounded-lg border-2 font-medium text-left ${
                         formData.interests.includes(interest)
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-background hover:bg-muted border-input'
+                          ? 'selected bg-primary text-primary-foreground border-primary shadow-md'
+                          : 'bg-background hover:bg-primary/10 hover:border-primary/50 border-input hover:shadow-sm'
                       }`}
                       onClick={() => toggleInterest(interest)}
                     >
                       {interest}
+                      {formData.interests.includes(interest) && (
+                        <Check className="w-4 h-4 ml-2 inline-block" />
+                      )}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Selected: {formData.interests.length} interest{formData.interests.length !== 1 ? 's' : ''}
-                </p>
+                <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Selected interests ({formData.interests.length}):</strong>{" "}
+                    {formData.interests.length > 0 
+                      ? formData.interests.join(', ') 
+                      : 'None selected yet'
+                    }
+                  </p>
+                </div>
               </div>
 
               <div>
                 <Label>What are your goals with CodeHut? * (Select all that apply)</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
                   {goals.map((goal) => (
                     <button
                       key={goal}
                       type="button"
-                      className={`p-3 text-sm rounded-md border text-left transition-colors ${
+                      className={`selection-button p-4 text-sm rounded-lg border-2 text-left font-medium relative ${
                         formData.goals.includes(goal)
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-background hover:bg-muted border-input'
+                          ? 'selected bg-primary text-primary-foreground border-primary shadow-md'
+                          : 'bg-background hover:bg-primary/10 hover:border-primary/50 border-input hover:shadow-sm'
                       }`}
                       onClick={() => toggleGoal(goal)}
                     >
                       {goal}
+                      {formData.goals.includes(goal) && (
+                        <Check className="w-4 h-4 absolute top-2 right-2" />
+                      )}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Selected: {formData.goals.length} goal{formData.goals.length !== 1 ? 's' : ''}
-                </p>
+                <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Selected goals ({formData.goals.length}):</strong>{" "}
+                    {formData.goals.length > 0 
+                      ? formData.goals.join(', ') 
+                      : 'None selected yet'
+                    }
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -807,6 +829,29 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <style jsx>{`
+        .selection-button {
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-origin: center;
+        }
+        .selection-button:hover {
+          transform: translateY(-2px);
+        }
+        .selection-button.selected {
+          transform: translateY(-2px) scale(1.02);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .selection-button {
+            transition: none;
+            transform: none;
+          }
+          .selection-button:hover,
+          .selection-button.selected {
+            transform: none;
+          }
+        }
+      `}</style>
+      
       {/* Header */}
       <header className="bg-background border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
