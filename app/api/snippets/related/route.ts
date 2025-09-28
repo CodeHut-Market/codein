@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { snippetsRepo } from '../../repository';
 
 export async function GET(request: NextRequest) {
   try {
