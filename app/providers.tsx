@@ -1,4 +1,5 @@
 "use client";
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import React from 'react';
 import { ToastProvider } from '../components/ToastProvider';
@@ -15,9 +16,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       <AuthProvider>
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <TooltipProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </TooltipProvider>
       </AuthProvider>
     </NextThemesProvider>
   );

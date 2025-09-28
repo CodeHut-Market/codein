@@ -4,12 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { CodeSnippet, GetUserResponse, UpdateCodeSnippetRequest } from "@shared/api";
 import {
-  ArrowLeft,
-  Calendar,
-  Download,
-  Edit3,
-  Star,
-  Trash2
+    ArrowLeft,
+    Calendar,
+    Download,
+    Edit3,
+    Star,
+    Trash2,
+    User
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -32,11 +33,11 @@ function CodeSnippetCard({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">{snippet.title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{snippet.title}</h3>
         <div className="flex items-center gap-2">
-          <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-medium">
+          <span className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded text-sm font-medium">
             ${snippet.price}
           </span>
           {isOwner && (
@@ -53,7 +54,7 @@ function CodeSnippetCard({
                 variant="outline"
                 size="sm"
                 onClick={handleDelete}
-                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
@@ -62,7 +63,7 @@ function CodeSnippetCard({
         </div>
       </div>
 
-      <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
         {snippet.description}
       </p>
 
@@ -74,7 +75,7 @@ function CodeSnippetCard({
         ))}
       </div>
 
-      <div className="flex justify-between items-center text-sm text-gray-500">
+      <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -98,6 +99,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingSnippet, setEditingSnippet] = useState<CodeSnippet | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
 
   const isOwner = currentUser?.username === username;
 
@@ -110,10 +112,15 @@ export default function Profile() {
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
+      setError("");
       const response = await fetch(`/api/users/username/${username}`);
 
       if (!response.ok) {
-        throw new Error("User not found");
+        if (response.status === 404) {
+          throw new Error("User not found");
+        } else {
+          throw new Error(`Server error: ${response.status}`);
+        }
       }
 
       const data: GetUserResponse = await response.json();
@@ -134,7 +141,7 @@ export default function Profile() {
 
   const handleUpdateSnippet = async (snippetId: string, updateData: UpdateCodeSnippetRequest) => {
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/snippets/${snippetId}`, {
         method: 'PUT',
         headers: {
@@ -159,7 +166,7 @@ export default function Profile() {
 
   const handleDeleteSnippet = async (snippetId: string) => {
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/snippets/${snippetId}`, {
         method: 'DELETE',
         headers: {
@@ -179,27 +186,40 @@ export default function Profile() {
     }
   };
 
+  const handleAvatarError = () => {
+    setAvatarError(true);
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
               <Link
                 to="/explore"
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">CodeHut</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">CodeHut</h1>
             </div>
           </div>
         </header>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading profile...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-300">Loading profile...</p>
           </div>
         </div>
       </div>
@@ -208,27 +228,27 @@ export default function Profile() {
 
   if (error || !profileData) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
               <Link
                 to="/explore"
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">CodeHut</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">CodeHut</h1>
             </div>
           </div>
         </header>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Profile Not Found
             </h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
             <Button asChild>
               <Link to="/explore">Browse Snippets</Link>
             </Button>
@@ -241,42 +261,52 @@ export default function Profile() {
   const { user, snippets } = profileData;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
             <Link
               to="/explore"
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">CodeHut</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">CodeHut</h1>
           </div>
         </div>
       </header>
 
       {/* Profile Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <img
-              src={user.avatar}
-              alt={user.username}
-              className="w-24 h-24 rounded-full bg-gray-200"
-            />
+            {/* Avatar with fallback */}
+            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+              {user.avatar && !avatarError ? (
+                <img
+                  src={user.avatar}
+                  alt={user.username}
+                  className="w-24 h-24 rounded-full object-cover"
+                  onError={handleAvatarError}
+                />
+              ) : (
+                <span className="text-white text-xl font-bold">
+                  {getInitials(user.username)}
+                </span>
+              )}
+            </div>
 
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {user.username}
               </h1>
               {user.bio && (
-                <p className="mt-2 text-gray-600 max-w-2xl">{user.bio}</p>
+                <p className="mt-2 text-gray-600 dark:text-gray-300 max-w-2xl">{user.bio}</p>
               )}
 
-              <div className="flex items-center gap-6 mt-4 text-sm text-gray-500">
+              <div className="flex items-center gap-6 mt-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>
@@ -290,37 +320,39 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4">
-              <Button variant="outline">Follow</Button>
-              <Button variant="outline">Message</Button>
-            </div>
+            {!isOwner && (
+              <div className="flex flex-col md:flex-row gap-4">
+                <Button variant="outline">Follow</Button>
+                <Button variant="outline">Message</Button>
+              </div>
+            )}
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {snippets.length}
               </div>
-              <div className="text-sm text-gray-600">Code Snippets</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Code Snippets</div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {user.totalDownloads}
               </div>
-              <div className="text-sm text-gray-600">Total Downloads</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Total Downloads</div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {user.rating}
               </div>
-              <div className="text-sm text-gray-600">Average Rating</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Average Rating</div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 ${snippets.reduce((sum, s) => sum + s.downloads * s.price, 0)}
               </div>
-              <div className="text-sm text-gray-600">Total Earnings</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Total Earnings</div>
             </div>
           </div>
         </div>
@@ -352,23 +384,29 @@ export default function Profile() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No code snippets yet.</p>
+                <User className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 text-lg">No code snippets yet.</p>
                 {isOwner && (
-                  <p className="text-gray-400 mt-2">
-                    Start sharing your code with the community!
-                  </p>
+                  <div className="mt-4">
+                    <p className="text-gray-400 dark:text-gray-500 mb-4">
+                      Start sharing your code with the community!
+                    </p>
+                    <Button asChild>
+                      <Link to="/upload">Upload Your First Snippet</Link>
+                    </Button>
+                  </div>
                 )}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="reviews">
-            <div className="bg-white rounded-lg border border-gray-200 p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8">
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Reviews & Feedback
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Reviews from buyers will appear here.
                 </p>
               </div>
@@ -376,12 +414,12 @@ export default function Profile() {
           </TabsContent>
 
           <TabsContent value="activity">
-            <div className="bg-white rounded-lg border border-gray-200 p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8">
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Recent Activity
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Recent activity and contributions will appear here.
                 </p>
               </div>
@@ -393,8 +431,8 @@ export default function Profile() {
       {/* Edit Snippet Modal */}
       {editingSnippet && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Edit Snippet</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Edit Snippet</h3>
             <form onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
@@ -410,63 +448,63 @@ export default function Profile() {
             }}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Title</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Title</label>
                   <input
                     name="title"
                     type="text"
                     defaultValue={editingSnippet.title}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Description</label>
                   <textarea
                     name="description"
                     defaultValue={editingSnippet.description}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 h-24"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 h-24 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Code</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Code</label>
                   <textarea
                     name="code"
                     defaultValue={editingSnippet.code}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 h-48 font-mono text-sm"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 h-48 font-mono text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Price ($)</label>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Price ($)</label>
                     <input
                       name="price"
                       type="number"
                       step="0.01"
                       defaultValue={editingSnippet.price}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Language</label>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Language</label>
                     <input
                       name="language"
                       type="text"
                       defaultValue={editingSnippet.language}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       required
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Tags (comma-separated)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Tags (comma-separated)</label>
                   <input
                     name="tags"
                     type="text"
                     defaultValue={editingSnippet.tags.join(', ')}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     placeholder="react, javascript, hooks"
                   />
                 </div>

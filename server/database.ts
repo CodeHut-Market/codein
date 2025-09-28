@@ -1,4 +1,4 @@
-import { CodeSnippet, User, Purchase } from "@shared/api";
+import { CodeSnippet, Purchase, User } from "@shared/api";
 
 // Enhanced User interface for internal use
 interface EnhancedUser extends User {
@@ -58,6 +58,21 @@ export const users: EnhancedUser[] = [
     isActive: true,
     emailVerified: true,
     createdAt: "2024-02-20T14:30:00Z",
+  },
+  {
+    id: "user-sarah",
+    username: "sarah_codes",
+    email: "sarah.chen@example.com",
+    bio: "Full-stack developer passionate about React, Node.js, and building amazing user experiences.",
+    avatar: "https://ui-avatars.com/api/?name=Sarah+Chen&background=6366f1",
+    totalSnippets: 0,
+    totalDownloads: 0,
+    rating: 5.0,
+    role: "user",
+    lastLoginAt: "2024-03-15T15:30:00Z",
+    isActive: true,
+    emailVerified: true,
+    createdAt: "2023-03-01T10:00:00Z",
   },
   {
     id: "user-3",
@@ -726,6 +741,7 @@ export const initializeDemoPasswords = (): void => {
 
   passwordStore["user-1"] = userHash;
   passwordStore["user-2"] = userHash;
+  passwordStore["user-sarah"] = userHash;
   passwordStore["user-3"] = userHash;
   passwordStore["user-4"] = userHash;
   passwordStore["user-5"] = userHash;
