@@ -1,43 +1,116 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isSupabaseEnabled, supabase } from '../../lib/supabaseClient';
+import { listSnippets } from '../../lib/repositories/snippetsRepo';
 
 export async function GET(request: NextRequest) {
   try {
-    // Return demo stats data
-    // In a real app, you'd query your database to get actual statistics
-    const stats = {
+    // Try to fetch real data from database
+    if (isSupabaseEnabled()) {
+      try {
+        // Get actual stats from Supabase
+        const [snippetsCount, usersCount, downloadsSum] = await Promise.all([
+          supabase!.from('snippets').select('*', { count: 'exact', head: true }),
+          supabase!.from('profiles').select('*', { count: 'exact', head: true }).catch(() => ({ count: 0 })),
+          supabase!.from('snippets').select('downloads').then(({ data }) => 
+            data?.reduce((sum, item) => sum + (item.downloads || 0), 0) || 0
+          ).catch(() => 0)
+        ]);
+
+        // Get language distribution
+        const { data: snippetsData } = await supabase!.from('snippets').select('language, downloads');
+        const languageStats = new Map<string, { count: number, downloads: number }>();
+        
+        snippetsData?.forEach(snippet => {
+          const lang = snippet.language || 'Unknown';
+          const current = languageStats.get(lang) || { count: 0, downloads: 0 };
+          languageStats.set(lang, {
+            count: current.count + 1,
+            downloads: current.downloads + (snippet.downloads || 0)
+          });
+        });
+
+        const totalSnippets = snippetsCount.count || 0;
+        const popularLanguages = Array.from(languageStats.entries())
+          .map(([name, stats]) => ({
+            name,
+            count: stats.count,
+            percentage: totalSnippets > 0 ? (stats.count / totalSnippets) * 100 : 0
+          }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 6);
+
+        // Calculate actual statistics
+        const stats = {
+          success: true,
+          data: {
+            totalSnippets,
+            totalUsers: usersCount.count || 0,
+            totalDownloads: downloadsSum,
+            totalRevenue: 0, // Would need payment records table
+            averageRating: 4.6, // Would need ratings table
+            popularLanguages,
+            recentActivity: {
+              dailyUploads: 0, // Would need to query by date
+              dailyDownloads: 0,
+              dailyRevenue: 0,
+              newUsers: 0
+            },
+            monthlyTrends: [] // Would need historical data
+          }
+        };
+
+        console.log('Stats fetched from database:', stats);
+        return NextResponse.json(stats);
+
+      } catch (dbError) {
+        console.error('Database error fetching stats:', dbError);
+        // Fall through to memory-based stats
+      }
+    }
+
+    // Fallback: Calculate stats from memory/repository
+    const snippets = await listSnippets();
+    const languageStats = new Map<string, number>();
+    let totalDownloads = 0;
+    
+    snippets.forEach(snippet => {
+      const lang = snippet.language || 'Unknown';
+      languageStats.set(lang, (languageStats.get(lang) || 0) + 1);
+      totalDownloads += snippet.downloads || 0;
+    });
+
+    const popularLanguages = Array.from(languageStats.entries())
+      .map(([name, count]) => ({
+        name,
+        count,
+        percentage: snippets.length > 0 ? (count / snippets.length) * 100 : 0
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+
+    const fallbackStats = {
       success: true,
       data: {
-        totalSnippets: 15742,
-        totalUsers: 8234,
-        totalDownloads: 147823,
-        totalRevenue: 98456.78,
-        averageRating: 4.6,
-        popularLanguages: [
-          { name: "JavaScript", count: 4523, percentage: 28.7 },
-          { name: "Python", count: 3214, percentage: 20.4 },
-          { name: "TypeScript", count: 2834, percentage: 18.0 },
-          { name: "React", count: 2187, percentage: 13.9 },
-          { name: "Node.js", count: 1654, percentage: 10.5 },
-          { name: "Other", count: 1330, percentage: 8.5 }
-        ],
+        totalSnippets: snippets.length,
+        totalUsers: new Set(snippets.map(s => s.authorId)).size, // Unique authors
+        totalDownloads,
+        totalRevenue: snippets.reduce((sum, s) => sum + (s.price || 0), 0),
+        averageRating: snippets.reduce((sum, s) => sum + (s.rating || 0), 0) / Math.max(snippets.length, 1),
+        popularLanguages,
         recentActivity: {
-          dailyUploads: 23,
-          dailyDownloads: 456,
-          dailyRevenue: 234.56,
-          newUsers: 12
+          dailyUploads: snippets.filter(s => 
+            new Date(s.createdAt).getTime() > Date.now() - 24 * 60 * 60 * 1000
+          ).length,
+          dailyDownloads: Math.floor(totalDownloads * 0.1), // Estimate
+          dailyRevenue: 0,
+          newUsers: 0
         },
-        monthlyTrends: [
-          { month: "Jan", uploads: 342, downloads: 5432, revenue: 2345.67 },
-          { month: "Feb", uploads: 389, downloads: 6123, revenue: 2987.43 },
-          { month: "Mar", uploads: 456, downloads: 7234, revenue: 3456.78 },
-          { month: "Apr", uploads: 523, downloads: 8345, revenue: 4123.45 },
-          { month: "May", uploads: 634, downloads: 9456, revenue: 4987.32 },
-          { month: "Jun", uploads: 789, downloads: 10567, revenue: 5678.90 }
-        ]
+        monthlyTrends: [] // Would need historical data
       }
     };
 
-    return NextResponse.json(stats);
+    console.log('Stats calculated from repository:', fallbackStats);
+    return NextResponse.json(fallbackStats);
 
   } catch (error) {
     console.error('Error fetching stats:', error);

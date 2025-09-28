@@ -2,8 +2,12 @@ import { CodeSnippet } from '@shared/api';
 import { randomUUID } from 'crypto';
 import { isSupabaseEnabled, supabase } from '../supabaseClient';
 
-// Initialize with demo snippets that will be shown in explore
-let memorySnippets: CodeSnippet[] = [
+// Memory fallback - only used when Supabase is not available
+// Start with empty array to prioritize actual database data
+let memorySnippets: CodeSnippet[] = [];
+
+// Demo snippets for fallback only (when no database connection)
+const FALLBACK_DEMO_SNIPPETS: CodeSnippet[] = [
   {
     id: "demo-1",
     title: "React Custom Hook for API Calls",
@@ -602,6 +606,25 @@ class NetworkService: NetworkServiceProtocol {
   }
 ];
 
+// Initialize memory snippets - prioritize actual data over demo data
+function initializeMemorySnippets() {
+  // Only use demo data if explicitly requested or no real data exists
+  const shouldUseDemoData = process.env.NODE_ENV === 'development' && 
+    process.env.USE_DEMO_DATA === 'true' && 
+    !isSupabaseEnabled();
+  
+  if (shouldUseDemoData) {
+    memorySnippets = [...FALLBACK_DEMO_SNIPPETS];
+    console.log('Using demo data for development');
+  } else {
+    memorySnippets = [];
+    console.log('Using actual data - demo data disabled');
+  }
+}
+
+// Initialize on module load
+initializeMemorySnippets();
+
 export interface CreateSnippetInput {
   title: string; code: string; description?: string; language: string; price?: number; tags?: string[]; framework?: string;
   authorId: string; author: string;
@@ -648,70 +671,87 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
   // Handle legacy string parameter for backward compatibility
   const opts: ListSnippetsOptions = typeof options === 'string' ? { query: options } : (options || {});
   
+  // PRIORITIZE SUPABASE DATA - Always try database first
   if(isSupabaseEnabled()){
-    let q = supabase!.from('snippets').select('*');
-    
-    // Apply filters
-    if(opts.query){
-      q = q.ilike('title', `%${opts.query}%`);
-    }
-    
-    if(opts.language){
-      q = q.eq('language', opts.language);
-    }
-    
-    if(opts.userId){
-      q = q.eq('authorId', opts.userId);
-    }
-    
-    // Handle sorting
-    switch(opts.sortBy) {
-      case 'popular':
-        q = q.order('downloads', { ascending: false });
-        break;
-      case 'views':
-        q = q.order('downloads', { ascending: false }); // Using downloads as proxy for views
-        break;
-      case 'recent':
-      default:
-        try {
-          q = q.order('createdAt', { ascending: false });
-        } catch (e) {
-          q = q.order('created_at', { ascending: false });
-        }
-        break;
-    }
-    
-    // Apply limit
-    if(opts.limit){
-      q = q.limit(opts.limit);
-    }
-    
-    let { data, error } = await q;
-    if(error){
-      // fallback if createdAt column missing (maybe created_at used instead)
-      if((error as any).code === '42703'){
-        const retry = await supabase!.from('snippets').select('*').order('created_at', { ascending: false });
-        if(retry.error){ console.error('Supabase list error', retry.error); return []; }
-        data = retry.data as any;
-      } else {
-        console.error('Supabase list error', error); return [];
+    try {
+      let q = supabase!.from('snippets').select('*');
+      
+      // Apply filters
+      if(opts.query){
+        q = q.or(`title.ilike.%${opts.query}%,description.ilike.%${opts.query}%`);
       }
+      
+      if(opts.language && opts.language !== 'all'){
+        q = q.eq('language', opts.language);
+      }
+      
+      if(opts.userId){
+        q = q.eq('authorId', opts.userId);
+      }
+      
+      // Handle sorting - prioritize actual database data sorting
+      switch(opts.sortBy) {
+        case 'popular':
+          q = q.order('downloads', { ascending: false });
+          break;
+        case 'views':
+          q = q.order('downloads', { ascending: false }); // Using downloads as proxy for views
+          break;
+        case 'trending':
+          // For trending, use a combination of recent + popular
+          q = q.order('downloads', { ascending: false });
+          break;
+        case 'recent':
+        default:
+          try {
+            q = q.order('created_at', { ascending: false });
+          } catch (e) {
+            try {
+              q = q.order('createdAt', { ascending: false });
+            } catch (e2) {
+              console.warn('Neither created_at nor createdAt column exists');
+            }
+          }
+          break;
+      }
+      
+      // Apply limit
+      if(opts.limit){
+        q = q.limit(opts.limit);
+      }
+      
+      const { data, error } = await q;
+      
+      if(error){
+        console.error('Supabase query error:', error);
+        // Don't fallback to demo data immediately - return empty array for actual data
+        return [];
+      }
+      
+      let results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
+      
+      // For featured snippets, return most popular ones
+      if(opts.featured){
+        results = results
+          .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+          .slice(0, 3);
+      }
+      
+      console.log(`Retrieved ${results.length} snippets from Supabase`);
+      return results;
+      
+    } catch (error) {
+      console.error('Database connection error:', error);
+      // Only fall back to memory if there's a connection issue
+      return [];
     }
-    
-    let results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
-    
-    // For featured snippets, return a subset of most popular ones
-    if(opts.featured){
-      results = results.slice(0, 3);
-    }
-    
-    return results;
   }
   
-  // Memory fallback
+  // MEMORY FALLBACK - Only when Supabase is not available
+  console.warn('Supabase not enabled - using memory storage');
   let results = [...memorySnippets];
   
+  // Apply same filtering logic to memory data
   if(opts.query) {
     const ql = opts.query.toLowerCase();
     results = results.filter(s=>
@@ -721,7 +761,7 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
     );
   }
   
-  if(opts.language) {
+  if(opts.language && opts.language !== 'all') {
     results = results.filter(s => s.language.toLowerCase() === opts.language!.toLowerCase());
   }
   
@@ -735,7 +775,15 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
       results.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
       break;
     case 'views':
-      results.sort((a, b) => (b.downloads || 0) - (a.downloads || 0)); // Using downloads as proxy
+      results.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      break;
+    case 'trending':
+      // Trending = recent + popular combined
+      results.sort((a, b) => {
+        const aScore = (b.downloads || 0) * 0.7 + (new Date(b.createdAt).getTime() / 1000000) * 0.3;
+        const bScore = (a.downloads || 0) * 0.7 + (new Date(a.createdAt).getTime() / 1000000) * 0.3;
+        return aScore - bScore;
+      });
       break;
     case 'recent':
     default:
@@ -751,6 +799,7 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
     results = results.slice(0, opts.limit);
   }
   
+  console.log(`Retrieved ${results.length} snippets from memory`);
   return results;
 }
 
