@@ -83,9 +83,9 @@ export default function Navigation({ className }: NavigationProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Code className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-all duration-200 group">
+            <Code className="h-8 w-8 text-blue-500 group-hover:text-blue-600 transition-colors duration-200" />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:via-indigo-700 group-hover:to-purple-700 transition-all duration-200">
               CodeHut
             </span>
           </Link>
@@ -98,14 +98,23 @@ export default function Navigation({ className }: NavigationProps) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 group ${
                     isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 text-blue-700 dark:text-blue-300 shadow-sm border border-blue-200/50 dark:border-blue-800/50'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 hover:shadow-sm hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50'
                   }`}
                 >
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.name}</span>
+                  <item.icon className={`h-4 w-4 transition-all duration-200 ${
+                    isActive 
+                      ? 'text-blue-600 dark:text-blue-400' 
+                      : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200'
+                  }`} />
+                  <span className="relative">
+                    {item.name}
+                    {isActive && (
+                      <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full opacity-80" />
+                    )}
+                  </span>
                 </Link>
               )
             })}
@@ -118,18 +127,18 @@ export default function Navigation({ className }: NavigationProps) {
 
             {/* User Menu or Sign In */}
             {isLoading ? (
-              <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 animate-pulse" />
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent transition-colors">
-                    <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
+                  <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 transition-all duration-200 hover:shadow-sm hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50 group">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white text-sm font-medium shadow-sm group-hover:shadow-md transition-all duration-200">
                       {getUserInitials(user)}
                     </div>
-                    <span className="hidden sm:block text-sm font-medium">
+                    <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200">
                       {getUserDisplayName(user)}
                     </span>
-                    <ChevronDown className="h-4 w-4 opacity-50" />
+                    <ChevronDown className="h-4 w-4 opacity-50 text-gray-500 dark:text-gray-400 group-hover:opacity-70 transition-all duration-200" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -171,14 +180,14 @@ export default function Navigation({ className }: NavigationProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <Link href="/login">
-                  <button className="px-4 py-2 text-sm font-medium border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors">
+                  <button className="px-5 py-2.5 text-sm font-medium border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-950/30 dark:hover:to-indigo-950/30 transition-all duration-200 hover:shadow-sm">
                     Sign In
                   </button>
                 </Link>
                 <Link href="/signup">
-                  <button className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">
+                  <button className="px-5 py-2.5 text-sm font-medium bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]">
                     Get Started
                   </button>
                 </Link>
@@ -187,7 +196,7 @@ export default function Navigation({ className }: NavigationProps) {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
+              className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 transition-all duration-200 hover:shadow-sm hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
@@ -209,15 +218,19 @@ export default function Navigation({ className }: NavigationProps) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    className={`block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
                       isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50'
                     }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <div className="flex items-center space-x-2">
-                      <item.icon className="h-4 w-4" />
+                    <div className="flex items-center space-x-3">
+                      <item.icon className={`h-5 w-5 ${
+                        isActive 
+                          ? 'text-blue-600 dark:text-blue-400' 
+                          : 'text-gray-500 dark:text-gray-400'
+                      }`} />
                       <span>{item.name}</span>
                     </div>
                   </Link>
@@ -226,13 +239,13 @@ export default function Navigation({ className }: NavigationProps) {
               
               {/* Auth section for mobile */}
               {!user && (
-                <div className="border-t border-border mt-3 pt-3 space-y-2">
+                <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4 space-y-3">
                   <Link
                     href="/login"
                     className="block w-full"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <button className="w-full px-3 py-2 text-sm font-medium border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors">
+                    <button className="w-full px-4 py-3 text-sm font-medium border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-950/30 dark:hover:to-indigo-950/30 transition-all duration-200">
                       Sign In
                     </button>
                   </Link>
@@ -241,7 +254,7 @@ export default function Navigation({ className }: NavigationProps) {
                     className="block w-full"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <button className="w-full px-3 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">
+                    <button className="w-full px-4 py-3 text-sm font-medium bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 hover:shadow-md">
                       Get Started
                     </button>
                   </Link>
@@ -250,24 +263,24 @@ export default function Navigation({ className }: NavigationProps) {
               
               {user && (
                 <>
-                  <div className="border-t border-border mt-3 pt-3">
+                  <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
                     <Link
                       href="/dashboard"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
+                      className="block px-4 py-3 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 transition-all duration-200 hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4" />
+                      <div className="flex items-center space-x-3">
+                        <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                         <span>Dashboard</span>
                       </div>
                     </Link>
                     <Link
                       href="/profile"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
+                      className="block px-4 py-3 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 transition-all duration-200 hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4" />
+                      <div className="flex items-center space-x-3">
+                        <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                         <span>Profile</span>
                       </div>
                     </Link>
@@ -276,10 +289,10 @@ export default function Navigation({ className }: NavigationProps) {
                         handleSignOut()
                         setIsMobileMenuOpen(false)
                       }}
-                      className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                      className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-red-600 dark:text-red-400 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 dark:hover:from-red-950/30 dark:hover:to-pink-950/30 transition-all duration-200 hover:border hover:border-red-200/50 dark:hover:border-red-800/50"
                     >
-                      <div className="flex items-center space-x-2">
-                        <LogOut className="h-4 w-4" />
+                      <div className="flex items-center space-x-3">
+                        <LogOut className="h-5 w-5" />
                         <span>Sign out</span>
                       </div>
                     </button>
