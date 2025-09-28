@@ -12,6 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    flowType: 'pkce', // Use PKCE flow for better security
   },
 });
 
@@ -118,14 +119,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Make sure to include a trailing `/`
       redirectUrl = redirectUrl.charAt(redirectUrl.length - 1) === '/' ? redirectUrl : `${redirectUrl}/`;
 
+      console.log('OAuth redirect URL:', `${redirectUrl}auth/callback`);
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${redirectUrl}auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       return { data, error };
     } catch (error) {
+      console.error('OAuth sign-in error:', error);
       return { data: null, error };
     }
   };

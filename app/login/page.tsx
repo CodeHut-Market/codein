@@ -29,9 +29,26 @@ export default function LoginPage() {
 		}
 	}, [searchParams]);
 
+	// Handle OAuth callback tokens in URL hash
+	useEffect(() => {
+		// Check if there are auth tokens in the URL hash (OAuth callback)
+		const handleAuthCallback = async () => {
+			const hash = window.location.hash;
+			if (hash && hash.includes('access_token')) {
+				console.log('Detected OAuth callback tokens in URL');
+				// Supabase will automatically handle this with detectSessionInUrl: true
+				// Just clear the URL to clean up the tokens
+				window.history.replaceState({}, document.title, window.location.pathname);
+			}
+		};
+
+		handleAuthCallback();
+	}, []);
+
 	// Redirect if already logged in
 	useEffect(() => {
 		if (user) {
+			console.log('User authenticated, redirecting to dashboard');
 			router.push('/dashboard');
 		}
 	}, [user, router]);

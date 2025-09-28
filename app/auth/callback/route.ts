@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
   // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/dashboard';
 
+  console.log('Callback received:', { code: !!code, error, searchParams: Array.from(searchParams.entries()) });
+
   // If there's an OAuth error, redirect to login with error message
   if (error) {
     console.error('OAuth error:', error, errorDescription);
@@ -19,10 +21,16 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          flowType: 'pkce',
+        },
+      }
     );
 
     try {
+      console.log('Attempting code exchange for session...');
       const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
       
       if (exchangeError) {
@@ -31,11 +39,11 @@ export async function GET(request: NextRequest) {
       }
 
       if (data.session && data.user) {
-        const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
+        console.log('Authentication successful for user:', data.user.email);
+        const forwardedHost = request.headers.get('x-forwarded-host');
         const isLocalEnv = process.env.NODE_ENV === 'development';
         
         if (isLocalEnv) {
-          // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
           return NextResponse.redirect(`${origin}${next}`);
         } else if (forwardedHost) {
           return NextResponse.redirect(`https://${forwardedHost}${next}`);
@@ -49,6 +57,8 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent('Invalid authentication request')}`);
+  // If no code parameter, this might be a direct token callback (implicit flow)
+  // In this case, let the client-side handle the tokens from the URL hash
+  console.log('No code parameter found - redirecting to login for client-side token handling');
+  return NextResponse.redirect(`${origin}/login`);
 }
