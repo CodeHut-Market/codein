@@ -12,7 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce', // Use PKCE flow for better security
+    flowType: 'pkce', // Use PKCE flow for better security with server-side callback
   },
 });
 
@@ -107,30 +107,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithProvider = async (provider: 'google' | 'github') => {
     try {
-      // Get the correct redirect URL for all environments
-      let redirectUrl = 
-        process.env.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env
-        process.env.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel
-        window.location.origin; // Fallback to current origin
+      const redirectUrl = `${window.location.origin}/auth/callback`;
       
-      // Make sure to include `https://` when not localhost
-      redirectUrl = redirectUrl.includes('http') ? redirectUrl : `https://${redirectUrl}`;
-      
-      // Make sure to include a trailing `/`
-      redirectUrl = redirectUrl.charAt(redirectUrl.length - 1) === '/' ? redirectUrl : `${redirectUrl}/`;
-
-      console.log('OAuth redirect URL:', `${redirectUrl}auth/callback`);
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${redirectUrl}auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
         },
       });
+      
+      console.log('OAuth initiated with redirect URL:', redirectUrl, { data, error });
       return { data, error };
     } catch (error) {
       console.error('OAuth sign-in error:', error);

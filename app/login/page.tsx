@@ -29,22 +29,6 @@ export default function LoginPage() {
 		}
 	}, [searchParams]);
 
-	// Handle OAuth callback tokens in URL hash
-	useEffect(() => {
-		// Check if there are auth tokens in the URL hash (OAuth callback)
-		const handleAuthCallback = async () => {
-			const hash = window.location.hash;
-			if (hash && hash.includes('access_token')) {
-				console.log('Detected OAuth callback tokens in URL');
-				// Supabase will automatically handle this with detectSessionInUrl: true
-				// Just clear the URL to clean up the tokens
-				window.history.replaceState({}, document.title, window.location.pathname);
-			}
-		};
-
-		handleAuthCallback();
-	}, []);
-
 	// Redirect if already logged in
 	useEffect(() => {
 		if (user) {
@@ -87,11 +71,19 @@ export default function LoginPage() {
 			setAuthError(null);
 			setOauthLoading(provider);
 
+			console.log(`Initiating ${provider} OAuth sign-in`);
 			const { data, error } = await signInWithProvider(provider);
 			
-			if (error) throw error;
-		} catch(e:any){
-			setAuthError(e.message || 'OAuth sign-in failed');
+			if (error) {
+				console.error(`${provider} OAuth error:`, error);
+				throw error;
+			}
+
+			console.log(`${provider} OAuth initiated successfully`);
+			// Don't clear loading here - let the auth state change handle it
+		} catch(e: any){
+			console.error(`${provider} OAuth sign-in failed:`, e);
+			setAuthError(e.message || `${provider} sign-in failed`);
 			setOauthLoading(null);
 		}
 	}
@@ -212,11 +204,11 @@ export default function LoginPage() {
 						<span className="px-2 font-sans text-card-foreground/60">Or continue with</span>
 					</div>
 					<div className="space-y-3">
-						<Button variant="outline" onClick={()=>handleSocialLogin('google')} disabled={oauthLoading==='google'} className="w-full glass-effect border-white/30 hover-lift ripple-effect font-sans hover:bg-white/20">
-							{oauthLoading==='google' ? 'Redirecting…' : 'Continue with Google'}
+						<Button variant="outline" onClick={()=>handleSocialLogin('google')} disabled={oauthLoading==='google' || oauthLoading==='processing'} className="w-full glass-effect border-white/30 hover-lift ripple-effect font-sans hover:bg-white/20">
+							{oauthLoading==='google' ? 'Redirecting…' : oauthLoading==='processing' ? 'Completing sign in…' : 'Continue with Google'}
 						</Button>
-						<Button variant="outline" onClick={()=>handleSocialLogin('github')} disabled={oauthLoading==='github'} className="w-full glass-effect border-white/30 hover-lift ripple-effect font-sans hover:bg-white/20">
-							{oauthLoading==='github' ? 'Redirecting…' : 'Continue with GitHub'}
+						<Button variant="outline" onClick={()=>handleSocialLogin('github')} disabled={oauthLoading==='github' || oauthLoading==='processing'} className="w-full glass-effect border-white/30 hover-lift ripple-effect font-sans hover:bg-white/20">
+							{oauthLoading==='github' ? 'Redirecting…' : oauthLoading==='processing' ? 'Completing sign in…' : 'Continue with GitHub'}
 						</Button>
 					</div>
 					<div className="text-center">
