@@ -50,10 +50,10 @@ export function ToastContainer({ toasts, onRemove }: { toasts: Toast[], onRemove
         <div
           key={toast.id}
           className={`
-            px-4 py-3 rounded-lg shadow-lg border animate-in slide-in-from-top-2 duration-300
-            ${toast.type === 'success' ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200' :
-              toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200' :
-              'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200'}
+            px-4 py-3 rounded-lg shadow-xl border backdrop-blur-lg animate-in slide-in-from-top-2 duration-300 supports-[backdrop-filter]:bg-opacity-60
+            ${toast.type === 'success' ? 'bg-green-50/80 border-green-200/40 text-green-800 dark:bg-green-900/30 dark:border-green-800/40 dark:text-green-200' :
+              toast.type === 'error' ? 'bg-red-50/80 border-red-200/40 text-red-800 dark:bg-red-900/30 dark:border-red-800/40 dark:text-red-200' :
+              'bg-blue-50/80 border-blue-200/40 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800/40 dark:text-blue-200'}
           `}
           onClick={() => onRemove(toast.id)}
         >

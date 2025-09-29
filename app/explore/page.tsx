@@ -127,8 +127,11 @@ export default function ExplorePage() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold">Explore Code Snippets</h1>
+      <div className="text-center space-y-4 relative">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 rounded-2xl blur-3xl"></div>
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">
+          Explore Code Snippets
+        </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {searchParams.get("query")
             ? `Search results for "${searchParams.get("query")}" (${totalCount} found)`
@@ -137,10 +140,10 @@ export default function ExplorePage() {
       </div>
 
       {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Search className="mr-2 h-5 w-5" />
+      <Card className="border-2 hover:border-primary/20 transition-colors duration-200">
+        <CardHeader className="bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5">
+          <CardTitle className="flex items-center text-primary">
+            <Search className="mr-2 h-5 w-5 text-emerald-600" />
             Search & Filter
           </CardTitle>
         </CardHeader>
@@ -151,14 +154,14 @@ export default function ExplorePage() {
                 placeholder="Search snippets, tags, or descriptions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11"
+                className="h-11 border-2 focus:border-primary/50 hover:border-primary/30 transition-colors"
               />
             </div>
             <Select value={selectedCategory} onValueChange={(value) => {
               setSelectedCategory(value)
               handleFilterChange()
             }}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px] border-2 hover:border-violet-500/30 focus:border-violet-500/50 transition-colors">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -173,7 +176,7 @@ export default function ExplorePage() {
               setSelectedLanguage(value)
               handleFilterChange()
             }}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px] border-2 hover:border-emerald-500/30 focus:border-emerald-500/50 transition-colors">
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
               <SelectContent>
@@ -188,7 +191,7 @@ export default function ExplorePage() {
               setSortBy(value)
               handleFilterChange()
             }}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px] border-2 hover:border-amber-500/30 focus:border-amber-500/50 transition-colors">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -198,7 +201,7 @@ export default function ExplorePage() {
                 <SelectItem value="views">Most Viewed</SelectItem>
               </SelectContent>
             </Select>
-            <Button type="submit">
+            <Button type="submit" className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 transition-all duration-200 shadow-lg hover:shadow-primary/25">
               <Search className="mr-2 h-4 w-4" />
               Search
             </Button>

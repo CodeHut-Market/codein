@@ -37,10 +37,20 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
     --chart-1: 217 91% 60%;
-    --chart-2: 120 60% 50%;
-    --chart-3: 39 100% 50%;
-    --chart-4: 300 60% 50%;
-    --chart-5: 210 60% 50%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 271 81% 56%;
+    --chart-5: 189 85% 46%;
+
+    /* Enhanced accent colors for better visual hierarchy */
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 27 87% 7%;
+    --info: 189 85% 46%;
+    --info-foreground: 210 40% 98%;
+    --code: 217 91% 60%;
+    --code-foreground: 210 40% 98%;
 
     --radius: 0.5rem;
 
@@ -90,10 +100,20 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
     --chart-1: 217 91% 60%;
-    --chart-2: 120 60% 50%;
-    --chart-3: 39 100% 50%;
-    --chart-4: 300 60% 50%;
-    --chart-5: 210 60% 50%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 271 81% 56%;
+    --chart-5: 189 85% 46%;
+
+    /* Dark mode enhanced accent colors */
+    --success: 142 71% 45%;
+    --success-foreground: 142 20% 95%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 20% 95%;
+    --info: 189 85% 46%;
+    --info-foreground: 189 20% 95%;
+    --code: 217 91% 60%;
+    --code-foreground: 217 20% 95%;
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -129,14 +149,16 @@
   .dark pre { background-color: hsl(var(--muted) / 0.4); }
 }
 
-/* Gradient hover utilities */
+/* Enhanced gradient and color utilities */
 .bg-gradient-hover {
   background-image: linear-gradient(135deg, rgba(96,165,250,0.08), rgba(99,102,241,0.06));
   transition: background-image 250ms ease, transform 250ms ease, box-shadow 250ms ease;
 }
+
 .hover\:bg-gradient-to-r:hover {
   background-image: linear-gradient(90deg, #60a5fa, #7c3aed);
 }
+
 .gradient-border-hover {
   position: relative;
 }
@@ -157,6 +179,83 @@
 }
 .gradient-border-hover:hover::before {
   opacity: 1;
+}
+
+/* Subtle accent background utilities */
+.bg-accent-emerald {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.03));
+}
+.bg-accent-violet {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(124, 58, 237, 0.03));
+}
+.bg-accent-amber {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(217, 119, 6, 0.03));
+}
+.bg-accent-rose {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.05), rgba(225, 29, 72, 0.03));
+}
+.bg-accent-cyan {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(8, 145, 178, 0.03));
+}
+
+/* Language-specific color badges */
+.badge-javascript { 
+  @apply bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300 border-amber-200 dark:border-amber-800;
+}
+.badge-typescript { 
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 border-blue-200 dark:border-blue-800;
+}
+.badge-python { 
+  @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800;
+}
+.badge-react { 
+  @apply bg-cyan-100 text-cyan-800 dark:bg-cyan-900/20 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800;
+}
+.badge-vue { 
+  @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800;
+}
+.badge-angular { 
+  @apply bg-rose-100 text-rose-800 dark:bg-rose-900/20 dark:text-rose-300 border-rose-200 dark:border-rose-800;
+}
+.badge-go { 
+  @apply bg-cyan-100 text-cyan-800 dark:bg-cyan-900/20 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800;
+}
+.badge-rust { 
+  @apply bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300 border-amber-200 dark:border-amber-800;
+}
+.badge-swift { 
+  @apply bg-violet-100 text-violet-800 dark:bg-violet-900/20 dark:text-violet-300 border-violet-200 dark:border-violet-800;
+}
+
+/* Subtle hover effects */
+.hover-lift {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Status indicator colors */
+.status-online {
+  @apply bg-emerald-500 shadow-emerald-500/20;
+}
+.status-busy {
+  @apply bg-amber-500 shadow-amber-500/20;
+}
+.status-away {
+  @apply bg-rose-500 shadow-rose-500/20;
+}
+
+/* Soft glow effects */
+.glow-emerald {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+.glow-violet {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+}
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
 }
 
 /* --- Electric Border Card Styles (login) --- */

@@ -40,13 +40,13 @@ export function SiteFooter() {
     }
   }
   return (
-    <footer className="bg-card border-t border-border mt-24" role="contentinfo" aria-label="Site footer">
+    <footer className="bg-gradient-to-b from-background to-muted/20 border-t border-primary/10 mt-24" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <Code2 className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">Marketplace</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">Marketplace</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Buy, sell, and discover quality code snippets, templates, and components.
@@ -94,7 +94,7 @@ export function SiteFooter() {
                 onChange={(e) => setEmail(e.target.value)}
                 aria-label="Email address"
               />
-              <Button size="sm" className="w-full" type="submit" disabled={status === "loading"} aria-live="polite">
+              <Button size="sm" className="w-full bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 transition-all duration-200" type="submit" disabled={status === "loading"} aria-live="polite">
                 {status === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {status === "success" && <CheckCircle2 className="mr-2 h-4 w-4" />}
                 {status === "error" && <XCircle className="mr-2 h-4 w-4" />}

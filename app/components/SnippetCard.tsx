@@ -116,15 +116,53 @@ export default function SnippetCard({
     return `${Math.ceil(diffDays / 365)} years ago`;
   };
 
+  // Enhanced language badge colors
+  const getLanguageBadgeClass = (language: string) => {
+    const lang = language.toLowerCase();
+    switch(lang) {
+      case 'javascript':
+        return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800';
+      case 'typescript':
+        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800';
+      case 'python':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800';
+      case 'react':
+        return 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800';
+      case 'vue':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800';
+      case 'angular':
+        return 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800';
+      case 'go':
+        return 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800';
+      case 'rust':
+        return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800';
+      case 'swift':
+        return 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800';
+      case 'java':
+        return 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800';
+      case 'css':
+        return 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800';
+      case 'html':
+        return 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800';
+      default:
+        return 'bg-muted text-muted-foreground border-muted-foreground/20';
+    }
+  };
+
   if (variant === 'compact') {
     return (
-      <Card className="hover:shadow-lg transition-shadow">
+      <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card to-card/95 hover:shadow-primary/5 border-border/50 hover:border-primary/20">
         <CardContent className="p-4">
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-2">
               <div className="flex items-start justify-between">
                 <h3 className="font-semibold text-sm line-clamp-1">{snippet.title}</h3>
-                <Badge variant="secondary" className="text-xs">{snippet.language}</Badge>
+                <Badge 
+                  variant="outline" 
+                  className={`text-xs font-medium hover-lift ${getLanguageBadgeClass(snippet.language)}`}
+                >
+                  {snippet.language}
+                </Badge>
               </div>
               
               <p className="text-xs text-muted-foreground line-clamp-2">
@@ -185,7 +223,7 @@ export default function SnippetCard({
   }
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card to-card/95 hover:shadow-primary/5 border-border/50 hover:border-primary/20">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1 flex-1">
@@ -195,7 +233,12 @@ export default function SnippetCard({
             </CardDescription>
           </div>
           <div className="flex flex-col items-end space-y-1">
-            <Badge variant="secondary">{snippet.language}</Badge>
+            <Badge 
+              variant="outline" 
+              className={`font-medium hover-lift ${getLanguageBadgeClass(snippet.language)}`}
+            >
+              {snippet.language}
+            </Badge>
             {snippet.price && snippet.price > 0 && (
               <Badge variant="outline">
                 <DollarSign className="h-3 w-3 mr-1" />

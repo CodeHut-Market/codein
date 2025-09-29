@@ -724,8 +724,9 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
       
       if(error){
         console.error('Supabase query error:', error);
-        // Don't fallback to demo data immediately - return empty array for actual data
-        return [];
+        // Fall back to demo data if database fails
+        console.log('Falling back to demo data due to database error');
+        return getFallbackSnippets(opts);
       }
       
       let results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
@@ -742,14 +743,73 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
       
     } catch (error) {
       console.error('Database connection error:', error);
-      // Only fall back to memory if there's a connection issue
-      return [];
+      // Fall back to demo data if there's a connection issue
+      console.log('Falling back to demo data due to connection error');
+      return getFallbackSnippets(opts);
     }
   }
   
   // MEMORY FALLBACK - Only when Supabase is not available
-  console.warn('Supabase not enabled - using memory storage');
+  console.warn('Supabase not enabled - using demo data');
+  return getFallbackSnippets(opts);
+}
+
+// Fallback function that provides demo data when database fails
+function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
+  // Start with demo data if memory is empty
+  if (memorySnippets.length === 0) {
+    memorySnippets = [...FALLBACK_DEMO_SNIPPETS];
+  }
+  
   let results = [...memorySnippets];
+  
+  // Apply same filtering logic to fallback data
+  if(opts.query) {
+    const ql = opts.query.toLowerCase();
+    results = results.filter(s=>
+      s.title.toLowerCase().includes(ql) ||
+      s.language.toLowerCase().includes(ql) ||
+      s.description.toLowerCase().includes(ql)
+    );
+  }
+  
+  if(opts.language && opts.language !== 'all') {
+    results = results.filter(s => s.language.toLowerCase() === opts.language!.toLowerCase());
+  }
+  
+  if(opts.userId) {
+    results = results.filter(s => s.authorId === opts.userId);
+  }
+  
+  // Sort results
+  switch(opts.sortBy) {
+    case 'popular':
+      results.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      break;
+    case 'views':
+      results.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      break;
+    case 'trending':
+      // Trending = recent + popular combined
+      results.sort((a, b) => {
+        const aScore = (b.downloads || 0) * 0.7 + (new Date(b.createdAt).getTime() / 1000000) * 0.3;
+        const bScore = (a.downloads || 0) * 0.7 + (new Date(a.createdAt).getTime() / 1000000) * 0.3;
+        return aScore - bScore;
+      });
+      break;
+    case 'recent':
+    default:
+      results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      break;
+  }
+  
+  if(opts.featured){
+    results = results.slice(0, 3);
+  } else if(opts.limit){
+    results = results.slice(0, opts.limit);
+  }
+  
+  return results;
   
   // Apply same filtering logic to memory data
   if(opts.query) {
@@ -798,8 +858,6 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
   if(opts.limit){
     results = results.slice(0, opts.limit);
   }
-  
-  console.log(`Retrieved ${results.length} snippets from memory`);
   return results;
 }
 

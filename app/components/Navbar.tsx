@@ -32,11 +32,11 @@ export function Navbar() {
   );
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <header className="border-b border-primary/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
           {/* Brand text (logo removed per request) */}
-          <Link href="/" className="font-bold text-xl tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <Link href="/" className="font-bold text-xl tracking-tight bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent hover:from-primary/80 hover:via-violet-600/80 hover:to-emerald-600/80 transition-all duration-200">
             Marketplace
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium relative" aria-label="Main Navigation">
@@ -63,7 +63,7 @@ export function Navbar() {
           <div className="relative">
             <NotificationsMenu />
             <Bell className="absolute -right-2 -top-2 h-4 w-4 text-muted-foreground" />
-            {unread > 0 && <span className="absolute right-0 top-0 translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center text-[10px] font-medium">{unread}</span>}
+            {unread > 0 && <span className="absolute right-0 top-0 translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center text-[10px] font-medium shadow-lg animate-pulse">{unread}</span>}
           </div>
           <ThemeToggle />
           {user ? (
@@ -75,7 +75,7 @@ export function Navbar() {
               <Button variant="ghost" asChild>
                 <Link href="/login">Sign In</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 transition-all duration-200 shadow-md hover:shadow-lg">
                 <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
@@ -86,7 +86,7 @@ export function Navbar() {
         </div>
       </div>
       {open && (
-        <div className="md:hidden border-t bg-background">
+        <div className="md:hidden border-t bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
           <nav className="px-4 py-4 flex flex-col gap-4">
             {navItems.map((item) => {
               const active = pathname === item.href;
@@ -106,7 +106,7 @@ export function Navbar() {
             })}
             {!user && !loading && (
               <div className="flex gap-2 pt-2">
-                <Button asChild className="flex-1" size="sm">
+                <Button asChild className="flex-1 bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 transition-all duration-200" size="sm">
                   <Link href="/signup">Sign Up</Link>
                 </Button>
                 <Button variant="outline" asChild className="flex-1" size="sm">

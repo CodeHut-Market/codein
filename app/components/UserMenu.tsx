@@ -31,12 +31,12 @@ export function UserMenu({ username = 'demo-user' }: UserMenuProps) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-48 rounded-md border bg-popover shadow-md focus:outline-none z-50 p-1 text-sm"
+          className="absolute right-0 mt-2 w-48 rounded-md border border-white/20 bg-background/80 backdrop-blur-lg shadow-xl supports-[backdrop-filter]:bg-background/60 focus:outline-none z-50 p-1 text-sm"
         >
           <Link
             href="/profile"
             role="menuitem"
-            className="flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
+            className="flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent/70 hover:text-accent-foreground hover:backdrop-blur-sm focus:bg-accent/70 focus:text-accent-foreground outline-none transition-all"
             onClick={() => setOpen(false)}
           >
             <User className="h-4 w-4" /> Profile
@@ -44,14 +44,14 @@ export function UserMenu({ username = 'demo-user' }: UserMenuProps) {
           <Link
             href="/settings"
             role="menuitem"
-            className="flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
+            className="flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent/70 hover:text-accent-foreground hover:backdrop-blur-sm focus:bg-accent/70 focus:text-accent-foreground outline-none transition-all"
             onClick={() => setOpen(false)}
           >
             <Settings className="h-4 w-4" /> Settings
           </Link>
           <button
             role="menuitem"
-            className="w-full text-left flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
+            className="w-full text-left flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent/70 hover:text-accent-foreground hover:backdrop-blur-sm focus:bg-accent/70 focus:text-accent-foreground outline-none transition-all"
             onClick={() => {
               // placeholder logout
               setOpen(false);

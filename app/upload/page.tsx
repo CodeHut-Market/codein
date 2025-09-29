@@ -11,16 +11,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from '@/components/ui/textarea'
 import type { User } from '@supabase/supabase-js'
 import {
-    AlertTriangle,
-    CheckCircle,
-    Code2,
-    DollarSign,
-    FileText,
-    Loader2,
-    Plus,
-    ShieldAlert,
-    UploadCloud,
-    X
+  AlertTriangle,
+  CheckCircle,
+  Code2,
+  DollarSign,
+  FileText,
+  Loader2,
+  Plus,
+  ShieldAlert,
+  UploadCloud,
+  X
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -204,20 +204,23 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-8 max-w-6xl relative">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Upload Code Snippet</h1>
+      <div className="text-center mb-8 relative">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-500/5 via-primary/5 to-violet-500/5 rounded-2xl blur-3xl"></div>
+        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-emerald-600 via-primary to-violet-600 bg-clip-text text-transparent">
+          Upload Code Snippet
+        </h1>
         <p className="text-muted-foreground">
           Share your code with the community. Help others learn and grow.
         </p>
       </div>
 
       {/* Progress Indicator */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center">
-            <CheckCircle className="mr-2 h-5 w-5" />
+      <Card className="mb-8 border-2 hover:border-emerald-500/20 transition-colors duration-200">
+        <CardHeader className="bg-gradient-to-r from-emerald-500/5 via-primary/5 to-violet-500/5">
+          <CardTitle className="text-lg flex items-center text-primary">
+            <CheckCircle className="mr-2 h-5 w-5 text-emerald-600" />
             Upload Progress
           </CardTitle>
         </CardHeader>
@@ -225,9 +228,9 @@ export default function UploadPage() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Form Completion</span>
-              <span>{Math.round(getFormProgress())}%</span>
+              <span className="text-emerald-600 font-medium">{Math.round(getFormProgress())}%</span>
             </div>
-            <Progress value={getFormProgress()} />
+            <Progress value={getFormProgress()} className="[&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:to-primary" />
             <p className="text-xs text-muted-foreground">
               Complete all fields for the best visibility
             </p>
@@ -237,16 +240,16 @@ export default function UploadPage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main Form */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 overflow-visible">
           <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="basic">Basic Info</TabsTrigger>
-              <TabsTrigger value="code">Code & Preview</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50 border border-primary/10">
+              <TabsTrigger value="basic" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-600/80">Basic Info</TabsTrigger>
+              <TabsTrigger value="code" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80">Code & Preview</TabsTrigger>
+              <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-violet-600/80">Settings</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="basic" className="space-y-6">
-              <Card>
+            <TabsContent value="basic" className="space-y-8 overflow-visible pt-4">
+              <Card className="overflow-visible">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <FileText className="mr-2 h-5 w-5" />
@@ -256,7 +259,7 @@ export default function UploadPage() {
                     Provide essential details about your code snippet
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 overflow-visible pb-12">
                   <div className="space-y-2">
                     <label className="text-sm font-medium" htmlFor="title">
                       Title *
@@ -270,16 +273,16 @@ export default function UploadPage() {
                     />
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
+                  <div className="grid gap-6 md:grid-cols-2 mb-8">
+                    <div className="space-y-2 relative z-10 mb-6">
                       <label className="text-sm font-medium" htmlFor="language">
                         Programming Language *
                       </label>
                       <Select value={language} onValueChange={setLanguage}>
-                        <SelectTrigger>
+                        <SelectTrigger className="border-2 hover:border-emerald-500/30 focus:border-emerald-500/50 transition-colors">
                           <SelectValue placeholder="Select language" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[70]" position="popper" sideOffset={4}>
                           {languages.map(lang => (
                             <SelectItem key={lang} value={lang}>
                               {lang.charAt(0).toUpperCase() + lang.slice(1)}
@@ -289,15 +292,15 @@ export default function UploadPage() {
                       </Select>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative z-10 mb-6">
                       <label className="text-sm font-medium" htmlFor="category">
                         Category
                       </label>
                       <Select value={category} onValueChange={setCategory}>
-                        <SelectTrigger>
+                        <SelectTrigger className="border-2 hover:border-violet-500/30 focus:border-violet-500/50 transition-colors">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[70]" position="popper" sideOffset={4}>
                           {categories.map(cat => (
                             <SelectItem key={cat} value={cat}>
                               {cat}

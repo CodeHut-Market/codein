@@ -142,23 +142,26 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between relative">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 rounded-2xl blur-3xl"></div>
         <div className="flex items-center space-x-4">
-          <Avatar className="h-16 w-16">
+          <Avatar className="h-16 w-16 border-2 border-primary/20 shadow-lg">
             <AvatarImage src={user.user_metadata?.avatar_url} alt={getUserDisplayName(user)} />
-            <AvatarFallback className="text-lg">
+            <AvatarFallback className="text-lg bg-gradient-to-br from-primary/20 to-emerald-500/20">
               {getUserInitials(user)}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-3xl font-bold">Welcome back, {getUserDisplayName(user)}!</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground via-violet-600 to-emerald-600 bg-clip-text text-transparent">
+              Welcome back, {getUserDisplayName(user)}!
+            </h1>
             <p className="text-muted-foreground">
               Here's what's happening with your code snippets
             </p>
           </div>
         </div>
         <Link href="/upload">
-          <Button className="flex items-center space-x-2">
+          <Button className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-600/90 hover:to-primary/90 transition-all duration-200 shadow-lg hover:shadow-emerald-500/25">
             <PlusCircle className="h-4 w-4" />
             <span>New Snippet</span>
           </Button>
@@ -167,52 +170,52 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-primary/60 hover:border-l-primary hover:shadow-lg transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-primary/5 to-transparent">
             <CardTitle className="text-sm font-medium">Total Snippets</CardTitle>
-            <Code2 className="h-4 w-4 text-muted-foreground" />
+            <Code2 className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalSnippets}</div>
+            <div className="text-2xl font-bold text-primary">{stats.totalSnippets}</div>
             <p className="text-xs text-muted-foreground">
               +{stats.weeklyUploads} this week
             </p>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-emerald-500/60 hover:border-l-emerald-500 hover:shadow-lg transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-emerald-500/5 to-transparent">
             <CardTitle className="text-sm font-medium">Total Views</CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
+            <Eye className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalViews.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.totalViews.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               +{stats.monthlyGrowth}% from last month
             </p>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-rose-500/60 hover:border-l-rose-500 hover:shadow-lg transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-rose-500/5 to-transparent">
             <CardTitle className="text-sm font-medium">Total Likes</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
+            <Heart className="h-4 w-4 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalLikes}</div>
+            <div className="text-2xl font-bold text-rose-500">{stats.totalLikes}</div>
             <p className="text-xs text-muted-foreground">
               Across all snippets
             </p>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-violet-500/60 hover:border-l-violet-500 hover:shadow-lg transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-violet-500/5 to-transparent">
             <CardTitle className="text-sm font-medium">Followers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-violet-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalFollowers}</div>
+            <div className="text-2xl font-bold text-violet-600">{stats.totalFollowers}</div>
             <p className="text-xs text-muted-foreground">
               Growing community
             </p>
@@ -222,11 +225,11 @@ export default function DashboardPage() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="snippets">Recent Snippets</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="bg-muted/50 border border-primary/10">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80">Overview</TabsTrigger>
+          <TabsTrigger value="snippets" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-600/80">Recent Snippets</TabsTrigger>
+          <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-violet-600/80">Activity</TabsTrigger>
+          <TabsTrigger value="analytics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-amber-600/80">Analytics</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-4">
