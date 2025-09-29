@@ -4,10 +4,25 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// Check if environment variables are properly configured (not placeholder values)
+const isValidSupabaseUrl = (url: string | undefined): boolean => {
+  return !!(url && 
+    !url.includes('your-supabase-url-here') && 
+    !url.includes('placeholder') &&
+    (url.startsWith('https://') || url.includes('localhost')));
+};
+
+const isValidSupabaseKey = (key: string | undefined): boolean => {
+  return !!(key && 
+    !key.includes('your-supabase-anon-key-here') && 
+    !key.includes('placeholder') &&
+    key.length > 20);
+};
+
 // Security validation for environment variables
 if (typeof window !== 'undefined' && SUPABASE_URL && SUPABASE_ANON_KEY) {
   // Client-side validation
-  if (!SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('localhost')) {
+  if (isValidSupabaseUrl(SUPABASE_URL) && !SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('localhost')) {
     console.warn('Supabase URL should use HTTPS in production');
   }
 }
@@ -26,7 +41,8 @@ export const getRedirectURL = () => {
 };
 
 // Enhanced Supabase client with security configurations
-export const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(
+export const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY && 
+  isValidSupabaseUrl(SUPABASE_URL) && isValidSupabaseKey(SUPABASE_ANON_KEY)) ? createClient(
 	SUPABASE_URL,
 	SUPABASE_ANON_KEY,
 	{

@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@//components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -534,6 +534,371 @@ export CODEHUT_API_KEY="your_api_key_here"`
           </div>
         </CardContent>
       </Card>
+
+      {/* Anchor Sections for Navigation Links */}
+      <div className="space-y-12 mt-16">
+        {/* Getting Started Sections */}
+        <section id="introduction" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Introduction</CardTitle>
+              <CardDescription>Welcome to CodeHut - your code snippet management platform</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                CodeHut is a powerful platform for managing, sharing, and organizing your code snippets. 
+                Whether you're a solo developer or part of a team, CodeHut helps you save time by making 
+                your most useful code easily accessible and searchable.
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                <li>Store and organize code snippets in multiple programming languages</li>
+                <li>Advanced search and filtering capabilities</li>
+                <li>Team collaboration and sharing features</li>
+                <li>API access for integration with your development workflow</li>
+                <li>VS Code extension for seamless integration</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="quick-start" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Quick Start</CardTitle>
+              <CardDescription>Get started with CodeHut in just a few steps</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Badge>1</Badge>
+                  <span>Sign up for a free account</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge>2</Badge>
+                  <span>Create your first snippet</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge>3</Badge>
+                  <span>Organize with tags and collections</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge>4</Badge>
+                  <span>Start sharing and collaborating</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="installation" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Installation</CardTitle>
+              <CardDescription>Install CodeHut tools and extensions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="vscode" className="w-full">
+                <TabsList>
+                  <TabsTrigger value="vscode">VS Code Extension</TabsTrigger>
+                  <TabsTrigger value="cli">CLI Tool</TabsTrigger>
+                </TabsList>
+                <TabsContent value="vscode">
+                  <div className="space-y-4">
+                    <p>Install the CodeHut VS Code extension from the marketplace:</p>
+                    <div className="bg-muted p-4 rounded-lg">
+                      <code>ext install codehut.codehut-vscode</code>
+                    </div>
+                  </div>
+                </TabsContent>
+                <TabsContent value="cli">
+                  <div className="space-y-4">
+                    <p>Install the CLI tool globally using npm:</p>
+                    <div className="bg-muted p-4 rounded-lg">
+                      <code>npm install -g codehut-cli</code>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="first-steps" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">First Steps</CardTitle>
+              <CardDescription>Learn the basics of using CodeHut</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <h4 className="font-semibold">Creating Your First Snippet</h4>
+                <p className="text-muted-foreground">
+                  Click the "Upload" button in the navigation or press Ctrl+U to create your first code snippet. 
+                  Add a descriptive title, select the programming language, and paste your code.
+                </p>
+                <h4 className="font-semibold">Organizing with Tags</h4>
+                <p className="text-muted-foreground">
+                  Use tags to categorize your snippets. Tags like "react", "utility", "api" help you find 
+                  your code quickly later.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* API Reference Sections */}
+        <section id="authentication" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Authentication</CardTitle>
+              <CardDescription>API authentication and security</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>CodeHut uses API keys for authentication. Include your API key in the Authorization header:</p>
+                <div className="bg-muted p-4 rounded-lg">
+                  <code>Authorization: Bearer YOUR_API_KEY</code>
+                </div>
+                <p className="text-muted-foreground">
+                  Get your API key from your account settings page.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="snippets-api" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Snippets API</CardTitle>
+              <CardDescription>Manage your code snippets programmatically</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <h4 className="font-semibold">GET /api/snippets</h4>
+                <p className="text-muted-foreground">Retrieve all your snippets with optional filtering</p>
+                
+                <h4 className="font-semibold">POST /api/snippets</h4>
+                <p className="text-muted-foreground">Create a new code snippet</p>
+                
+                <h4 className="font-semibold">GET /api/snippets/&#123;id&#125;</h4>
+                <p className="text-muted-foreground">Get a specific snippet by ID</p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="users-api" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Users API</CardTitle>
+              <CardDescription>User management and profile operations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <h4 className="font-semibold">GET /api/user/profile</h4>
+                <p className="text-muted-foreground">Get current user profile information</p>
+                
+                <h4 className="font-semibold">PUT /api/user/profile</h4>
+                <p className="text-muted-foreground">Update user profile settings</p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="search-api" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Search API</CardTitle>
+              <CardDescription>Advanced search and filtering capabilities</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <h4 className="font-semibold">GET /api/search</h4>
+                <p className="text-muted-foreground">Search across all your snippets with advanced filters</p>
+                
+                <div className="bg-muted p-4 rounded-lg">
+                  <code>GET /api/search?q=react&language=javascript&tags=component</code>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Integrations Sections */}
+        <section id="vscode" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">VS Code Extension</CardTitle>
+              <CardDescription>Seamless integration with Visual Studio Code</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>The CodeHut VS Code extension allows you to:</p>
+                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                  <li>Save code snippets directly from your editor</li>
+                  <li>Search and insert snippets while coding</li>
+                  <li>Browse your snippet library in the sidebar</li>
+                  <li>Sync snippets across devices</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="cli" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">CLI Tools</CardTitle>
+              <CardDescription>Command-line interface for power users</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>Use the CodeHut CLI for automation and scripting:</p>
+                <div className="space-y-2">
+                  <div className="bg-muted p-2 rounded">
+                    <code>codehut search "react hooks"</code>
+                  </div>
+                  <div className="bg-muted p-2 rounded">
+                    <code>codehut upload ./component.js --title "My Component"</code>
+                  </div>
+                  <div className="bg-muted p-2 rounded">
+                    <code>codehut sync</code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="webhooks" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Webhooks</CardTitle>
+              <CardDescription>Real-time notifications for snippet changes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>Set up webhooks to receive notifications when snippets are created, updated, or deleted:</p>
+                <div className="bg-muted p-4 rounded-lg">
+                  <code>{`{
+  "event": "snippet.created",
+  "data": {
+    "id": "snippet-123",
+    "title": "New React Hook",
+    "language": "javascript"
+  }
+}`}</code>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="third-party" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Third Party Integrations</CardTitle>
+              <CardDescription>Connect with other development tools</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>CodeHut integrates with popular development tools:</p>
+                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                  <li>GitHub - Sync snippets with gists</li>
+                  <li>Slack - Share snippets in team channels</li>
+                  <li>Discord - Bot for snippet sharing</li>
+                  <li>Notion - Import snippets into documentation</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Guides Sections */}
+        <section id="best-practices" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Best Practices</CardTitle>
+              <CardDescription>Tips for effective snippet management</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <h4 className="font-semibold">Writing Good Snippet Titles</h4>
+                <p className="text-muted-foreground">
+                  Use descriptive titles that clearly indicate what the code does. 
+                  "React Custom Hook for API Calls" is better than "Hook".
+                </p>
+                
+                <h4 className="font-semibold">Effective Tagging</h4>
+                <p className="text-muted-foreground">
+                  Use consistent, lowercase tags. Include the language, framework, and purpose.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="organization" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Code Organization</CardTitle>
+              <CardDescription>Structure your snippets for maximum efficiency</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>Organize your snippets using:</p>
+                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                  <li>Collections for related snippets</li>
+                  <li>Consistent tagging conventions</li>
+                  <li>Clear descriptions and comments</li>
+                  <li>Regular cleanup of outdated code</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="collaboration" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Team Collaboration</CardTitle>
+              <CardDescription>Working with teams and sharing knowledge</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>CodeHut supports team collaboration through:</p>
+                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                  <li>Team workspaces with shared access</li>
+                  <li>Permission controls for snippet visibility</li>
+                  <li>Comment and review system</li>
+                  <li>Activity feeds for team updates</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section id="security" className="scroll-mt-24">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Security Guide</CardTitle>
+              <CardDescription>Keeping your code snippets secure</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p>Security best practices:</p>
+                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                  <li>Never store API keys or passwords in snippets</li>
+                  <li>Use private snippets for sensitive code</li>
+                  <li>Regularly review public snippet permissions</li>
+                  <li>Enable two-factor authentication</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
     </div>
   )
 }
