@@ -648,10 +648,30 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
     createdAt: now,
     updatedAt: now
   };
+  
+  console.log('createSnippet - Creating snippet with ID:', snippet.id);
+  console.log('createSnippet - Supabase enabled:', isSupabaseEnabled());
+  
   if(isSupabaseEnabled()){
-    const { error } = await supabase!.from('snippets').insert(snippet as any);
-    if(error) console.error('Supabase insert error', error);
+    try {
+      console.log('createSnippet - Inserting into Supabase');
+      const { error } = await supabase!.from('snippets').insert(snippet as any);
+      if(error) {
+        console.error('createSnippet - Supabase insert error:', error);
+        // Fall back to memory storage if database fails
+        memorySnippets.unshift(snippet);
+        console.log('createSnippet - Stored in memory as fallback');
+      } else {
+        console.log('createSnippet - Successfully stored in Supabase');
+      }
+    } catch (err) {
+      console.error('createSnippet - Exception during Supabase insert:', err);
+      // Fall back to memory storage
+      memorySnippets.unshift(snippet);
+      console.log('createSnippet - Stored in memory due to exception');
+    }
   } else {
+    console.log('createSnippet - Storing in memory (Supabase disabled)');
     memorySnippets.unshift(snippet);
   }
   return snippet;
@@ -862,13 +882,42 @@ function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
 }
 
 export async function getSnippetById(id: string): Promise<CodeSnippet | null>{
+  console.log('getSnippetById - Looking for snippet with ID:', id);
+  console.log('getSnippetById - Supabase enabled:', isSupabaseEnabled());
+  
   if(isSupabaseEnabled()){
-    const { data, error } = await supabase!.from('snippets').select('*').eq('id', id).maybeSingle();
-    if(error){ console.error('Supabase get error', error); return null; }
-    if(!data) return null;
-    return mapRowToSnippet(data as any);
+    try {
+      console.log('getSnippetById - Querying Supabase');
+      const { data, error } = await supabase!.from('snippets').select('*').eq('id', id).maybeSingle();
+      if(error){ 
+        console.error('getSnippetById - Supabase get error:', error);
+        // Fallback to memory search
+        const memoryResult = memorySnippets.find(s=> s.id === id) || null;
+        console.log('getSnippetById - Memory search result:', memoryResult ? 'found' : 'not found');
+        return memoryResult;
+      }
+      if(!data) {
+        console.log('getSnippetById - No data returned from Supabase');
+        // Try memory as fallback
+        const memoryResult = memorySnippets.find(s=> s.id === id) || null;
+        console.log('getSnippetById - Memory search result:', memoryResult ? 'found' : 'not found');
+        return memoryResult;
+      }
+      console.log('getSnippetById - Found in Supabase:', data.title);
+      return mapRowToSnippet(data as any);
+    } catch (err) {
+      console.error('getSnippetById - Exception during Supabase query:', err);
+      // Fallback to memory search
+      const memoryResult = memorySnippets.find(s=> s.id === id) || null;
+      console.log('getSnippetById - Memory search result:', memoryResult ? 'found' : 'not found');
+      return memoryResult;
+    }
   }
-  return memorySnippets.find(s=> s.id === id) || null;
+  
+  console.log('getSnippetById - Searching memory, total snippets:', memorySnippets.length);
+  const result = memorySnippets.find(s=> s.id === id) || null;
+  console.log('getSnippetById - Memory search result:', result ? result.title : 'not found');
+  return result;
 }
 
 export async function listPopular(limit = 6): Promise<CodeSnippet[]>{

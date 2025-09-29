@@ -8,28 +8,34 @@ export async function GET(
   try {
     const { id } = params;
 
+    console.log('GET /api/snippets/[id] - Received ID:', id);
+
     if (!id) {
+      console.log('GET /api/snippets/[id] - No ID provided');
       return NextResponse.json(
         { error: 'Snippet ID is required' },
         { status: 400 }
       );
     }
 
+    console.log('GET /api/snippets/[id] - Attempting to fetch snippet with ID:', id);
     const snippet = await getSnippetById(id);
     
     if (!snippet) {
+      console.log('GET /api/snippets/[id] - Snippet not found for ID:', id);
       return NextResponse.json(
         { error: 'Snippet not found' },
         { status: 404 }
       );
     }
 
+    console.log('GET /api/snippets/[id] - Successfully found snippet:', snippet.title);
     return NextResponse.json(snippet);
 
   } catch (error) {
     console.error('Error in GET /api/snippets/[id]:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
