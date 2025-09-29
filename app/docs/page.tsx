@@ -511,7 +511,7 @@ export CODEHUT_API_KEY="your_api_key_here"`
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             <Button variant="outline" className="justify-start" asChild>
-              <Link href="https://github.com/codehut/examples">
+              <Link href="/coming-soon?feature=example-projects">
                 <Github className="h-4 w-4 mr-2" />
                 Example Projects
                 <ExternalLink className="h-3 w-3 ml-auto" />
@@ -525,7 +525,7 @@ export CODEHUT_API_KEY="your_api_key_here"`
               </Link>
             </Button>
             <Button variant="outline" className="justify-start" asChild>
-              <Link href="/changelog">
+              <Link href="/coming-soon?feature=changelog">
                 <FileText className="h-4 w-4 mr-2" />
                 Changelog
                 <ExternalLink className="h-3 w-3 ml-auto" />
@@ -604,6 +604,14 @@ export CODEHUT_API_KEY="your_api_key_here"`
                 </TabsList>
                 <TabsContent value="vscode">
                   <div className="space-y-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                      <p className="text-sm text-yellow-800">
+                        <strong>Coming Soon:</strong> The VS Code extension is currently in development. 
+                        <Link href="/coming-soon?feature=vscode-extension" className="text-yellow-700 underline hover:text-yellow-900 ml-1">
+                          Learn more about the roadmap →
+                        </Link>
+                      </p>
+                    </div>
                     <p>Install the CodeHut VS Code extension from the marketplace:</p>
                     <div className="bg-muted p-4 rounded-lg">
                       <code>ext install codehut.codehut-vscode</code>
@@ -612,6 +620,14 @@ export CODEHUT_API_KEY="your_api_key_here"`
                 </TabsContent>
                 <TabsContent value="cli">
                   <div className="space-y-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                      <p className="text-sm text-yellow-800">
+                        <strong>Coming Soon:</strong> The CLI tool is currently in development. 
+                        <Link href="/coming-soon?feature=cli-tools" className="text-yellow-700 underline hover:text-yellow-900 ml-1">
+                          Learn more about the roadmap →
+                        </Link>
+                      </p>
+                    </div>
                     <p>Install the CLI tool globally using npm:</p>
                     <div className="bg-muted p-4 rounded-lg">
                       <code>npm install -g codehut-cli</code>
@@ -734,7 +750,15 @@ export CODEHUT_API_KEY="your_api_key_here"`
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <p>The CodeHut VS Code extension allows you to:</p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>In Development:</strong> The VS Code extension is being actively developed. 
+                    <Link href="/coming-soon?feature=vscode-extension" className="text-blue-700 underline hover:text-blue-900 ml-1">
+                      View development roadmap →
+                    </Link>
+                  </p>
+                </div>
+                <p>The CodeHut VS Code extension will allow you to:</p>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   <li>Save code snippets directly from your editor</li>
                   <li>Search and insert snippets while coding</li>
@@ -754,7 +778,15 @@ export CODEHUT_API_KEY="your_api_key_here"`
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <p>Use the CodeHut CLI for automation and scripting:</p>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Coming Soon:</strong> The CLI tool is in planning phase. 
+                    <Link href="/coming-soon?feature=cli-tools" className="text-yellow-700 underline hover:text-yellow-900 ml-1">
+                      Check the roadmap →
+                    </Link>
+                  </p>
+                </div>
+                <p>The CodeHut CLI will enable automation and scripting:</p>
                 <div className="space-y-2">
                   <div className="bg-muted p-2 rounded">
                     <code>codehut search "react hooks"</code>
