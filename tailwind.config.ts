@@ -81,6 +81,39 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        // New vibrant accent colors
+        "emerald-vivid": {
+          DEFAULT: "hsl(var(--emerald-vivid))",
+          foreground: "hsl(var(--emerald-vivid-foreground))",
+        },
+        "violet-vivid": {
+          DEFAULT: "hsl(var(--violet-vivid))",
+          foreground: "hsl(var(--violet-vivid-foreground))",
+        },
+        "amber-vivid": {
+          DEFAULT: "hsl(var(--amber-vivid))",
+          foreground: "hsl(var(--amber-vivid-foreground))",
+        },
+        "rose-vivid": {
+          DEFAULT: "hsl(var(--rose-vivid))",
+          foreground: "hsl(var(--rose-vivid-foreground))",
+        },
+        "cyan-vivid": {
+          DEFAULT: "hsl(var(--cyan-vivid))",
+          foreground: "hsl(var(--cyan-vivid-foreground))",
+        },
+        "indigo-vivid": {
+          DEFAULT: "hsl(var(--indigo-vivid))",
+          foreground: "hsl(var(--indigo-vivid-foreground))",
+        },
+        "orange-vivid": {
+          DEFAULT: "hsl(var(--orange-vivid))",
+          foreground: "hsl(var(--orange-vivid-foreground))",
+        },
+        "teal-vivid": {
+          DEFAULT: "hsl(var(--teal-vivid))",
+          foreground: "hsl(var(--teal-vivid-foreground))",
+        },
         // Enhanced color palette for better visual appeal
         "blue-light": {
           50: "#eff6ff",

@@ -48,7 +48,7 @@ const footerSections = {
     title: 'Community',
     links: [
       { name: 'Community Hub', href: '/community', icon: Users },
-      { name: 'Discord', href: 'https://discord.gg/codehut', icon: MessageCircle, external: true },
+      { name: 'Discord', href: 'https://discord.gg/BqkC2YjD', icon: MessageCircle, external: true },
       { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github, external: true },
       { name: 'Contributors', href: '/contributors', icon: Users },
       { name: 'Events', href: '/events', icon: Users },
@@ -62,6 +62,7 @@ const footerSections = {
       { name: 'Contact', href: '/contact', icon: Mail },
       { name: 'Press Kit', href: '/press', icon: FileText },
       { name: 'Partners', href: '/partners', icon: Users },
+      { name: 'CodeHut UI Library', href: '/ui-library', icon: Code, highlight: true },
     ]
   },
   legal: {
@@ -80,7 +81,7 @@ const socialLinks = [
   { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github },
   { name: 'Discord', href: 'https://discord.gg/BqkC2YjD', icon: MessageCircle },
   { name: 'Twitter', href: 'https://twitter.com/codehut', icon: Twitter },
-  { name: 'LinkedIn', href: 'https://linkedin.com/company/codehut', icon: Linkedin },
+  { name: 'LinkedIn', href: 'https://www.linkedin.com/in/codehut-market-a097ab387/', icon: Linkedin },
   { name: 'Email', href: 'mailto:marketcodehut@gmail.com', icon: Mail },
 ];
 
@@ -132,12 +133,25 @@ export default function Footer() {
                     <li key={link.name}>
                       <Link
                         href={link.href}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center space-x-2 group"
+                        className={`text-sm transition-colors flex items-center space-x-2 group ${
+                          link.highlight 
+                            ? 'text-primary font-semibold hover:text-primary/80' 
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
                         {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                       >
-                        <link.icon className="h-3 w-3 group-hover:text-primary transition-colors" />
+                        <link.icon className={`h-3 w-3 transition-colors ${
+                          link.highlight 
+                            ? 'text-primary group-hover:text-primary/80' 
+                            : 'group-hover:text-primary'
+                        }`} />
                         <span>{link.name}</span>
                         {link.external && <ExternalLink className="h-3 w-3 opacity-50" />}
+                        {link.highlight && (
+                          <span className="ml-1 px-1.5 py-0.5 text-xs bg-primary/10 text-primary rounded-full">
+                            New
+                          </span>
+                        )}
                       </Link>
                     </li>
                   ))}

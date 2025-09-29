@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,29 +11,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { CodeHighlighter } from '@/components/ui/syntax-highlighter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CodeHighlighter } from '@/components/ui/syntax-highlighter';
-import LoadingSpinner, { LoadingOverlay, PageLoading } from '../../components/LoadingSpinner';
-import RippleThemeToggle from '../../components/RippleThemeToggle';
-import { useLoading, useAsyncOperation } from '../../hooks/useLoading';
-import { 
-  Code, 
-  Copy, 
-  Palette, 
-  Zap, 
-  Sparkles, 
-  Layers, 
-  Settings, 
-  Eye,
-  Download,
-  Star,
-  Heart,
-  CheckCircle,
-  AlertCircle,
-  Info
+import {
+    AlertCircle,
+    CheckCircle,
+    Code,
+    Copy,
+    Crown,
+    Download,
+    Eye,
+    Heart,
+    Info,
+    Sparkles,
+    Star,
+    Users,
+    Zap
 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import LoadingSpinner, { LoadingOverlay } from '../../components/LoadingSpinner';
+import RippleThemeToggle from '../../components/RippleThemeToggle';
+import { useAsyncOperation, useLoading } from '../../hooks/useLoading';
 
 export default function UILibraryPage() {
   const [progress, setProgress] = useState(60);
@@ -88,33 +88,133 @@ export function ExampleComponent() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-primary/10 rounded-full">
-              <Layers className="h-8 w-8 text-primary" />
-            </div>
+            <Badge className="bg-primary/10 text-primary border-primary/20">
+              <Crown className="w-3 h-3 mr-1" />
+              Premium UI Library
+            </Badge>
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            CodeHut UI Components Library
+          <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-purple-600 to-emerald-600 bg-clip-text text-transparent mb-6">
+            CodeHut UI Library
           </h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            A comprehensive collection of custom-built, tech-themed UI components designed specifically for CodeHut. 
-            From loading animations to form elements, all crafted with developers in mind.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
+            Professional, ready-to-use React components and templates. Save months of development time with our premium UI library featuring custom animations and tech-themed designs.
           </p>
-          <div className="flex justify-center gap-4 mt-6">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <Button size="lg" asChild className="bg-primary hover:bg-primary/90">
+              <Link href="/ui-library/subscribe?plan=pro">
+                <Crown className="w-4 h-4 mr-2" />
+                Start Pro Subscription
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/ui-library/components">
+                <Eye className="w-4 h-4 mr-2" />
+                Browse Components
+              </Link>
+            </Button>
+          </div>
+          <div className="flex justify-center gap-4">
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-300">
               <Code className="h-3 w-3 mr-1" />
-              50+ Components
+              200+ Components
             </Badge>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-300">
               <Zap className="h-3 w-3 mr-1" />
-              Tech-Themed
+              Production Ready
             </Badge>
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-300">
               <Sparkles className="h-3 w-3 mr-1" />
-              Custom Animations
+              Premium Quality
             </Badge>
           </div>
         </div>
 
+        {/* Subscription Stats & CTA Section */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <Card className="text-center">
+            <CardContent className="p-6">
+              <div className="text-3xl font-bold text-primary mb-2">200+</div>
+              <p className="text-sm text-muted-foreground">Premium Components</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardContent className="p-6">
+              <div className="text-3xl font-bold text-primary mb-2">5K+</div>
+              <p className="text-sm text-muted-foreground">Happy Subscribers</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardContent className="p-6">
+              <div className="text-3xl font-bold text-primary mb-2">50+</div>
+              <p className="text-sm text-muted-foreground">Monthly Updates</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardContent className="p-6">
+              <div className="text-3xl font-bold text-primary mb-2">99%</div>
+              <p className="text-sm text-muted-foreground">Satisfaction Rate</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Subscription Plans */}
+        <Card className="mb-12 bg-gradient-to-r from-primary/5 to-purple-600/5">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Choose Your Plan</CardTitle>
+            <CardDescription>Get unlimited access to our premium component library</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              <Card className="border-2">
+                <CardHeader className="text-center">
+                  <CardTitle className="flex items-center justify-center">
+                    <Crown className="w-5 h-5 mr-2 text-primary" />
+                    Pro Plan
+                  </CardTitle>
+                  <div className="text-3xl font-bold">$19<span className="text-base font-normal text-muted-foreground">/month</span></div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Unlimited downloads</li>
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Full source code access</li>
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Priority support</li>
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Commercial usage rights</li>
+                  </ul>
+                  <Button className="w-full" asChild>
+                    <Link href="/ui-library/subscribe?plan=pro">
+                      Start Pro Subscription
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-primary">
+                <CardHeader className="text-center">
+                  <CardTitle className="flex items-center justify-center">
+                    <Users className="w-5 h-5 mr-2 text-primary" />
+                    Team Plan
+                  </CardTitle>
+                  <div className="text-3xl font-bold">$49<span className="text-base font-normal text-muted-foreground">/month</span></div>
+                  <Badge className="bg-primary/10 text-primary">Most Popular</Badge>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Everything in Pro</li>
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Up to 10 team members</li>
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Team collaboration tools</li>
+                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Dedicated support</li>
+                  </ul>
+                  <Button className="w-full" asChild>
+                    <Link href="/ui-library/subscribe?plan=team">
+                      Start Team Subscription
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Component Showcase Tabs */}
         <Tabs defaultValue="loading" className="space-y-8">
           <div className="flex justify-center">
             <TabsList className="grid grid-cols-7 w-full max-w-4xl">
@@ -592,22 +692,24 @@ import { LoadingSpinner } from '@codehut/ui-components';
         {/* Footer CTA */}
         <div className="text-center mt-16 p-8 bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg">
           <h3 className="text-2xl font-bold text-foreground mb-4">
-            Ready to use these components?
+            Ready to accelerate your development?
           </h3>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            All components are built with TypeScript, Tailwind CSS, and Radix UI primitives. 
-            They're designed to be accessible, customizable, and perfect for developer tools.
+            Join thousands of developers who trust CodeHut UI Library for their projects. 
+            All components are built with TypeScript, Tailwind CSS, and Radix UI primitives.
           </p>
           <div className="flex justify-center gap-4">
-            <Button asChild>
-              <a href="https://github.com/CodeHut-Market/codein" target="_blank" rel="noopener noreferrer">
-                <Code className="h-4 w-4 mr-2" />
-                View Source Code
-              </a>
+            <Button size="lg" asChild>
+              <Link href="/ui-library/subscribe?plan=pro">
+                <Crown className="h-4 w-4 mr-2" />
+                Start Subscription
+              </Link>
             </Button>
-            <Button variant="outline" onClick={() => copyToClipboard(window.location.href)}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy URL
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/ui-library/components">
+                <Eye className="h-4 w-4 mr-2" />
+                Browse Components
+              </Link>
             </Button>
           </div>
         </div>

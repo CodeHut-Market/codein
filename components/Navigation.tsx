@@ -1,18 +1,18 @@
 "use client"
 
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { BookOpen, ChevronDown, Code, CreditCard, DollarSign, Heart, Home, LogOut, Menu, Play, Search, Settings, Upload, User, Users, X } from 'lucide-react';
+import { BookOpen, ChevronDown, Code, CreditCard, Heart, Home, LogOut, Menu, Play, Search, Settings, Upload, User, Users, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { isSupabaseEnabled, supabase } from '../app/lib/supabaseClient';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from '../client/components/ui/dropdown-menu';
 import RippleThemeToggle from './RippleThemeToggle';
 
@@ -21,15 +21,13 @@ interface NavigationProps {
 }
 
 const navItems = [
-  { name: 'Home', href: '/', icon: Home },
-  { name: 'Explore', href: '/explore', icon: Search },
-  { name: 'Upload', href: '/upload', icon: Upload },
-  { name: 'Favorites', href: '/favorites', icon: Heart },
-  { name: 'Demo', href: '/demo', icon: Play },
-  { name: 'UI Library', href: '/ui-library', icon: Code },
-  { name: 'Pricing', href: '/pricing', icon: DollarSign },
-  { name: 'Docs', href: '/docs', icon: BookOpen },
-  { name: 'Community', href: '/community', icon: Users },
+  { name: 'Home', href: '/', icon: Home, color: 'text-emerald-600 hover:text-emerald-700' },
+  { name: 'Explore', href: '/explore', icon: Search, color: 'text-cyan-600 hover:text-cyan-700' },
+  { name: 'Upload', href: '/upload', icon: Upload, color: 'text-violet-600 hover:text-violet-700' },
+  { name: 'Favorites', href: '/favorites', icon: Heart, color: 'text-rose-600 hover:text-rose-700' },
+  { name: 'Demo', href: '/demo', icon: Play, color: 'text-amber-600 hover:text-amber-700' },
+  { name: 'Docs', href: '/docs', icon: BookOpen, color: 'text-teal-600 hover:text-teal-700' },
+  { name: 'Community', href: '/community', icon: Users, color: 'text-orange-600 hover:text-orange-700' },
 ]
 
 export default function Navigation({ className }: NavigationProps) {
@@ -102,13 +100,13 @@ export default function Navigation({ className }: NavigationProps) {
                   className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 group ${
                     isActive
                       ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 text-blue-700 dark:text-blue-300 shadow-sm border border-blue-200/50 dark:border-blue-800/50'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 hover:shadow-sm hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50'
+                      : `text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 hover:shadow-sm hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50 ${item.color}`
                   }`}
                 >
                   <item.icon className={`h-4 w-4 transition-all duration-200 ${
                     isActive 
                       ? 'text-blue-600 dark:text-blue-400' 
-                      : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200'
+                      : `text-gray-500 dark:text-gray-400 group-hover:${item.color.split(' ')[0].replace('text-', 'text-')} dark:group-hover:${item.color.split(' ')[0].replace('text-', 'text-')}`
                   }`} />
                   <span className="relative">
                     {item.name}
@@ -132,8 +130,8 @@ export default function Navigation({ className }: NavigationProps) {
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800/50 dark:hover:to-slate-800/50 transition-all duration-200 hover:shadow-sm hover:border hover:border-gray-200/50 dark:hover:border-gray-700/50 group">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white text-sm font-medium shadow-sm group-hover:shadow-md transition-all duration-200">
+                  <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gradient-to-r hover:from-emerald-50 hover:to-cyan-50 dark:hover:from-emerald-900/20 dark:hover:to-cyan-900/20 transition-all duration-200 hover:shadow-sm hover:border hover:border-emerald-200/50 dark:hover:border-emerald-700/50 group">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-violet-500 flex items-center justify-center text-white text-sm font-medium shadow-lg group-hover:shadow-xl transition-all duration-200 hover:scale-105">
                       {getUserInitials(user)}
                     </div>
                     <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200">

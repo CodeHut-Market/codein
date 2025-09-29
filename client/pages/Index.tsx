@@ -64,19 +64,19 @@ export default function Index() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-violet-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading popular snippets...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-200 border-t-emerald-500 mx-auto mb-4 shadow-lg"></div>
+          <p className="text-gray-600 dark:text-gray-300 font-medium">Loading popular snippets...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-violet-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header */}
-      <header className="bg-background border-b border-border">
+      <header className="bg-background/80 backdrop-blur-sm border-b border-border/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -87,10 +87,10 @@ export default function Index() {
             <div className="flex items-center gap-4">
               <ThemeToggle />
               <NotificationCenter />
-              <Button variant="ghost" asChild>
+              <Button variant="ghost" asChild className="hover:bg-gradient-to-r hover:from-cyan-50 hover:to-violet-50 dark:hover:from-cyan-900/20 dark:hover:to-violet-900/20">
                 <Link to="/login">Sign In</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className="bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white shadow-lg">
                 <Link to="/signup">Sign Up</Link>
               </Button>
             </div>
@@ -101,52 +101,65 @@ export default function Index() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
-        <div className="text-center mb-8">
-          <p className="text-xl text-gray-600 mb-8 mt-4">
+        <div className="text-center mb-12">
+          <div className="bg-gradient-to-r from-emerald-600 via-cyan-600 to-violet-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
+              Code Snippets Marketplace
+            </h1>
+          </div>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 mt-4 max-w-2xl mx-auto">
             Buy and Sell Quality Code Snippets Instantly
           </p>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button
               asChild
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium bg-gradient-hover gradient-border-hover"
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 py-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
             >
               <Link to="/upload">Upload Your Code</Link>
             </Button>
             <Button
               asChild
               variant="outline"
-        className="border-border text-foreground/80 hover:bg-muted px-6 py-3 rounded-lg font-medium hover:bg-gradient-to-r"
+              className="border-2 border-violet-200 hover:border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-300 dark:hover:bg-violet-900/20 px-8 py-4 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
             >
-              <Link to="/explore">Explore Code</Link>
+              <Link to="/explore">Browse Snippets</Link>
             </Button>
           </div>
 
-    {/* Background GL */}
-    <BackgroundGl />
+          {/* Background GL */}
+          <BackgroundGl />
 
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-8">
+          <div className="max-w-2xl mx-auto mb-12">
             <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-500 w-5 h-5" />
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search code snippets, tools, components..."
-                className="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                className="pl-12 pr-4 py-4 w-full rounded-xl border-2 border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 dark:border-gray-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-800/20 text-lg placeholder:text-gray-400 shadow-lg hover:shadow-xl transition-all duration-200"
               />
             </form>
           </div>
         </div>
 
         {/* Popular Code Snippets */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Popular Code Snippets
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent mb-3">
+              Popular Code Snippets
+            </h2>
+            <div className="flex items-center justify-center space-x-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-4 h-4 text-amber-400 fill-current" />
+              ))}
+              <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">Trending Now</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {snippets && snippets.length > 0 ? (
               snippets.map((snippet) => (
                 <SnippetCard
@@ -156,15 +169,20 @@ export default function Index() {
                 />
               ))
             ) : (
-              <div className="col-span-full text-center py-8">
-                <p className="text-gray-600">
-                  {loading
-                    ? "Loading..."
-                    : "No popular snippets available at the moment."}
-                </p>
-                <Button asChild variant="outline" className="mt-4">
-                  <Link to="/explore">Browse All Snippets</Link>
-                </Button>
+              <div className="col-span-full text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-emerald-100 to-cyan-100 dark:from-emerald-900/20 dark:to-cyan-900/20 rounded-full flex items-center justify-center">
+                    <Search className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 text-lg">
+                    {loading
+                      ? "Loading amazing code snippets..."
+                      : "No popular snippets available at the moment."}
+                  </p>
+                  <Button asChild variant="outline" className="border-2 border-cyan-200 hover:border-cyan-300 text-cyan-700 hover:bg-cyan-50 dark:border-cyan-700 dark:text-cyan-300 dark:hover:bg-cyan-900/20">
+                    <Link to="/explore">Browse All Snippets</Link>
+                  </Button>
+                </div>
               </div>
             )}
           </div>
