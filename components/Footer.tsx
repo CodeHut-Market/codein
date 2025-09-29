@@ -49,7 +49,7 @@ const footerSections = {
     links: [
       { name: 'Community Hub', href: '/community', icon: Users },
       { name: 'Discord', href: 'https://discord.gg/codehut', icon: MessageCircle, external: true },
-      { name: 'GitHub', href: 'https://github.com/codehut', icon: Github, external: true },
+      { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github, external: true },
       { name: 'Contributors', href: '/contributors', icon: Users },
       { name: 'Events', href: '/events', icon: Users },
     ]
@@ -77,7 +77,7 @@ const footerSections = {
 };
 
 const socialLinks = [
-  { name: 'GitHub', href: 'https://github.com/codehut', icon: Github },
+  { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github },
   { name: 'Twitter', href: 'https://twitter.com/codehut', icon: Twitter },
   { name: 'LinkedIn', href: 'https://linkedin.com/company/codehut', icon: Linkedin },
   { name: 'Email', href: 'mailto:hello@codehut.com', icon: Mail },

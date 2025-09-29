@@ -1,0 +1,20 @@
+# CodeHut Environment Variables
+# Copy this file to .env and fill in your actual values
+
+# Supabase Configuration (REQUIRED)
+SUPABASE_URL=https://lapgjnimnkyyxeltzcxw.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcGdqbmltbmt5eXhlbHR6Y3h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2OTMzOTgsImV4cCI6MjA3NDI2OTM5OH0.tcQ6s07MNwvTonr35cXdvOG4QTDuTgrDX4Xqdsp1CNA
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcGdqbmltbmt5eXhlbHR6Y3h3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODY5MzM5OCwiZXhwIjoyMDc0MjY5Mzk4fQ.BdQIflI2rFyC6CK1C2Ah1--xxF2x238mq8RvXSv_pbc
+SUPABASE_DB_PASSWORD=nIKSHEY@12
+
+# Razorpay Payment (REQUIRED for payments)
+RAZORPAY_KEY_ID=rzp_test_RLN5kbAedu2lZ9
+RAZORPAY_KEY_SECRET=ivkJbyeXcKtNiCT4jonHPTjW
+
+# AI & Search APIs
+OPENROUTER_API_KEY=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
+LANGSEARCH_API_KEY=sk-fc4ef81a8575419a94dd6d5ff6e33608
+
+# Server Settings
+PORT=3000
+NODE_ENV=development
