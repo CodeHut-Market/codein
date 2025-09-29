@@ -78,9 +78,10 @@ const footerSections = {
 
 const socialLinks = [
   { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github },
+  { name: 'Discord', href: 'https://discord.gg/BqkC2YjD', icon: MessageCircle },
   { name: 'Twitter', href: 'https://twitter.com/codehut', icon: Twitter },
   { name: 'LinkedIn', href: 'https://linkedin.com/company/codehut', icon: Linkedin },
-  { name: 'Email', href: 'mailto:hello@codehut.com', icon: Mail },
+  { name: 'Email', href: 'mailto:marketcodehut@gmail.com', icon: Mail },
 ];
 
 export default function Footer() {
@@ -107,17 +108,17 @@ export default function Footer() {
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4" />
-                  <a href="mailto:hello@codehut.com" className="hover:text-foreground transition-colors">
-                    hello@codehut.com
+                  <a href="mailto:marketcodehut@gmail.com" className="hover:text-foreground transition-colors">
+                    marketcodehut@gmail.com
                   </a>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>Upcoming</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <MapPin className="h-4 w-4" />
-                  <span>San Francisco, CA</span>
+                  <span>New Delhi, India</span>
                 </div>
               </div>
             </div>
@@ -180,18 +181,44 @@ export default function Footer() {
 
             {/* Social Links */}
             <div className="flex items-center space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.name}
-                >
-                  <social.icon className="h-4 w-4" />
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                // Special handling for Discord with custom styling
+                if (social.name === 'Discord') {
+                  return (
+                    <a 
+                      key={social.name}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center space-x-2 group" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      href="https://discord.gg/BqkC2YjD"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle h-3 w-3 group-hover:text-primary transition-colors">
+                        <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"></path>
+                      </svg>
+                      <span>Discord</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link h-3 w-3 opacity-50">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" x2="21" y1="14" y2="3"></line>
+                      </svg>
+                    </a>
+                  );
+                }
+                
+                // Default styling for other social links
+                return (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
+                  >
+                    <social.icon className="h-4 w-4" />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
