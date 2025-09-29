@@ -26,6 +26,7 @@ const navItems = [
   { name: 'Upload', href: '/upload', icon: Upload },
   { name: 'Favorites', href: '/favorites', icon: Heart },
   { name: 'Demo', href: '/demo', icon: Play },
+  { name: 'UI Library', href: '/ui-library', icon: Code },
   { name: 'Pricing', href: '/pricing', icon: DollarSign },
   { name: 'Docs', href: '/docs', icon: BookOpen },
   { name: 'Community', href: '/community', icon: Users },
