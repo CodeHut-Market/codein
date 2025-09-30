@@ -10,6 +10,7 @@ export async function GET(req: NextRequest){
   const sortBy = searchParams.get('sortBy') || 'recent';
   const featured = searchParams.get('featured') === 'true';
   const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+  const debug = searchParams.get('debug') === 'true';
   
   const results = await listSnippets({
     query,
@@ -20,11 +21,24 @@ export async function GET(req: NextRequest){
     limit
   });
   
+  // Add debug information if requested
+  if (debug) {
+    console.log('GET /api/snippets - Debug mode');
+    console.log('GET /api/snippets - Results count:', results.length);
+    console.log('GET /api/snippets - Results IDs:', results.map(s => `${s.id} - ${s.title}`));
+  }
+  
   return NextResponse.json({ 
     snippets: results, 
     total: results.length, 
     page: 1, 
-    limit: results.length 
+    limit: results.length,
+    ...(debug && { 
+      debug: {
+        resultIds: results.map(s => ({ id: s.id, title: s.title })),
+        timestamp: new Date().toISOString()
+      }
+    })
   });
 }
 
@@ -47,8 +61,26 @@ export async function POST(req: NextRequest){
       });
       return NextResponse.json({ error: 'Missing required fields'}, { status: 400 });
     }
-    
-    console.log('POST /api/snippets - Attempting to create snippet');
+
+    // Require user authentication for upload
+    const userDataHeader = req.headers.get('x-user-data');
+    if (!userDataHeader) {
+      console.log('POST /api/snippets - No user authentication found, rejecting upload');
+      return NextResponse.json({ error: 'Authentication required to upload snippets.' }, { status: 401 });
+    }
+    let userData;
+    try {
+      userData = JSON.parse(userDataHeader);
+    } catch (e) {
+      console.warn('POST /api/snippets - Failed to parse user data header');
+      return NextResponse.json({ error: 'Invalid user data.' }, { status: 400 });
+    }
+    if (!userData.id || !userData.username) {
+      return NextResponse.json({ error: 'Incomplete user data.' }, { status: 400 });
+    }
+    const author = userData.username;
+    const authorId = userData.id;
+    console.log('POST /api/snippets - Authenticated user:', { author, authorId });
     const snippet = await createSnippet({
       title: body.title,
       code: body.code,
@@ -57,8 +89,8 @@ export async function POST(req: NextRequest){
       price: typeof body.price === 'number' ? body.price : 0,
       tags: body.tags || [],
       framework: body.framework,
-      author: 'demo-user',
-      authorId: 'demo-user-id'
+      author: author,
+      authorId: authorId
     });
     
     console.log('POST /api/snippets - Successfully created snippet with ID:', snippet.id);

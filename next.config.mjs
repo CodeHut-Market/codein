@@ -15,6 +15,20 @@ const nextConfig = {
     // We'll re-enable once pages fully migrated.
     ignoreDuringBuilds: true,
   },
+  // Disable tracing to fix Windows EPERM errors
+  experimental: {
+    instrumentationHook: false,
+  },
+  // Disable output file tracing completely
+  output: 'standalone',
+  // Disable webpack file watching issues on Windows
+  webpack: (config) => {
+    config.watchOptions = {
+      poll: 1000,
+      aggregateTimeout: 300,
+    }
+    return config
+  },
   // Allow ngrok and other dev origins for cross-origin requests
   allowedDevOrigins: [
     '4af482d17f59.ngrok-free.app',

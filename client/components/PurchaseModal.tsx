@@ -1,34 +1,74 @@
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
-  Star,
-  Download,
-  DollarSign,
-  Code,
-  User,
-  Calendar,
-  CreditCard,
-  Landmark,
-  Wallet2,
-  IndianRupee,
-  ShieldCheck,
-} from "lucide-react";
-import { CodeSnippet, PurchaseSnippetResponse } from "@shared/api";
-import PaymentButton from "./PaymentButton";
-import { Link, useNavigate } from "react-router-dom";
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import useRequireAuth from "@/hooks/useRequireAuth";
+import { CodeSnippet } from "@shared/api";
+import {
+    Code,
+    Download,
+    Star,
+    User
+} from "lucide-react";
+import React, { useState } from "react";
+import PaymentButton from "./PaymentButton";
+
+// Conditional navigation hook for both React Router and Next.js compatibility
+const useConditionalNavigate = () => {
+  // Check if we're in a Next.js environment
+  if (typeof window !== 'undefined' && window.location.pathname.includes('/snippet/')) {
+    // We're likely in Next.js context, use window.location
+    return (path: string) => {
+      window.location.href = path;
+    };
+  }
+  
+  // Try to use React Router useNavigate, fallback to window.location
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks, @typescript-eslint/no-var-requires
+    const { useNavigate } = require("react-router-dom");
+    return useNavigate();
+  } catch {
+    return (path: string) => {
+      window.location.href = path;
+    };
+  }
+};
+
+// Conditional Link component for both React Router and Next.js compatibility
+const ConditionalLink = ({ to, children, ...props }: any) => {
+  // Check if we're in a Next.js environment
+  if (typeof window !== 'undefined' && window.location.pathname.includes('/snippet/')) {
+    // We're likely in Next.js context, use regular anchor
+    return (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    );
+  }
+  
+  // Try to use React Router Link, fallback to anchor
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Link } = require("react-router-dom");
+    return <Link to={to} {...props}>{children}</Link>;
+  } catch {
+    return (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    );
+  }
+};
 
 interface PurchaseModalProps {
   snippet: CodeSnippet | null;
@@ -49,7 +89,7 @@ export default function PurchaseModal({
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [hasToken, setHasToken] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"upi" | "card" | "netbanking" | "wallet">("upi");
-  const navigate = useNavigate();
+  const navigate = useConditionalNavigate();
   const requireAuth = useRequireAuth();
 
   if (!snippet) return null;
@@ -281,10 +321,10 @@ export default function PurchaseModal({
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <Button asChild variant="outline">
-                      <Link to="/login">Log in</Link>
+                      <ConditionalLink to="/login">Log in</ConditionalLink>
                     </Button>
                     <Button asChild>
-                      <Link to="/signup">Sign up</Link>
+                      <ConditionalLink to="/signup">Sign up</ConditionalLink>
                     </Button>
                   </div>
                 </div>

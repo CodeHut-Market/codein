@@ -19,9 +19,34 @@ import {
     User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import FavoriteButton from "./FavoriteButton";
 import PurchaseModal from "./PurchaseModal";
+
+// Conditional Link component for both React Router and Next.js compatibility
+const ConditionalLink = ({ href, children, ...props }: any) => {
+  // Check if we're in a Next.js environment
+  if (typeof window !== 'undefined' && window.location.pathname.includes('/snippet/')) {
+    // We're likely in Next.js context, use regular anchor
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
+  }
+  
+  // Try to use React Router Link, fallback to anchor
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Link } = require("react-router-dom");
+    return <Link to={href} {...props}>{children}</Link>;
+  } catch {
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
+  }
+};
 
 // Helper function to assign colors to tags
 const getTagColor = (index: number): string => {
@@ -153,13 +178,13 @@ export default function SnippetCard({
             </div>
             <div className="flex items-center gap-1">
               <User className="w-3 h-3 text-indigo-500" />
-              <Link
-                to={`/profile/${snippet.author}`}
+              <ConditionalLink
+                href={`/profile/${snippet.author}`}
                 className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e: any) => e.stopPropagation()}
               >
                 {snippet.author}
-              </Link>
+              </ConditionalLink>
             </div>
           </div>
 
@@ -263,7 +288,7 @@ export default function SnippetCard({
             )}
 
             <Button variant="outline" asChild className="border-cyan-200 hover:border-cyan-300 text-cyan-700 hover:bg-cyan-50 dark:border-cyan-800 dark:text-cyan-400 dark:hover:bg-cyan-900/10">
-              <Link to={`/snippet/${snippet.id}`}>View Details</Link>
+              <ConditionalLink href={`/snippet/${snippet.id}`}>View Details</ConditionalLink>
             </Button>
 
             <FavoriteButton

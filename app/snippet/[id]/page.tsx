@@ -138,27 +138,27 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       
       if (!response.ok) {
         if (response.status === 404) {
-          // Use demo snippet for now
-          setSnippet(demoSnippet);
-          setRelatedSnippets(demoRelatedSnippets);
+          console.error('Snippet not found for ID:', params.id);
+          setError(`Snippet not found (ID: ${params.id}). It may have been deleted or the URL is incorrect.`);
           return;
         }
         throw new Error(`Failed to load snippet: ${response.status}`);
       }
       
       const data = await response.json();
-      setSnippet(data.snippet);
+      console.log('API Response:', data);
+      
+      // Handle both direct snippet response and wrapped response
+      const snippetData = data.snippet || data;
+      setSnippet(snippetData);
       
       // Load related snippets
-      loadRelatedSnippets(data.snippet.tags, data.snippet.language);
+      loadRelatedSnippets(snippetData.tags, snippetData.language);
       
     } catch (error) {
       console.error("Failed to load snippet", error);
       setError(error instanceof Error ? error.message : "Failed to load snippet");
-      
-      // Fallback to demo snippet
-      setSnippet(demoSnippet);
-      setRelatedSnippets(demoRelatedSnippets);
+      // Don't show demo data - let user know there was an actual error
     } finally {
       setLoading(false);
     }

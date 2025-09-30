@@ -11,20 +11,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from '@/components/ui/textarea'
 import type { User } from '@supabase/supabase-js'
 import {
-  AlertTriangle,
-  CheckCircle,
-  Code2,
-  DollarSign,
-  FileText,
-  Loader2,
-  Plus,
-  ShieldAlert,
-  UploadCloud,
-  X
+    AlertTriangle,
+    CheckCircle,
+    Code2,
+    DollarSign,
+    FileText,
+    Loader2,
+    Plus,
+    ShieldAlert,
+    UploadCloud,
+    Upload as UploadIcon,
+    X
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
 
 export default function UploadPage() {
@@ -53,6 +54,10 @@ export default function UploadPage() {
 
   // Preview state
   const [showPreview, setShowPreview] = useState(false)
+  
+  // Drag and drop state
+  const [isDragging, setIsDragging] = useState(false)
+  const [uploadedFileName, setUploadedFileName] = useState("")
 
   useEffect(() => {
     if (isSupabaseEnabled()) {
@@ -100,9 +105,30 @@ export default function UploadPage() {
     setUploading(true)
     setUploadMessage(null)
     try {
+      // Prepare headers with user information
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+
+      // Add user data to request headers if user is authenticated
+      if (user) {
+        headers['x-user-data'] = JSON.stringify({
+          id: user.id,
+          username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+          email: user.email
+        });
+        console.log('Upload: Adding user data to request:', {
+          id: user.id,
+          username: user.user_metadata?.username || user.email?.split('@')[0],
+          email: user.email
+        });
+      } else {
+        console.log('Upload: No authenticated user found');
+      }
+
       const res = await fetch('/api/snippets', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           title: title.trim(),
           code,
@@ -158,6 +184,82 @@ export default function UploadPage() {
     } finally {
       setTimeout(() => setPlagStatus('idle'), 5000)
     }
+  }
+
+  // Drag and drop handlers
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length > 0) {
+      handleFileUpload(files[0])
+    }
+  }, [])
+
+  const handleFileUpload = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const content = e.target?.result as string
+      setCode(content)
+      setUploadedFileName(file.name)
+      
+      // Auto-detect language from file extension
+      const extension = file.name.split('.').pop()?.toLowerCase()
+      const languageMap: { [key: string]: string } = {
+        js: 'javascript',
+        ts: 'typescript',
+        jsx: 'javascript',
+        tsx: 'typescript',
+        py: 'python',
+        java: 'java',
+        cpp: 'cpp',
+        c: 'cpp',
+        html: 'html',
+        css: 'css',
+        php: 'php',
+        rb: 'ruby',
+        go: 'go',
+        rs: 'rust',
+        kt: 'kotlin',
+        swift: 'swift',
+      }
+      
+      if (extension && languageMap[extension]) {
+        setLanguage(languageMap[extension])
+      }
+      
+      // Auto-generate title if empty
+      if (!title.trim() && file.name) {
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "")
+        const formattedName = nameWithoutExt.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+        setTitle(formattedName)
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const clearUploadedFile = () => {
+    setCode("")
+    setUploadedFileName("")
   }
 
   const getFormProgress = () => {
@@ -388,14 +490,80 @@ export default function UploadPage() {
                         <label className="text-sm font-medium" htmlFor="code">
                           Code *
                         </label>
-                        <Textarea 
-                          id="code" 
-                          value={code} 
-                          onChange={e => setCode(e.target.value)} 
-                          placeholder="Paste your code here..."
-                          className="min-h-[400px] font-mono text-sm"
-                          required
-                        />
+                        
+                        {/* File Upload Status */}
+                        {uploadedFileName && (
+                          <div className="mb-2 p-3 bg-gradient-to-r from-emerald-50 to-cyan-50 border border-emerald-200 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 text-emerald-700">
+                                <FileText className="w-4 h-4" />
+                                <span className="text-sm font-medium">Uploaded: {uploadedFileName}</span>
+                              </div>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={clearUploadedFile}
+                                className="h-6 w-6 p-0 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-100"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Drag & Drop Zone */}
+                        <div
+                          className={`relative transition-all duration-300 ${
+                            isDragging 
+                              ? 'ring-4 ring-emerald-200 ring-opacity-50 bg-emerald-50/50' 
+                              : ''
+                          }`}
+                          onDragEnter={handleDragEnter}
+                          onDragLeave={handleDragLeave}
+                          onDragOver={handleDragOver}
+                          onDrop={handleDrop}
+                        >
+                          <Textarea 
+                            id="code" 
+                            value={code} 
+                            onChange={e => setCode(e.target.value)} 
+                            placeholder="Paste your code here or drag & drop a file..."
+                            className="min-h-[400px] font-mono text-sm resize-y"
+                            required
+                          />
+                          
+                          {/* Drag Overlay */}
+                          {isDragging && (
+                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/90 via-cyan-100/90 to-primary/10 border-2 border-dashed border-emerald-400 rounded-lg flex items-center justify-center z-10">
+                              <div className="text-center p-6">
+                                <UploadIcon className="w-16 h-16 text-emerald-600 mx-auto mb-4 animate-bounce" />
+                                <p className="text-xl font-bold text-emerald-700 mb-2">Drop your file here!</p>
+                                <p className="text-sm text-emerald-600">Supported: .js, .ts, .py, .java, .cpp, .html, .css and more</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* File Upload Button */}
+                        <div className="flex justify-between items-center mt-3">
+                          <label className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-100 to-cyan-100 hover:from-emerald-200 hover:to-cyan-200 text-emerald-700 text-sm font-medium rounded-lg border border-emerald-200 cursor-pointer transition-all duration-200">
+                            <FileText className="w-4 h-4" />
+                            Choose File
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept=".js,.ts,.jsx,.tsx,.py,.java,.cpp,.c,.html,.css,.php,.rb,.go,.rs,.kt,.swift,.txt"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) handleFileUpload(file)
+                              }}
+                            />
+                          </label>
+                          <p className="text-xs text-muted-foreground">
+                            Or drag & drop a code file anywhere in the editor
+                          </p>
+                        </div>
                       </div>
                     </TabsContent>
                     
