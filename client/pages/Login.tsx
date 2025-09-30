@@ -1,12 +1,12 @@
-import { useState } from "react";
+import DemoLogin from "@/components/DemoLogin";
+import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import DemoLogin from "@/components/DemoLogin";
-import Logo from "@/components/Logo";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();

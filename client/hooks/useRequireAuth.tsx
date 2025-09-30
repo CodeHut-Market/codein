@@ -40,7 +40,7 @@ const useConditionalAuth = () => {
   // Try to use React Router AuthContext, fallback to local storage
   try {
     // eslint-disable-next-line react-hooks/rules-of-hooks, @typescript-eslint/no-var-requires
-    const { useAuth } = require("@/contexts/AuthContext");
+    const { useAuth } = require("../contexts/AuthContext");
     return useAuth();
   } catch {
     // Fallback for when AuthContext is not available

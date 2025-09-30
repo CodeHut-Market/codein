@@ -19,8 +19,8 @@ import { Checkbox } from "../../client/components/ui/checkbox";
 import { Input } from "../../client/components/ui/input";
 import { Label } from "../../client/components/ui/label";
 import { Progress } from "../../client/components/ui/progress";
+import { useAuth } from "../../client/contexts/AuthContext";
 import RippleThemeToggle from "../../components/RippleThemeToggle";
-import { useAuth } from "../../contexts/AuthContext";
 
 interface PasswordValidation {
   length: boolean;
@@ -65,7 +65,7 @@ interface OnboardingData {
 
 export default function SignupPage() {
   const router = useRouter();
-  const { signUp, user } = useAuth();
+    const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -224,18 +224,19 @@ export default function SignupPage() {
     setError("");
 
     try {
-      // Create user metadata
-      const metadata = {
+      // Prepare the complete signup data
+      const signupData = {
         username: formData.username.trim(),
-        first_name: formData.firstName.trim(),
-        last_name: formData.lastName.trim(),
-        full_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+        email: formData.email.trim(),
+        password: formData.password,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
         bio: formData.bio,
         location: formData.location,
         website: formData.website,
-        primary_language: formData.primaryLanguage,
+        primaryLanguage: formData.primaryLanguage,
         interests: formData.interests,
-        experience_level: formData.experienceLevel,
+        experienceLevel: formData.experienceLevel,
         goals: formData.goals,
         preferences: {
           emailNotifications: formData.emailNotifications,
@@ -245,36 +246,30 @@ export default function SignupPage() {
           profileVisibility: formData.profileVisibility,
           showEmail: formData.showEmail,
         },
-        subscribe_newsletter: formData.subscribeNewsletter,
+        subscribeNewsletter: formData.subscribeNewsletter,
       };
 
-      // Sign up with auth context
-      const { data, error } = await signUp(
-        formData.email.trim(),
-        formData.password,
-        metadata
-      );
+      // Call the signup API directly
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(signupData),
+      });
 
-      if (error) {
-        throw new Error(error.message);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Signup failed');
       }
 
-      if (data?.user) {
-        // Check if user needs email confirmation
-        if (!data.session) {
-          // Email confirmation required
-          router.push("/login?message=" + encodeURIComponent("Please check your email and click the confirmation link to complete your registration."));
-        } else {
-          // User is automatically signed in, redirect to dashboard
-          router.push("/dashboard?welcome=true");
-        }
-      } else {
-        // Handle case where no user was returned
-        throw new Error("Account creation failed - no user returned");
-      }
+      // Account created successfully
+      router.push("/login?message=" + encodeURIComponent("Account created successfully! Please sign in to continue."));
+
     } catch (error) {
       console.error("Signup error:", error);
-      setError(error instanceof Error ? error.message : "Signup failed");
+      setError(error instanceof Error ? error.message : "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }

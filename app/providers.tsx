@@ -1,7 +1,7 @@
 "use client";
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import React from 'react';
+import { TooltipProvider } from '../client/components/ui/tooltip';
 import { ToastProvider } from '../components/ToastProvider';
 import { AuthProvider } from '../contexts/AuthContext';
 

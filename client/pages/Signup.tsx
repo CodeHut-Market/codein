@@ -6,27 +6,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/contexts/AuthContext";
 import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Code,
-  Eye,
-  EyeOff,
-  Github,
-  Rocket,
-  Settings,
-  Sparkles,
-  User,
-  X
+    ArrowLeft,
+    ArrowRight,
+    Check,
+    Code,
+    Eye,
+    EyeOff,
+    Github,
+    Rocket,
+    Settings,
+    Sparkles,
+    User,
+    X
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 interface PasswordValidation {
   length: boolean;
@@ -306,10 +305,12 @@ export default function Signup() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="w-8 h-8 text-primary" />
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                <User className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold">Create Your Account</h2>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+                Create Your Account
+              </h2>
               <p className="text-muted-foreground">Let's start with the basics</p>
             </div>
 
@@ -428,10 +429,12 @@ export default function Signup() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="w-8 h-8 text-primary" />
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 via-teal-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                <User className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold">Tell Us About You</h2>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-teal-600 to-blue-600">
+                Tell Us About You
+              </h2>
               <p className="text-muted-foreground">Help others discover and connect with you</p>
             </div>
 
@@ -503,10 +506,12 @@ export default function Signup() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <Code className="w-8 h-8 text-primary" />
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                <Code className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold">Your Coding Profile</h2>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-pink-600">
+                Your Coding Profile
+              </h2>
               <p className="text-muted-foreground">Help us personalize your CodeHut experience</p>
             </div>
 
@@ -520,7 +525,11 @@ export default function Signup() {
                       variant={formData.primaryLanguage === lang ? "default" : "outline"}
                       size="sm"
                       onClick={() => updateFormData({ primaryLanguage: lang })}
-                      className="justify-start"
+                      className={`justify-start transition-all duration-200 hover:scale-105 ${
+                        formData.primaryLanguage === lang 
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg' 
+                          : 'hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20'
+                      }`}
                     >
                       {lang}
                     </Button>
@@ -538,7 +547,11 @@ export default function Signup() {
                       variant={formData.interests.includes(interest) ? "default" : "outline"}
                       size="sm"
                       onClick={() => toggleInterest(interest)}
-                      className="justify-start"
+                      className={`justify-start transition-all duration-200 hover:scale-105 ${
+                        formData.interests.includes(interest)
+                          ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
+                          : 'hover:bg-gradient-to-r hover:from-green-50 hover:to-teal-50 dark:hover:from-green-900/20 dark:hover:to-teal-900/20'
+                      }`}
                     >
                       {interest}
                     </Button>
@@ -555,10 +568,10 @@ export default function Signup() {
                   {experienceLevels.map((level) => (
                     <div
                       key={level.id}
-                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                      className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 hover:scale-105 ${
                         formData.experienceLevel === level.id 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-border hover:border-primary/50'
+                          ? 'border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 shadow-lg' 
+                          : 'border-border hover:border-purple-300 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-pink-50/50 dark:hover:from-purple-900/10 dark:hover:to-pink-900/10'
                       }`}
                       onClick={() => updateFormData({ experienceLevel: level.id })}
                     >
@@ -568,7 +581,7 @@ export default function Signup() {
                           <p className="text-sm text-muted-foreground">{level.desc}</p>
                         </div>
                         {formData.experienceLevel === level.id && (
-                          <Check className="w-5 h-5 text-primary" />
+                          <Check className="w-5 h-5 text-purple-500" />
                         )}
                       </div>
                     </div>
@@ -586,7 +599,11 @@ export default function Signup() {
                       variant={formData.goals.includes(goal) ? "default" : "outline"}
                       size="sm"
                       onClick={() => toggleGoal(goal)}
-                      className="justify-start"
+                      className={`justify-start transition-all duration-200 hover:scale-105 ${
+                        formData.goals.includes(goal)
+                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                          : 'hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 dark:hover:from-orange-900/20 dark:hover:to-red-900/20'
+                      }`}
                     >
                       {goal}
                     </Button>
@@ -604,17 +621,19 @@ export default function Signup() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <Settings className="w-8 h-8 text-primary" />
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                <Settings className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold">Preferences</h2>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600">
+                Preferences
+              </h2>
               <p className="text-muted-foreground">Customize your notifications and privacy settings</p>
             </div>
 
             <div className="space-y-6">
-              <Card>
+              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
                 <CardHeader>
-                  <CardTitle className="text-lg">Notifications</CardTitle>
+                  <CardTitle className="text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Notifications</CardTitle>
                   <CardDescription>Choose how you'd like to be notified</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -664,9 +683,9 @@ export default function Signup() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
                 <CardHeader>
-                  <CardTitle className="text-lg">Privacy</CardTitle>
+                  <CardTitle className="text-lg text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">Privacy</CardTitle>
                   <CardDescription>Control who can see your information</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -680,10 +699,10 @@ export default function Signup() {
                       ].map((option) => (
                         <div
                           key={option.id}
-                          className={`border rounded-lg p-3 cursor-pointer transition-colors ${
+                          className={`border rounded-lg p-3 cursor-pointer transition-all duration-200 hover:scale-105 ${
                             formData.profileVisibility === option.id 
-                              ? 'border-primary bg-primary/5' 
-                              : 'border-border hover:border-primary/50'
+                              ? 'border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 shadow-lg' 
+                              : 'border-border hover:border-green-300 hover:bg-gradient-to-r hover:from-green-50/50 hover:to-emerald-50/50 dark:hover:from-green-900/10 dark:hover:to-emerald-900/10'
                           }`}
                           onClick={() => updateFormData({ profileVisibility: option.id })}
                         >
@@ -693,7 +712,7 @@ export default function Signup() {
                               <p className="text-sm text-muted-foreground">{option.desc}</p>
                             </div>
                             {formData.profileVisibility === option.id && (
-                              <Check className="w-5 h-5 text-primary" />
+                              <Check className="w-5 h-5 text-green-500" />
                             )}
                           </div>
                         </div>
@@ -721,17 +740,20 @@ export default function Signup() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <Rocket className="w-8 h-8 text-primary" />
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                <Rocket className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold">You're Almost Ready!</h2>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600">
+                You're Almost Ready!
+              </h2>
               <p className="text-muted-foreground">Just a few more details and you're all set</p>
             </div>
 
-            <Card className="bg-gradient-to-r from-primary/5 to-purple-600/5">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2" />
+            <Card className="bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-emerald-900/20 dark:via-green-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-700 shadow-lg">
+              <CardContent className="p-6 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/50 to-teal-100/50 dark:from-emerald-800/20 dark:to-teal-800/20"></div>
+                <h3 className="relative text-lg font-semibold mb-4 flex items-center text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
+                  <Sparkles className="w-5 h-5 mr-2 text-emerald-500 animate-spin [animation-duration:3s]" />
                   Welcome to CodeHut!
                 </h3>
                 <div className="space-y-3 text-sm">
@@ -793,11 +815,19 @@ export default function Signup() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" type="button">
+              <Button 
+                variant="outline" 
+                type="button"
+                className="transition-all duration-200 hover:scale-105 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-800 dark:hover:to-slate-800 hover:border-gray-300"
+              >
                 <Github className="w-4 h-4 mr-2" />
                 GitHub
               </Button>
-              <Button variant="outline" type="button">
+              <Button 
+                variant="outline" 
+                type="button"
+                className="transition-all duration-200 hover:scale-105 hover:bg-gradient-to-r hover:from-blue-50 hover:to-red-50 dark:hover:from-blue-900/20 dark:hover:to-red-900/20 hover:border-blue-300"
+              >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -828,15 +858,23 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-1/4 -left-8 w-32 h-32 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-15 animate-bounce [animation-duration:3s]"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full opacity-25 animate-pulse [animation-delay:1s]"></div>
+        <div className="absolute bottom-8 left-1/3 w-20 h-20 bg-gradient-to-r from-orange-400 to-red-400 rounded-full opacity-20 animate-bounce [animation-duration:4s] [animation-delay:2s]"></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-background border-b border-border">
+      <header className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
                 to="/"
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-200 hover:scale-105"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Home
@@ -845,7 +883,10 @@ export default function Signup() {
             </div>
             <div className="text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="text-primary hover:underline">
+              <Link 
+                to="/login" 
+                className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-medium transition-all duration-200 hover:scale-105"
+              >
                 Sign in
               </Link>
             </div>
@@ -854,35 +895,47 @@ export default function Signup() {
       </header>
 
       {/* Progress Bar */}
-      <div className="bg-background border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-            <span>Step {currentStep} of {totalSteps}</span>
-            <span>{Math.round(progress)}% complete</span>
+      <div className="relative bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border-b border-border/50">
+        <div className="max-w-2xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
+            <span className="font-medium">Step {currentStep} of {totalSteps}</span>
+            <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              {Math.round(progress)}% complete
+            </span>
           </div>
-          <Progress value={progress} className="h-2" />
+          <div className="relative h-3 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full overflow-hidden">
+            <div 
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out shadow-lg"
+              style={{ width: `${progress}%` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full animate-pulse"></div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <main className="relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl w-full">
-          <Card className="shadow-lg">
-            <CardContent className="p-8">
+          <Card className="shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-0 ring-1 ring-white/20 dark:ring-slate-700/50">
+            <CardContent className="p-8 relative overflow-hidden">
+              {/* Card Background Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 dark:from-slate-800/50 dark:to-slate-700/50 pointer-events-none"></div>
               {error && (
-                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+                <div className="relative mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border border-red-200 dark:border-red-800 rounded-xl shadow-lg">
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-100/50 to-pink-100/50 dark:from-red-800/20 dark:to-pink-800/20 rounded-xl"></div>
+                  <p className="relative text-red-700 dark:text-red-400 text-sm font-medium">{error}</p>
                 </div>
               )}
 
               {renderStep()}
 
-              <div className="flex items-center justify-between pt-6 mt-8 border-t">
+              <div className="relative flex items-center justify-between pt-6 mt-8 border-t">
                 <Button
                   variant="outline"
                   onClick={handlePrevious}
                   disabled={currentStep === 1}
-                  className="flex items-center"
+                  className="flex items-center transition-all duration-200 hover:scale-105 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-800 dark:hover:to-gray-700"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Previous
@@ -892,15 +945,22 @@ export default function Signup() {
                   {Array.from({ length: totalSteps }, (_, i) => (
                     <div
                       key={i}
-                      className={`w-2 h-2 rounded-full ${
-                        i < currentStep ? 'bg-primary' : 'bg-muted'
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        i < currentStep 
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg scale-110' 
+                          : i === currentStep - 1
+                          ? 'bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse'
+                          : 'bg-muted'
                       }`}
                     />
                   ))}
                 </div>
 
                 {currentStep < totalSteps ? (
-                  <Button onClick={handleNext} className="flex items-center">
+                  <Button 
+                    onClick={handleNext} 
+                    className="flex items-center bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-200 hover:scale-105 shadow-lg"
+                  >
                     Next
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -908,7 +968,7 @@ export default function Signup() {
                   <Button 
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center bg-green-600 hover:bg-green-700"
+                    className="flex items-center bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:hover:scale-100"
                   >
                     {loading ? (
                       "Creating Account..."

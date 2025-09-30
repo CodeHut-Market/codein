@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
 import { CodeSnippet, GetUserResponse, UpdateCodeSnippetRequest } from "@shared/api";
 import {
     ArrowLeft,
@@ -14,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 function CodeSnippetCard({ 
   snippet, 

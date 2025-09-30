@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth, useAuthenticatedFetch } from "@/contexts/AuthContext";
 import {
-    CreateCodeSnippetRequest
+  CreateCodeSnippetRequest
 } from "@shared/api";
-import { ArrowLeft, Upload as UploadIcon, FileText, X } from "lucide-react";
-import { useState, useCallback } from "react";
+import { ArrowLeft, FileText, Upload as UploadIcon, X } from "lucide-react";
+import { useCallback, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
 
 export default function Upload() {
   const navigate = useNavigate();

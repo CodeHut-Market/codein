@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create user profile
+    // Create user profile - only include fields that exist in the database schema
     const profileData = {
       id: authData.user.id,
       username: body.username.trim(),
@@ -165,17 +165,7 @@ export async function POST(request: NextRequest) {
       bio: body.bio?.trim() || null,
       location: body.location?.trim() || null,
       website: body.website?.trim() || null,
-      primary_language: body.primaryLanguage,
-      interests: body.interests,
-      experience_level: body.experienceLevel,
-      goals: body.goals,
-      email_notifications: body.preferences.emailNotifications,
-      browser_notifications: body.preferences.browserNotifications,
-      weekly_digest: body.preferences.weeklyDigest,
-      marketing_emails: body.preferences.marketingEmails,
-      profile_visibility: body.preferences.profileVisibility,
-      show_email: body.preferences.showEmail,
-      subscribe_newsletter: body.subscribeNewsletter,
+      avatar_url: null, // Will be set later when user uploads avatar
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };

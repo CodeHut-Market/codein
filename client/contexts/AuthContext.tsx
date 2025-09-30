@@ -1,10 +1,11 @@
 import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
 } from "react";
+import { isSupabaseEnabled, supabase } from "../../app/lib/supabaseClient";
 
 interface User {
   id: string;
@@ -26,6 +27,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (userData: User, accessToken: string) => void;
+  signUp: (email: string, password: string, metadata?: any) => Promise<{ data?: any; error?: any }>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
   isLoading: boolean;
@@ -105,6 +107,82 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
+  const signUp = async (email: string, password: string, metadata?: any) => {
+    try {
+      setIsLoading(true);
+      
+      // Try Supabase signup first if available
+      if (isSupabaseEnabled() && supabase) {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: metadata || {}
+          }
+        });
+        
+        if (error) {
+          return { error };
+        }
+        
+        if (data.user) {
+          // Auto-login if session is available
+          if (data.session) {
+            const userData: User = {
+              id: data.user.id,
+              username: metadata?.username || data.user.email?.split('@')[0] || 'User',
+              email: data.user.email || email,
+              bio: metadata?.bio || '',
+              avatar: data.user.user_metadata?.avatar_url || '',
+              totalSnippets: 0,
+              totalDownloads: 0,
+              rating: 0,
+              role: 'user',
+              isActive: true,
+              emailVerified: data.user.email_confirmed_at ? true : false,
+              createdAt: data.user.created_at || new Date().toISOString(),
+              lastLoginAt: new Date().toISOString()
+            };
+            
+            login(userData, data.session.access_token);
+          }
+        }
+        
+        return { data, error: null };
+      } else {
+        // Fallback to API-based signup
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            metadata
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          return { error: { message: result.error || 'Signup failed' } };
+        }
+        
+        return { data: result, error: null };
+      }
+    } catch (error) {
+      console.error('SignUp error:', error);
+      return { 
+        error: { 
+          message: error instanceof Error ? error.message : 'An unexpected error occurred during signup' 
+        } 
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       // Call logout endpoint to invalidate session
@@ -139,6 +217,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     token,
     login,
+    signUp,
     logout,
     updateUser,
     isLoading,
