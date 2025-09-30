@@ -3,9 +3,9 @@
 import { Check, Copy, Download } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow, vs } from 'react-syntax-highlighter/dist/styles';
-import { useToastContext } from '../../../components/ToastProvider';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { tomorrow, vs } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { useToast } from '../../hooks/useToast';
 import { Button } from './button';
 
 interface CodeHighlighterProps {
@@ -30,7 +30,7 @@ export function CodeHighlighter({
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const { resolvedTheme } = useTheme();
-  const { success, error } = useToastContext();
+  const { success, error } = useToast();
 
   // Map common language names to Prism.js language identifiers
   const getLanguageId = (lang: string): string => {
