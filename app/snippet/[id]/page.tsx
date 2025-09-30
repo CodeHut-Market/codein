@@ -264,7 +264,17 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             <Code2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Error loading snippet</h3>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={loadSnippet}>Try Again</Button>
+            <div className="flex gap-2 justify-center">
+              <Button onClick={loadSnippet} variant="outline">Try Again</Button>
+              <Button asChild>
+                <Link href="/explore">Browse Snippets</Link>
+              </Button>
+            </div>
+            <div className="mt-4">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard">← Back to Dashboard</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

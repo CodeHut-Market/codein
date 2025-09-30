@@ -33,6 +33,12 @@ export interface CodeSnippet {
   updatedAt: string;
   /** Optional aggregated favorites count */
   favoriteCount?: number;
+  // Enhanced fields for complete functionality
+  category?: string;
+  visibility?: 'public' | 'private' | 'unlisted';
+  allowComments?: boolean;
+  featured?: boolean;
+  verificationStatus?: 'pending' | 'verified' | 'rejected';
 }
 
 /**
@@ -46,6 +52,9 @@ export interface CreateCodeSnippetRequest {
   tags: string[];
   language: string;
   framework?: string;
+  category?: string;
+  visibility?: 'public' | 'private' | 'unlisted';
+  allowComments?: boolean;
 }
 
 /**
