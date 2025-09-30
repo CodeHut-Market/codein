@@ -1,10 +1,5 @@
 "use client";
 
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
-import { CodeHighlighter } from "../../components/ui/syntax-highlighter";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import {
     Code,
     Crown,
@@ -14,6 +9,11 @@ import {
     Settings
 } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { CodeHighlighter } from "../../components/ui/syntax-highlighter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 
 const installationCode = `# Install via npm
 npm install @codehut/ui-components

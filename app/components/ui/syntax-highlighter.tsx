@@ -4,7 +4,7 @@ import { Check, Copy, Download } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { tomorrow, vs } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { tomorrow, vs } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import { useToast } from '../../hooks/useToast';
 import { Button } from './button';
 
