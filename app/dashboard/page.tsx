@@ -5,6 +5,7 @@ import {
     Activity,
     BarChart3,
     Code2,
+    CreditCard,
     Eye,
     Heart,
     PlusCircle,
@@ -25,6 +26,17 @@ import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [userSnippets, setUserSnippets] = useState<any[]>([])
+  const [stats, setStats] = useState({
+    totalSnippets: 0,
+    publicSnippets: 0,
+    privateSnippets: 0,
+    totalViews: 0,
+    totalLikes: 0,
+    totalDownloads: 0,
+    averageRating: 0
+  })
+  const [loadingData, setLoadingData] = useState(false)
 
   useEffect(() => {
     if (isSupabaseEnabled()) {
@@ -46,52 +58,62 @@ export default function DashboardPage() {
     }
   }, [])
 
-  // Mock data for demonstration
-  const stats = {
-    totalSnippets: 24,
-    totalViews: 1247,
-    totalLikes: 89,
-    totalFollowers: 156,
-    weeklyUploads: 5,
-    monthlyGrowth: 12.5
+  // Fetch user's snippets when user is available
+  useEffect(() => {
+    if (user) {
+      fetchUserSnippets()
+    }
+  }, [user])
+
+  const fetchUserSnippets = async () => {
+    if (!user) return
+    
+    try {
+      setLoadingData(true)
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+
+      // Add user data to request headers
+      headers['x-user-data'] = JSON.stringify({
+        id: user.id,
+        username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+        email: user.email
+      });
+
+      const res = await fetch('/api/snippets/my-snippets', {
+        headers,
+        cache: 'no-store'
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch snippets');
+      }
+
+      const data = await res.json();
+      setUserSnippets(data.snippets || []);
+      setStats(data.stats || stats);
+      
+      console.log('Dashboard: Fetched user snippets:', data.snippets?.length || 0);
+    } catch (error) {
+      console.error('Dashboard: Error fetching snippets:', error);
+    } finally {
+      setLoadingData(false);
+    }
   }
 
-  const recentSnippets = [
-    {
-      id: 1,
-      title: 'React Hook for API Calls',
-      language: 'JavaScript',
-      views: 234,
-      likes: 18,
-      createdAt: '2 days ago',
-      tags: ['react', 'hooks', 'api']
-    },
-    {
-      id: 2,
-      title: 'Python Data Processing',
-      language: 'Python',
-      views: 156,
-      likes: 12,
-      createdAt: '5 days ago',
-      tags: ['python', 'data', 'pandas']
-    },
-    {
-      id: 3,
-      title: 'CSS Grid Layout',
-      language: 'CSS',
-      views: 89,
-      likes: 7,
-      createdAt: '1 week ago',
-      tags: ['css', 'grid', 'layout']
-    }
-  ]
-
-  const activity = [
-    { action: 'Uploaded new snippet', snippet: 'React Hook for API Calls', time: '2 hours ago' },
-    { action: 'Received a like on', snippet: 'Python Data Processing', time: '4 hours ago' },
-    { action: 'New follower', snippet: null, time: '6 hours ago' },
-    { action: 'Snippet featured', snippet: 'CSS Grid Layout', time: '1 day ago' }
-  ]
+  // Get recent snippets from user's snippets
+  const recentSnippets = userSnippets.slice(0, 5).map(snippet => ({
+    id: snippet.id,
+    title: snippet.title,
+    language: snippet.language,
+    views: snippet.views || 0,
+    likes: snippet.likes || 0,
+    downloads: snippet.downloads || 0,
+    createdAt: new Date(snippet.createdAt).toLocaleDateString(),
+    tags: snippet.tags || [],
+    visibility: snippet.visibility || 'public'
+  }))
 
   const getUserDisplayName = (user: User | null) => {
     if (!user) return 'Guest User'
@@ -176,9 +198,9 @@ export default function DashboardPage() {
             <Code2 className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">{stats.totalSnippets}</div>
+            <div className="text-2xl font-bold text-primary">{loadingData ? '...' : stats.totalSnippets}</div>
             <p className="text-xs text-muted-foreground">
-              +{stats.weeklyUploads} this week
+              {stats.publicSnippets} public, {stats.privateSnippets} private
             </p>
           </CardContent>
         </Card>
@@ -189,9 +211,9 @@ export default function DashboardPage() {
             <Eye className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{stats.totalViews.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-emerald-600">{loadingData ? '...' : stats.totalViews.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              +{stats.monthlyGrowth}% from last month
+              Total downloads: {stats.totalDownloads}
             </p>
           </CardContent>
         </Card>
@@ -202,9 +224,9 @@ export default function DashboardPage() {
             <Heart className="h-4 w-4 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-rose-500">{stats.totalLikes}</div>
+            <div className="text-2xl font-bold text-rose-500">{loadingData ? '...' : stats.totalLikes}</div>
             <p className="text-xs text-muted-foreground">
-              Across all snippets
+              Avg rating: {stats.averageRating.toFixed(1)}/5
             </p>
           </CardContent>
         </Card>
@@ -215,9 +237,9 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-violet-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-violet-600">{stats.totalFollowers}</div>
+            <div className="text-2xl font-bold text-violet-600">{loadingData ? '...' : userSnippets.length}</div>
             <p className="text-xs text-muted-foreground">
-              Growing community
+              Recent uploads
             </p>
           </CardContent>
         </Card>
@@ -266,6 +288,12 @@ export default function DashboardPage() {
                     Edit Profile
                   </Button>
                 </Link>
+                <Link href="/transactions">
+                  <Button variant="outline" className="w-full justify-start">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Transaction History
+                  </Button>
+                </Link>
                 <Link href="/dashboard/profile">
                   <Button variant="outline" className="w-full justify-start">
                     <BarChart3 className="mr-2 h-4 w-4" />
@@ -285,24 +313,24 @@ export default function DashboardPage() {
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Uploads Goal</span>
-                    <span>{stats.weeklyUploads * 4}/20</span>
+                    <span>Total Snippets</span>
+                    <span>{stats.totalSnippets}</span>
                   </div>
-                  <Progress value={(stats.weeklyUploads * 4) / 20 * 100} className="mt-2" />
+                  <Progress value={Math.min((stats.totalSnippets / 10) * 100, 100)} className="mt-2" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Engagement Rate</span>
-                    <span>68%</span>
+                    <span>Public vs Private</span>
+                    <span>{stats.publicSnippets}/{stats.privateSnippets}</span>
                   </div>
-                  <Progress value={68} className="mt-2" />
+                  <Progress value={stats.totalSnippets > 0 ? (stats.publicSnippets / stats.totalSnippets) * 100 : 0} className="mt-2" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Profile Completeness</span>
-                    <span>85%</span>
+                    <span>Avg Rating</span>
+                    <span>{stats.averageRating.toFixed(1)}/5</span>
                   </div>
-                  <Progress value={85} className="mt-2" />
+                  <Progress value={(stats.averageRating / 5) * 100} className="mt-2" />
                 </div>
               </CardContent>
             </Card>
@@ -318,42 +346,59 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentSnippets.map((snippet) => (
-                  <div
+              {loadingData ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-muted-foreground">Loading your snippets...</div>
+                </div>
+              ) : recentSnippets.length === 0 ? (
+                <div className="text-center py-8">
+                  <Code2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground mb-4">No snippets yet</p>
+                  <Link href="/upload">
+                    <Button>Upload Your First Snippet</Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentSnippets.map((snippet) => (
+                  <Link
                     key={snippet.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                    href={`/snippet/${snippet.id}`}
+                    className="block"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="font-semibold">{snippet.title}</h3>
-                        <Badge variant="secondary">{snippet.language}</Badge>
+                    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="font-semibold hover:text-primary transition-colors">{snippet.title}</h3>
+                          <Badge variant="secondary">{snippet.language}</Badge>
+                        </div>
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                          <span className="flex items-center">
+                            <Eye className="mr-1 h-3 w-3" />
+                            {snippet.views}
+                          </span>
+                          <span className="flex items-center">
+                            <Heart className="mr-1 h-3 w-3" />
+                            {snippet.likes}
+                          </span>
+                          <span>{snippet.createdAt}</span>
+                        </div>
+                        <div className="flex gap-1 mt-2">
+                          {snippet.tags.map((tag) => (
+                            <Badge key={tag} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                        <span className="flex items-center">
-                          <Eye className="mr-1 h-3 w-3" />
-                          {snippet.views}
-                        </span>
-                        <span className="flex items-center">
-                          <Heart className="mr-1 h-3 w-3" />
-                          {snippet.likes}
-                        </span>
-                        <span>{snippet.createdAt}</span>
-                      </div>
-                      <div className="flex gap-1 mt-2">
-                        {snippet.tags.map((tag) => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
+                      <Button variant="ghost" size="sm" onClick={(e) => e.preventDefault()}>
+                        <BarChart3 className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      <BarChart3 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
+                  </Link>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -367,22 +412,31 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {activity.map((item, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <Activity className="h-4 w-4 mt-1 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm">
-                        {item.action}
-                        {item.snippet && (
-                          <span className="font-medium"> "{item.snippet}"</span>
-                        )}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{item.time}</p>
+              {loadingData ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-muted-foreground">Loading activity...</div>
+                </div>
+              ) : recentSnippets.length === 0 ? (
+                <div className="text-center py-8">
+                  <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No recent activity</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentSnippets.slice(0, 3).map((snippet, index) => (
+                    <div key={snippet.id} className="flex items-start space-x-3">
+                      <Upload className="h-4 w-4 mt-1 text-muted-foreground" />
+                      <div className="flex-1">
+                        <p className="text-sm">
+                          Uploaded new snippet
+                          <span className="font-medium"> "{snippet.title}"</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">{snippet.createdAt}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

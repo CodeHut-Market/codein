@@ -162,12 +162,6 @@ export default function Navigation({ className }: NavigationProps) {
                       <span>Profile Settings</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/billing" className="cursor-pointer">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Billing</span>
-                    </Link>
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"

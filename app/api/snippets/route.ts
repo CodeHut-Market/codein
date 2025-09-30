@@ -50,16 +50,19 @@ export async function POST(req: NextRequest){
       title: body.title, 
       language: body.language, 
       hasCode: !!body.code,
-      codeLength: body.code?.length 
+      codeLength: body.code?.length,
+      visibility: body.visibility,
+      category: body.category 
     });
     
+    // Validate required fields
     if(!body.title || !body.code || !body.language){
       console.log('POST /api/snippets - Missing required fields:', { 
         hasTitle: !!body.title, 
         hasCode: !!body.code, 
         hasLanguage: !!body.language 
       });
-      return NextResponse.json({ error: 'Missing required fields'}, { status: 400 });
+      return NextResponse.json({ error: 'Missing required fields: title, code, and language are required'}, { status: 400 });
     }
 
     // Require user authentication for upload
@@ -68,6 +71,7 @@ export async function POST(req: NextRequest){
       console.log('POST /api/snippets - No user authentication found, rejecting upload');
       return NextResponse.json({ error: 'Authentication required to upload snippets.' }, { status: 401 });
     }
+    
     let userData;
     try {
       userData = JSON.parse(userDataHeader);
@@ -75,26 +79,37 @@ export async function POST(req: NextRequest){
       console.warn('POST /api/snippets - Failed to parse user data header');
       return NextResponse.json({ error: 'Invalid user data.' }, { status: 400 });
     }
+    
     if (!userData.id || !userData.username) {
       return NextResponse.json({ error: 'Incomplete user data.' }, { status: 400 });
     }
+    
     const author = userData.username;
     const authorId = userData.id;
     console.log('POST /api/snippets - Authenticated user:', { author, authorId });
+    
+    // Enhanced snippet creation with new fields
     const snippet = await createSnippet({
-      title: body.title,
+      title: body.title.trim(),
       code: body.code,
-      description: body.description,
+      description: body.description?.trim() || '',
       language: body.language,
-      price: typeof body.price === 'number' ? body.price : 0,
-      tags: body.tags || [],
-      framework: body.framework,
+      price: typeof body.price === 'number' ? Math.max(0, body.price) : 0,
+      tags: Array.isArray(body.tags) ? body.tags.filter(tag => tag.trim()) : [],
+      framework: body.framework?.trim(),
+      category: body.category?.trim(),
+      visibility: body.visibility || 'public',
+      allowComments: body.allowComments !== false, // default to true
       author: author,
       authorId: authorId
     });
     
     console.log('POST /api/snippets - Successfully created snippet with ID:', snippet.id);
-    return NextResponse.json({ snippet, message: 'Created'}, { status: 201 });
+    return NextResponse.json({ 
+      snippet, 
+      message: 'Snippet created successfully'
+    }, { status: 201 });
+    
   } catch(e){
     console.error('POST /api/snippets - Error creating snippet:', e);
     return NextResponse.json({ 
