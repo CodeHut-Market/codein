@@ -11,6 +11,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdvancedSearch from "./pages/AdvancedSearch";
 import Analytics from "./pages/Analytics";
+import Billing from "./pages/Billing";
 import CheckoutPage from "./pages/CheckoutPage";
 import Dashboard from "./pages/Dashboard";
 import Explore from "./pages/Explore";
@@ -49,6 +50,7 @@ const AppRoutes = () => (
     <Route path="/admin" element={<AdminDashboard />} />
     <Route path="/analytics" element={<Analytics />} />
     <Route path="/favorites" element={<Favorites />} />
+    <Route path="/billing" element={<Billing />} />
     <Route path="/profile" element={<ProfileRedirect />} />
     <Route path="/profile/:username" element={<Profile />} />
     <Route path="/checkout" element={<CheckoutPage />} />
