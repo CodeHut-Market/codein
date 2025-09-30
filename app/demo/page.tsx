@@ -494,32 +494,7 @@ export default function DemoPage() {
         </div>
 
         {/* CTA Section */}
-        <Card className="mt-12 bg-gradient-to-r from-primary/10 to-purple-600/10 border-primary/20">
-          <CardContent className="text-center py-12">
-            <h2 className="text-3xl font-bold mb-4">Ready to organize your code snippets?</h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              You've seen how powerful CodeHut can be. Start your free trial today and experience 
-              the full platform with your own code snippets.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup">
-                <Button size="lg" className="text-lg px-8">
-                  <Users className="h-5 w-5 mr-2" />
-                  Start Free Trial - 14 Days
-                </Button>
-              </Link>
-              <Link href="/pricing">
-                <Button size="lg" variant="outline" className="text-lg px-8">
-                  <ArrowRight className="h-5 w-5 mr-2" />
-                  View Pricing Plans
-                </Button>
-              </Link>
-            </div>
-            <p className="text-sm text-muted-foreground mt-4">
-              No credit card required • Full access to Pro features • Cancel anytime
-            </p>
-          </CardContent>
-        </Card>
+
       </div>
     </div>
   );
