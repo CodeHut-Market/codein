@@ -46,7 +46,7 @@ export default function ExplorePage() {
       if (selectedCategory !== 'all') params.set("category", selectedCategory)
       if (sortBy !== 'trending') params.set("sortBy", sortBy)
       
-      const res = await fetch(`/api/snippets?${params.toString()}`, { cache: "no-store" })
+      const res = await fetch(`/api/snippets/explore?${params.toString()}`, { cache: "no-store" })
       if (!res.ok) {
         setSnippets([])
         setTotalCount(0)

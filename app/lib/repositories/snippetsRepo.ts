@@ -56,6 +56,7 @@ export function useAPI(url, options = {}) {
     author: "ReactPro",
     authorId: "react-pro-123",
     downloads: 1234,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
     updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -102,6 +103,7 @@ def create_user(name: str, age: int, email: str):
     author: "PythonMaster",
     authorId: "python-master-456",
     downloads: 892,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
     updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -147,6 +149,7 @@ export function useLocalStorage<T>(
     author: "VueGuru",
     authorId: "vue-guru-789",
     downloads: 567,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
     updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -207,6 +210,7 @@ export function useLocalStorage<T>(
     author: "CSSArtist",
     authorId: "css-artist-101",
     downloads: 2345,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
     updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -281,6 +285,7 @@ module.exports = JWTAuth;`,
     author: "SecurityExpert",
     authorId: "security-expert-202",
     downloads: 1876,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -372,6 +377,7 @@ export class CustomValidators {
     author: "AngularPro",
     authorId: "angular-pro-303",
     downloads: 743,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
     updatedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
   },
@@ -481,6 +487,7 @@ func main() {
     author: "GoExpert",
     authorId: "go-expert-404",
     downloads: 456,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
     updatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
   },
@@ -610,6 +617,7 @@ class NetworkService: NetworkServiceProtocol {
     author: "iOSDeveloper",
     authorId: "ios-dev-505",
     downloads: 321,
+    visibility: 'public' as const,
     createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
     updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
   }
@@ -635,8 +643,18 @@ function initializeMemorySnippets() {
 initializeMemorySnippets();
 
 export interface CreateSnippetInput {
-  title: string; code: string; description?: string; language: string; price?: number; tags?: string[]; framework?: string;
-  authorId: string; author: string;
+  title: string; 
+  code: string; 
+  description?: string; 
+  language: string; 
+  price?: number; 
+  tags?: string[]; 
+  framework?: string;
+  category?: string;
+  visibility?: 'public' | 'private' | 'unlisted';
+  allowComments?: boolean;
+  authorId: string; 
+  author: string;
 }
 
 export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnippet>{
@@ -653,6 +671,9 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
     tags: input.tags || [],
     language: input.language,
     framework: input.framework,
+    category: input.category,
+    visibility: input.visibility || 'public',
+    allowComments: input.allowComments !== false,
     downloads: 0,
     createdAt: now,
     updatedAt: now
@@ -680,10 +701,12 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
         rating: snippet.rating,
         author: snippet.author,
         author_id: snippet.authorId, // Map authorId to author_id
-        user_id: snippet.authorId,   // ALSO map to user_id (database schema requirement)
         tags: snippet.tags,
         language: snippet.language,
         framework: snippet.framework,
+        category: snippet.category,
+        visibility: snippet.visibility,
+        allow_comments: snippet.allowComments,
         downloads: snippet.downloads,
         created_at: snippet.createdAt, // Map createdAt to created_at
         updated_at: snippet.updatedAt  // Map updatedAt to updated_at
@@ -721,6 +744,7 @@ export interface ListSnippetsOptions {
   featured?: boolean;
   limit?: number;
   userId?: string;
+  publicOnly?: boolean;
 }
 
 export async function listSnippets(options?: ListSnippetsOptions | string): Promise<CodeSnippet[]>{
@@ -741,8 +765,20 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
         q = q.eq('language', opts.language);
       }
       
+      if(opts.category && opts.category !== 'all'){
+        q = q.eq('category', opts.category);
+      }
+      
       if(opts.userId){
-        q = q.eq('authorId', opts.userId);
+        q = q.eq('author_id', opts.userId);
+      }
+      
+      if(opts.publicOnly){
+        q = q.eq('visibility', 'public');
+      }
+      
+      if(opts.featured){
+        q = q.eq('featured', true);
       }
       
       // Handle sorting - prioritize actual database data sorting
@@ -825,7 +861,8 @@ function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
     results = results.filter(s=>
       s.title.toLowerCase().includes(ql) ||
       s.language.toLowerCase().includes(ql) ||
-      s.description.toLowerCase().includes(ql)
+      s.description.toLowerCase().includes(ql) ||
+      (s.tags && s.tags.some(tag => tag.toLowerCase().includes(ql)))
     );
   }
   
@@ -833,8 +870,16 @@ function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
     results = results.filter(s => s.language.toLowerCase() === opts.language!.toLowerCase());
   }
   
+  if(opts.category && opts.category !== 'all') {
+    results = results.filter(s => s.category?.toLowerCase() === opts.category!.toLowerCase());
+  }
+  
   if(opts.userId) {
     results = results.filter(s => s.authorId === opts.userId);
+  }
+  
+  if(opts.publicOnly) {
+    results = results.filter(s => (s.visibility || 'public') === 'public');
   }
   
   // Sort results
@@ -1008,6 +1053,9 @@ function mapRowToSnippet(row: any): CodeSnippet {
     tags: Array.isArray(row.tags) ? row.tags : [],
     language: row.language,
     framework: row.framework || undefined,
+    category: row.category || undefined,
+    visibility: row.visibility || 'public',
+    allowComments: row.allow_comments !== false,
     downloads: Number(row.downloads || 0),
     createdAt: row.createdAt ?? row.created_at ?? new Date().toISOString(),
     updatedAt: row.updatedAt ?? row.updated_at ?? row.createdAt ?? row.created_at ?? new Date().toISOString(),

@@ -100,8 +100,40 @@ export default function UploadPage() {
     setTags(tags.filter(tag => tag !== tagToRemove))
   }
 
+  const validateForm = () => {
+    const errors: string[] = []
+    
+    if (!title.trim()) errors.push('Title is required')
+    if (title.trim().length < 3) errors.push('Title must be at least 3 characters')
+    if (title.trim().length > 100) errors.push('Title must be less than 100 characters')
+    
+    if (!code.trim()) errors.push('Code is required')
+    if (code.trim().length < 10) errors.push('Code must be at least 10 characters')
+    
+    if (!language) errors.push('Programming language is required')
+    
+    if (description.length > 500) errors.push('Description must be less than 500 characters')
+    
+    if (tags.length > 10) errors.push('Maximum 10 tags allowed')
+    
+    const priceNum = parseFloat(price)
+    if (isNaN(priceNum) || priceNum < 0) errors.push('Price must be a valid non-negative number')
+    if (priceNum > 1000) errors.push('Price cannot exceed $1000')
+    
+    if (!user) errors.push('You must be logged in to upload snippets')
+    
+    return errors
+  }
+
   async function handleUpload() {
-    if (!title.trim() || !code.trim()) return
+    // Validate form
+    const validationErrors = validateForm()
+    if (validationErrors.length > 0) {
+      setUploadMessage(`❌ ${validationErrors[0]}`)
+      setTimeout(() => setUploadMessage(null), 4000)
+      return
+    }
+    
     setUploading(true)
     setUploadMessage(null)
     try {
@@ -137,29 +169,40 @@ export default function UploadPage() {
           price: parseFloat(price) || 0,
           tags,
           category,
-          isPublic,
+          visibility: isPublic ? 'public' : 'private',
           allowComments
         })
       })
-      if (!res.ok) throw new Error('Upload failed')
-      const data = await res.json()
-      setUploadMessage('Uploaded successfully! Redirecting...')
-      // Optimistic redirect to detail page
-      if (data.snippet?.id) {
-        setTimeout(() => router.push(`/snippet/${data.snippet.id}`), 600)
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(errorData.error || `Upload failed with status ${res.status}`);
       }
-      // Clear form (optimistic)
+      
+      const data = await res.json()
+      console.log('Upload successful:', data);
+      setUploadMessage('✅ Snippet uploaded successfully! Redirecting...')
+      
+      // Clear form immediately
       setTitle('')
       setCode('')
       setDescription('')
       setPrice('0')
       setTags([])
       setCategory('')
+      
+      // Redirect to detail page or dashboard
+      if (data.snippet?.id) {
+        setTimeout(() => router.push(`/snippet/${data.snippet.id}`), 1500)
+      } else {
+        setTimeout(() => router.push('/dashboard'), 1500)
+      }
     } catch (e) {
-      setUploadMessage((e as Error).message)
+      console.error('Upload error:', e);
+      const errorMessage = e instanceof Error ? e.message : 'Upload failed';
+      setUploadMessage(`❌ ${errorMessage}`)
     } finally {
       setUploading(false)
-      setTimeout(() => setUploadMessage(null), 4000)
+      setTimeout(() => setUploadMessage(null), 6000)
     }
   }
 

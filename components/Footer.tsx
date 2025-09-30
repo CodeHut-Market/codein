@@ -51,7 +51,6 @@ const footerSections = {
       { name: 'Discord', href: 'https://discord.gg/BqkC2YjD', icon: MessageCircle, external: true },
       { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github, external: true },
       { name: 'Contributors', href: '/contributors', icon: Users },
-      { name: 'Events', href: '/events', icon: Users },
     ]
   },
   company: {
