@@ -1,6 +1,6 @@
 import { CodeSnippet } from '@shared/api';
 import { randomUUID } from 'crypto';
-import { isSupabaseEnabled, supabase } from '../supabaseClient';
+import { isSupabaseAdminEnabled, isSupabaseEnabled, supabase, supabaseAdmin } from '../supabaseClient';
 
 // Memory fallback - only used when Supabase is not available
 // Start with empty array to prioritize actual database data
@@ -667,9 +667,9 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
   console.log('createSnippet - Added to memory. Total memory snippets:', memorySnippets.length);
   console.log('createSnippet - Memory snippet IDs:', memorySnippets.map(s => s.id).slice(0, 5));
   
-  if(isSupabaseEnabled()){
+  if(isSupabaseAdminEnabled()){
     try {
-      console.log('createSnippet - Also attempting to store in Supabase');
+      console.log('createSnippet - Also attempting to store in Supabase using admin client');
       // Map camelCase to snake_case for database
       const dbSnippet = {
         id: snippet.id,
@@ -690,7 +690,7 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
       };
       
       console.log('createSnippet - Database snippet object:', JSON.stringify(dbSnippet, null, 2));
-      const { data: insertResult, error } = await supabase!.from('snippets').insert(dbSnippet).select();
+      const { data: insertResult, error } = await supabaseAdmin!.from('snippets').insert(dbSnippet).select();
       if(error) {
         console.error('createSnippet - Supabase insert error:', JSON.stringify(error, null, 2));
         console.error('createSnippet - Error code:', error.code);
@@ -707,7 +707,7 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
       console.log('createSnippet - Fallback to memory storage is already done');
     }
   } else {
-    console.log('createSnippet - Stored only in memory (Supabase disabled)');
+    console.log('createSnippet - Stored only in memory (Supabase admin not enabled)');
   }
   
   return snippet;
@@ -1012,4 +1012,70 @@ function mapRowToSnippet(row: any): CodeSnippet {
     createdAt: row.createdAt ?? row.created_at ?? new Date().toISOString(),
     updatedAt: row.updatedAt ?? row.updated_at ?? row.createdAt ?? row.created_at ?? new Date().toISOString(),
   };
+}
+
+// Semantic search function for code snippets
+export async function semanticSearchSnippets(query: string, limit: number = 10): Promise<CodeSnippet[]> {
+  console.log(`semanticSearchSnippets - Query: "${query}", Limit: ${limit}`);
+  console.log('semanticSearchSnippets - Supabase enabled:', isSupabaseEnabled());
+  
+  if (isSupabaseEnabled()) {
+    try {
+      // First try semantic search using vector database
+      console.log('semanticSearchSnippets - Attempting vector search...');
+      
+      // For now, let's try a simple hybrid approach:
+      // 1. Do a text search first
+      // 2. Later we can enhance with actual vector embeddings
+      
+      let results: CodeSnippet[] = [];
+      
+      // Try text-based search first (fallback that should work)
+      const textSearchQuery = supabase!
+        .from('snippets')
+        .select('*')
+        .or(`title.ilike.%${query}%,description.ilike.%${query}%,code.ilike.%${query}%`)
+        .limit(limit);
+        
+      const { data: textData, error: textError } = await textSearchQuery;
+      
+      if (textError) {
+        console.error('semanticSearchSnippets - Text search error:', textError);
+      } else {
+        results = (textData || []).map(mapRowToSnippet);
+        console.log(`semanticSearchSnippets - Found ${results.length} results via text search`);
+      }
+      
+      // If we have vector search available, we could enhance results here
+      // For now, return text search results
+      return results;
+      
+    } catch (error) {
+      console.error('semanticSearchSnippets - Database error:', error);
+      // Fall back to memory search
+    }
+  }
+  
+  // Fallback to memory/demo data search
+  console.log('semanticSearchSnippets - Using fallback memory search');
+  return searchMemorySnippets(query, limit);
+}
+
+// Helper function for memory-based search
+function searchMemorySnippets(query: string, limit: number): CodeSnippet[] {
+  if (memorySnippets.length === 0) {
+    // Use demo data if no real snippets exist
+    memorySnippets.push(...FALLBACK_DEMO_SNIPPETS);
+  }
+  
+  const queryLower = query.toLowerCase();
+  const results = memorySnippets.filter(snippet => 
+    snippet.title.toLowerCase().includes(queryLower) ||
+    snippet.description.toLowerCase().includes(queryLower) ||
+    snippet.code.toLowerCase().includes(queryLower) ||
+    snippet.tags.some(tag => tag.toLowerCase().includes(queryLower)) ||
+    snippet.language.toLowerCase().includes(queryLower)
+  );
+  
+  return results.slice(0, limit);
 }
