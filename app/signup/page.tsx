@@ -12,14 +12,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../../client/components/ui/button";
 import { Card, CardContent } from "../../client/components/ui/card";
 import { Checkbox } from "../../client/components/ui/checkbox";
 import { Input } from "../../client/components/ui/input";
 import { Label } from "../../client/components/ui/label";
 import { Progress } from "../../client/components/ui/progress";
-import { useAuth } from "../../client/contexts/AuthContext";
 import RippleThemeToggle from "../../components/RippleThemeToggle";
 
 interface PasswordValidation {
@@ -65,7 +64,6 @@ interface OnboardingData {
 
 export default function SignupPage() {
   const router = useRouter();
-    const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -79,13 +77,6 @@ export default function SignupPage() {
     special: false,
   });
   const [isUsernameValid, setIsUsernameValid] = useState(true);
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      router.push('/dashboard');
-    }
-  }, [user, router]);
 
   const [formData, setFormData] = useState<OnboardingData>({
     username: "",
