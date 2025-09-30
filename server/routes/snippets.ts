@@ -11,10 +11,16 @@ import {
   createSnippet as dbCreateSnippet,
   pool
 } from "../db/database";
+import { 
+  supabaseClient, 
+  supabaseHelpers, 
+  isSupabaseAvailable,
+  SupabaseSnippet 
+} from "../lib/supabaseClient";
 
 /**
  * GET /api/snippets
- * Get all code snippets with optional filtering
+ * Get all code snippets with optional filtering - prioritizes Supabase
  */
 export const getSnippets: RequestHandler = async (req, res) => {
   try {
@@ -35,6 +41,86 @@ export const getSnippets: RequestHandler = async (req, res) => {
     const limitNum = parseInt(limit as string);
     const offset = (pageNum - 1) * limitNum;
 
+    // Try Supabase first if available
+    if (isSupabaseAvailable() && supabaseClient) {
+      try {
+        // Build filters object
+        const filters = {
+          language,
+          framework,
+          author,
+          minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
+          maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
+          search,
+          sortBy,
+          sortOrder,
+          limit: limitNum,
+          offset,
+        };
+
+        // Build and execute query
+        const query = supabaseHelpers.buildSearchQuery(supabaseClient, filters);
+        const { data: snippets, error } = await query;
+
+        if (error) {
+          console.error('Supabase query error:', error);
+          throw error;
+        }
+
+        // Get total count for pagination
+        let countQuery = supabaseClient
+          .from('snippets')
+          .select('*', { count: 'exact', head: true });
+
+        // Apply same filters for count
+        if (language) {
+          countQuery = countQuery.ilike('language', `%${language}%`);
+        }
+        if (framework) {
+          countQuery = countQuery.ilike('framework', `%${framework}%`);
+        }
+        if (author) {
+          countQuery = countQuery.ilike('author', `%${author}%`);
+        }
+        if (minPrice !== undefined) {
+          countQuery = countQuery.gte('price', parseFloat(minPrice as string));
+        }
+        if (maxPrice !== undefined) {
+          countQuery = countQuery.lte('price', parseFloat(maxPrice as string));
+        }
+        if (search) {
+          countQuery = countQuery.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+        }
+
+        const { count, error: countError } = await countQuery;
+
+        if (countError) {
+          console.error('Supabase count error:', countError);
+          throw countError;
+        }
+
+        const total = count || 0;
+
+        const response = {
+          snippets: (snippets || []).map((snippet: SupabaseSnippet) => 
+            supabaseHelpers.mapSupabaseSnippetToAPI(snippet)
+          ),
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            totalPages: Math.ceil(total / limitNum),
+          },
+        };
+
+        return res.json(response);
+      } catch (supabaseError) {
+        console.error('Supabase error, falling back to PostgreSQL:', supabaseError);
+        // Fall through to PostgreSQL fallback
+      }
+    }
+
+    // Fallback to PostgreSQL implementation
     try {
       // Try PostgreSQL database first
       let query = `
@@ -439,7 +525,7 @@ export const getSnippetsByAuthor: RequestHandler = async (req, res) => {
 
 /**
  * POST /api/snippets
- * Create a new code snippet with plagiarism detection
+ * Create a new code snippet with Supabase storage
  */
 export const createCodeSnippet: RequestHandler = async (req, res) => {
   try {
@@ -462,7 +548,6 @@ export const createCodeSnippet: RequestHandler = async (req, res) => {
       tags = [],
       language,
       framework,
-      skipPlagiarismCheck = false, // Allow admins to skip check
     } = req.body;
 
     // Validate required fields
@@ -486,11 +571,113 @@ export const createCodeSnippet: RequestHandler = async (req, res) => {
       return res.status(400).json(errorResponse);
     }
 
-    // Simplified flow: approve snippet without plagiarism checks
-    let snippetStatus = "approved";
+    // Try Supabase first if available
+    if (isSupabaseAvailable() && supabaseClient) {
+      try {
+        const snippetId = supabaseHelpers.generateSnippetId();
+        
+        const snippetData = {
+          id: snippetId,
+          title,
+          description,
+          code,
+          price,
+          author: user.username,
+          author_id: user.id,
+          tags: Array.isArray(tags) ? tags : [],
+          language,
+          framework: framework || null,
+          rating: 0,
+          downloads: 0,
+        };
 
-    // Create snippet with appropriate status
-    const snippet = await dbCreateSnippet({
+        const { data, error } = await supabaseClient
+          .from('snippets')
+          .insert([snippetData])
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Supabase insert error:', error);
+          throw error;
+        }
+
+        // Convert to API format
+        const snippet = supabaseHelpers.mapSupabaseSnippetToAPI(data as SupabaseSnippet);
+
+        const response = {
+          ...snippet,
+          status: "approved",
+          message: "Code snippet uploaded successfully to Supabase.",
+        };
+
+        return res.status(201).json(response);
+      } catch (supabaseError) {
+        console.error('Supabase error, falling back to PostgreSQL:', supabaseError);
+        // Fall through to PostgreSQL fallback
+      }
+    }
+
+    // Fallback to PostgreSQL pool if Supabase unavailable
+    if (pool) {
+      try {
+        // Simplified flow: approve snippet without plagiarism checks
+        let snippetStatus = "approved";
+
+        // Create snippet with appropriate status
+        const snippet = await dbCreateSnippet({
+          title,
+          description,
+          code,
+          price,
+          author: user.username,
+          authorId: user.id,
+          tags: Array.isArray(tags) ? tags : [],
+          language: language,
+          framework: framework || "",
+        });
+
+        // Update snippet status in database (add status column if needed)
+        try {
+          await pool.query("UPDATE snippets SET status = $1 WHERE id = $2", [
+            snippetStatus,
+            snippet.id,
+          ]);
+        } catch (statusError) {
+          // Status column might not exist in fallback mode - that's okay
+          console.log(
+            "Status update skipped (column may not exist in fallback mode)",
+          );
+        }
+
+        // Update user's snippet count
+        try {
+          await pool.query(
+            "UPDATE users SET total_snippets = total_snippets + 1 WHERE id = $1",
+            [user.id],
+          );
+        } catch (updateError) {
+          console.warn("Failed to update user snippet count:", updateError);
+        }
+
+        // Prepare response
+        const response: any = {
+          ...snippet,
+          status: snippetStatus,
+          message: "Code snippet uploaded successfully to PostgreSQL.",
+        };
+
+        return res.status(201).json(response);
+      } catch (dbError) {
+        console.error('PostgreSQL error, falling back to in-memory:', dbError);
+        // Fall through to in-memory fallback
+      }
+    }
+
+    // Final fallback to in-memory storage
+    const snippetId = `snippet-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newSnippet: CodeSnippet = {
+      id: snippetId,
       title,
       description,
       code,
@@ -498,39 +685,20 @@ export const createCodeSnippet: RequestHandler = async (req, res) => {
       author: user.username,
       authorId: user.id,
       tags: Array.isArray(tags) ? tags : [],
-      language: language,
+      language,
       framework: framework || "",
-    });
+      rating: 0,
+      downloads: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-    // Update snippet status in database (add status column if needed)
-    try {
-      await pool.query("UPDATE snippets SET status = $1 WHERE id = $2", [
-        snippetStatus,
-        snippet.id,
-      ]);
-    } catch (statusError) {
-      // Status column might not exist in fallback mode - that's okay
-      console.log(
-        "Status update skipped (column may not exist in fallback mode)",
-      );
-    }
+    codeSnippets.push(newSnippet);
 
-
-    // Update user's snippet count
-    try {
-      await pool.query(
-        "UPDATE users SET total_snippets = total_snippets + 1 WHERE id = $1",
-        [user.id],
-      );
-    } catch (updateError) {
-      console.warn("Failed to update user snippet count:", updateError);
-    }
-
-    // Prepare response
-    const response: any = {
-      ...snippet,
-      status: snippetStatus,
-      message: "Code snippet uploaded successfully.",
+    const response = {
+      ...newSnippet,
+      status: "approved",
+      message: "Code snippet uploaded successfully to in-memory storage.",
     };
 
     res.status(201).json(response);

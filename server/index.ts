@@ -10,6 +10,9 @@ import {
 } from "./config/db";
 import { pool, testConnection } from "./db/database";
 
+// Import Supabase client
+import { testSupabaseConnection } from "./lib/supabaseClient";
+
 // Import all route handlers
 import {
     createCodeSnippet,
@@ -153,6 +156,17 @@ async function initializeDatabase() {
     await testConnection(); // Test Neon database connection
     console.log("🚀 Neon database initialized successfully");
 
+    // Test Supabase connection
+    try {
+      const supabaseAvailable = await testSupabaseConnection();
+      if (supabaseAvailable) {
+        console.log("✅ Supabase database connection successful - using Supabase for snippet storage");
+      } else {
+        console.log("ℹ️  Supabase not available - falling back to PostgreSQL/in-memory storage");
+      }
+    } catch (supabaseError) {
+      console.warn("⚠️  Supabase connection test failed:", supabaseError);
+    }
 
     // Initialize old PostgreSQL tables if needed
     try {

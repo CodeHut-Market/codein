@@ -177,6 +177,66 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Fix for transparent dropdowns and popovers */
+  [data-radix-dropdown-menu-content] {
+    background-color: hsl(var(--popover) / 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  [data-radix-popover-content] {
+    background-color: hsl(var(--popover) / 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  [data-radix-tooltip-content] {
+    background-color: hsl(var(--popover) / 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+
+  /* Ensure proper layering for dropdowns */
+  [data-radix-dropdown-menu-content],
+  [data-radix-popover-content] {
+    z-index: 9999 !important;
+  }
+
+  /* Enhanced text highlighting effects */
+  .text-highlight {
+    background: linear-gradient(120deg, transparent 0%, transparent 40%, hsl(var(--accent) / 0.3) 40%, hsl(var(--accent) / 0.3) 60%, transparent 60%);
+    background-size: 200% 100%;
+    background-position: 100% 0;
+    transition: background-position 0.3s ease;
+  }
+
+  .text-highlight:hover {
+    background-position: 0 0;
+  }
+
+  /* Subtle glow effect for interactive elements */
+  .glow-on-hover:hover {
+    text-shadow: 0 0 8px hsl(var(--accent) / 0.4);
+    transition: text-shadow 0.2s ease-in-out;
+  }
+
+  /* Animated underline for links and buttons */
+  .animated-underline {
+    position: relative;
+  }
+
+  .animated-underline::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: hsl(var(--accent));
+    transition: width 0.3s ease-in-out;
+  }
+
+  .animated-underline:hover::after {
+    width: 100%;
+  }
+
   pre, code, kbd, samp {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
