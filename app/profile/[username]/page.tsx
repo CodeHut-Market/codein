@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../../client/contexts/AuthContext";
 
 interface CodeSnippet {
   id: string;
@@ -133,13 +134,17 @@ function CodeSnippetCard({
 export default function UserProfilePage() {
   const params = useParams();
   const username = params.username as string;
+  const { user: currentUser } = useAuth();
   
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [avatarError, setAvatarError] = useState(false);
 
-  const isOwner = false; // TODO: Check if current user owns this profile
+  // Check if the current user is viewing their own profile
+  const isOwner = currentUser && profileData 
+    ? currentUser.username === profileData.user.username || currentUser.username === username
+    : false;
 
   useEffect(() => {
     if (username) {
@@ -289,7 +294,16 @@ export default function UserProfilePage() {
               </div>
             </div>
 
-            {!isOwner && (
+            {isOwner ? (
+              <div className="flex flex-col md:flex-row gap-4">
+                <Button variant="outline" asChild>
+                  <Link href="/profile/edit">
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Link>
+                </Button>
+              </div>
+            ) : (
               <div className="flex flex-col md:flex-row gap-4">
                 <Button variant="outline">Follow</Button>
                 <Button variant="outline">Message</Button>
