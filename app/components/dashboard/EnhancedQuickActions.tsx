@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -26,6 +27,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { toast } from '../../../client/hooks/use-toast';
 
 interface QuickAction {
   id: string;
@@ -65,6 +67,7 @@ interface DraftSnippet {
 }
 
 export default function EnhancedQuickActions() {
+  const router = useRouter();
   const [userContext, setUserContext] = useState<{
     has_snippets: boolean;
     has_drafts: boolean;
@@ -94,21 +97,21 @@ export default function EnhancedQuickActions() {
       type: 'comment_received',
       title: 'New comment on "React Custom Hook"',
       timestamp: '2024-12-15T10:30:00Z',
-      action: () => console.log('Navigate to comment')
+      action: () => router.push('/snippet/react-custom-hook?tab=comments')
     },
     {
       id: '2',
       type: 'snippet_liked',
       title: '"Python Data Analysis" received 3 new likes',
       timestamp: '2024-12-15T09:15:00Z',
-      action: () => console.log('View snippet analytics')
+      action: () => router.push('/snippet/python-data-analysis?tab=analytics')
     },
     {
       id: '3',
       type: 'snippet_downloaded',
       title: '"TypeScript Utility Types" was downloaded 5 times',
       timestamp: '2024-12-15T08:45:00Z',
-      action: () => console.log('View download stats')
+      action: () => router.push('/snippet/typescript-utility-types?tab=analytics')
     }
   ];
 
@@ -146,6 +149,34 @@ export default function EnhancedQuickActions() {
     setUserContext(prev => ({ ...prev, time_of_day: timeOfDay }));
   }, []);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        const relevantActions = getRelevantActions();
+        const action = relevantActions.find(a => {
+          if (!a.shortcut) return false;
+          const shortcut = a.shortcut.toLowerCase();
+          const key = event.key.toLowerCase();
+          
+          if (shortcut.includes('ctrl+n') && key === 'n') return true;
+          if (shortcut.includes('ctrl+u') && key === 'u') return true;
+          if (shortcut.includes('ctrl+k') && key === 'k') return true;
+          
+          return false;
+        });
+        
+        if (action) {
+          event.preventDefault();
+          action.action();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [drafts]);
+
   const allQuickActions: QuickAction[] = [
     // Create Actions
     {
@@ -153,7 +184,7 @@ export default function EnhancedQuickActions() {
       title: 'Create New Snippet',
       description: 'Start coding something new',
       icon: <Plus size={20} />,
-      action: () => console.log('Create new snippet'),
+      action: () => router.push('/upload'),
       color: 'bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700',
       category: 'create',
       shortcut: 'Ctrl+N',
@@ -164,7 +195,7 @@ export default function EnhancedQuickActions() {
       title: 'Upload Code File',
       description: 'Import existing code',
       icon: <Upload size={20} />,
-      action: () => console.log('Upload file'),
+      action: () => router.push('/upload'),
       color: 'bg-gradient-to-br from-emerald-500 via-green-600 to-teal-600 hover:from-emerald-600 hover:via-green-700 hover:to-teal-700',
       category: 'create',
       shortcut: 'Ctrl+U',
@@ -175,7 +206,14 @@ export default function EnhancedQuickActions() {
       title: 'Continue Draft',
       description: 'Resume your work in progress',
       icon: <Edit size={20} />,
-      action: () => console.log('Continue draft'),
+      action: () => {
+        // Show draft selection modal or navigate to most recent draft
+        if (drafts.length > 0) {
+          router.push(`/upload?draft=${drafts[0].id}`);
+        } else {
+          router.push('/upload');
+        }
+      },
       color: 'bg-gradient-to-br from-orange-500 via-amber-600 to-yellow-600 hover:from-orange-600 hover:via-amber-700 hover:to-yellow-700',
       category: 'create',
       badge: userContext.draft_count.toString(),
@@ -190,7 +228,7 @@ export default function EnhancedQuickActions() {
       title: 'My Snippets',
       description: 'View and manage your code',
       icon: <Eye size={20} />,
-      action: () => console.log('View my snippets'),
+      action: () => router.push('/profile?tab=snippets'),
       color: 'bg-gradient-to-br from-purple-500 via-violet-600 to-indigo-600 hover:from-purple-600 hover:via-violet-700 hover:to-indigo-700',
       category: 'manage',
       badge: userContext.snippet_count.toString(),
@@ -201,7 +239,7 @@ export default function EnhancedQuickActions() {
       title: 'Favorites',
       description: 'Your saved snippets',
       icon: <Star size={20} />,
-      action: () => console.log('View favorites'),
+      action: () => router.push('/favorites'),
       color: 'bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 hover:from-yellow-600 hover:via-amber-600 hover:to-orange-600',
       category: 'manage',
       badge: userContext.favorite_count.toString(),
@@ -214,7 +252,7 @@ export default function EnhancedQuickActions() {
       title: 'Archive Manager',
       description: 'Organize old snippets',
       icon: <Archive size={20} />,
-      action: () => console.log('Manage archive'),
+      action: () => router.push('/profile?tab=archived'),
       color: 'bg-gradient-to-br from-slate-500 via-gray-600 to-zinc-600 hover:from-slate-600 hover:via-gray-700 hover:to-zinc-700',
       category: 'manage',
       priority: 4
@@ -226,7 +264,7 @@ export default function EnhancedQuickActions() {
       title: 'Explore Code',
       description: 'Discover trending snippets',
       icon: <TrendingUp size={20} />,
-      action: () => console.log('Explore trending'),
+      action: () => router.push('/explore'),
       color: 'bg-gradient-to-br from-pink-500 via-rose-600 to-red-600 hover:from-pink-600 hover:via-rose-700 hover:to-red-700',
       category: 'discover',
       priority: 2
@@ -236,7 +274,7 @@ export default function EnhancedQuickActions() {
       title: 'Advanced Search',
       description: 'Find specific code patterns',
       icon: <Search size={20} />,
-      action: () => console.log('Advanced search'),
+      action: () => router.push('/explore?search=advanced'),
       color: 'bg-gradient-to-br from-indigo-500 via-blue-600 to-cyan-600 hover:from-indigo-600 hover:via-blue-700 hover:to-cyan-700',
       category: 'discover',
       shortcut: 'Ctrl+K',
@@ -247,7 +285,7 @@ export default function EnhancedQuickActions() {
       title: 'Recommended',
       description: 'Code suggestions for you',
       icon: <Target size={20} />,
-      action: () => console.log('View recommendations'),
+      action: () => router.push('/explore?filter=recommended'),
       color: 'bg-gradient-to-br from-teal-500 via-emerald-600 to-green-600 hover:from-teal-600 hover:via-emerald-700 hover:to-green-700',
       category: 'discover',
       priority: 3,
@@ -261,7 +299,7 @@ export default function EnhancedQuickActions() {
       title: 'Recent Activity',
       description: 'Check latest interactions',
       icon: <Clock size={20} />,
-      action: () => console.log('View recent activity'),
+      action: () => router.push('/dashboard?tab=activity'),
       color: 'bg-gradient-to-br from-cyan-500 via-teal-600 to-blue-600 hover:from-cyan-600 hover:via-teal-700 hover:to-blue-700',
       category: 'engage',
       badge: recentActivity.length.toString(),
@@ -274,7 +312,23 @@ export default function EnhancedQuickActions() {
       title: 'Share Collection',
       description: 'Share your best snippets',
       icon: <Share2 size={20} />,
-      action: () => console.log('Share collection'),
+      action: async () => {
+        try {
+          const profileUrl = `${window.location.origin}/profile`;
+          await navigator.clipboard.writeText(profileUrl);
+          toast({
+            title: "Profile URL Copied! 🎉",
+            description: "Your profile link has been copied to clipboard",
+            variant: "default",
+          });
+        } catch (error) {
+          toast({
+            title: "Copy Failed",
+            description: "Unable to copy to clipboard. Please try again.",
+            variant: "destructive",
+          });
+        }
+      },
       color: 'bg-gradient-to-br from-rose-500 via-pink-600 to-fuchsia-600 hover:from-rose-600 hover:via-pink-700 hover:to-fuchsia-700',
       category: 'engage',
       priority: 3,
@@ -286,7 +340,7 @@ export default function EnhancedQuickActions() {
       title: 'Give Feedback',
       description: 'Help others improve their code',
       icon: <MessageSquare size={20} />,
-      action: () => console.log('Give feedback'),
+      action: () => router.push('/community'),
       color: 'bg-gradient-to-br from-emerald-500 via-green-600 to-lime-600 hover:from-emerald-600 hover:via-green-700 hover:to-lime-700',
       category: 'engage',
       priority: 4
@@ -298,7 +352,7 @@ export default function EnhancedQuickActions() {
       title: 'View Analytics',
       description: 'Check your code performance',
       icon: <TrendingUp size={20} />,
-      action: () => console.log('View analytics'),
+      action: () => router.push('/dashboard?tab=analytics'),
       color: 'bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-600 hover:from-violet-600 hover:via-purple-700 hover:to-indigo-700',
       category: 'analyze',
       priority: 2,
@@ -310,7 +364,7 @@ export default function EnhancedQuickActions() {
       title: 'Performance Report',
       description: 'Monthly progress summary',
       icon: <CheckCircle size={20} />,
-      action: () => console.log('View performance'),
+      action: () => router.push('/dashboard?tab=performance'),
       color: 'bg-gradient-to-br from-lime-500 via-green-600 to-emerald-600 hover:from-lime-600 hover:via-green-700 hover:to-emerald-700',
       category: 'analyze',
       priority: 3
@@ -477,7 +531,12 @@ export default function EnhancedQuickActions() {
               </div>
 
               {recentActivity.length > 3 && (
-                <Button variant="ghost" size="sm" className="w-full mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 text-blue-700 border border-blue-200/50">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 text-blue-700 border border-blue-200/50"
+                  onClick={() => router.push('/dashboard?tab=activity')}
+                >
                   View All Activity ({recentActivity.length})
                 </Button>
               )}
@@ -506,7 +565,7 @@ export default function EnhancedQuickActions() {
                   <div 
                     key={draft.id} 
                     className="p-4 rounded-xl bg-gradient-to-r from-white to-orange-50/30 hover:from-orange-50 hover:to-amber-50 cursor-pointer transition-all duration-200 border border-transparent hover:border-orange-200/50 shadow-sm hover:shadow-md"
-                    onClick={() => console.log('Open draft', draft.id)}
+                    onClick={() => router.push(`/upload?draft=${draft.id}`)}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <h4 className="font-semibold text-sm truncate flex-1 text-gray-800">
