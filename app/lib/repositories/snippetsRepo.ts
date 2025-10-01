@@ -681,18 +681,21 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
   
   console.log('createSnippet - Creating snippet with ID:', snippet.id);
   console.log('createSnippet - Snippet title:', snippet.title);
-  console.log('createSnippet - Supabase enabled:', isSupabaseEnabled());
+  console.log('createSnippet - Supabase admin enabled:', isSupabaseAdminEnabled());
   
-  // ALWAYS store in memory as primary storage for development
-  memorySnippets.unshift(snippet);
-  console.log('createSnippet - Added to memory. Total memory snippets:', memorySnippets.length);
-  console.log('createSnippet - Memory snippet IDs:', memorySnippets.map(s => s.id).slice(0, 5));
+  let supabaseStoreSuccess = false;
   
+  // PRIMARY STORAGE: Try Supabase first for persistence
   if(isSupabaseAdminEnabled()){
     try {
-      console.log('createSnippet - Also attempting to store in Supabase using admin client');
-      // Map camelCase to snake_case for database
-      const dbSnippet = {
+      console.log('createSnippet - Attempting to store in Supabase (primary storage)');
+      
+      // Check if visibility column exists before including it
+      const hasVisibilityColumn = await checkVisibilityColumnExists();
+      console.log('createSnippet - Visibility column exists:', hasVisibilityColumn);
+      
+      // Map camelCase to snake_case for database with conditional fields
+      const dbSnippet: any = {
         id: snippet.id,
         title: snippet.title,
         code: snippet.code,
@@ -705,12 +708,16 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
         language: snippet.language,
         framework: snippet.framework,
         category: snippet.category,
-        visibility: snippet.visibility,
-        allow_comments: snippet.allowComments,
         downloads: snippet.downloads,
         created_at: snippet.createdAt, // Map createdAt to created_at
         updated_at: snippet.updatedAt  // Map updatedAt to updated_at
       };
+      
+      // Only include visibility and allow_comments if columns exist
+      if (hasVisibilityColumn) {
+        dbSnippet.visibility = snippet.visibility;
+        dbSnippet.allow_comments = snippet.allowComments;
+      }
       
       console.log('createSnippet - Database snippet object:', JSON.stringify(dbSnippet, null, 2));
       const { data: insertResult, error } = await supabaseAdmin!.from('snippets').insert(dbSnippet).select();
@@ -719,21 +726,91 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
         console.error('createSnippet - Error code:', error.code);
         console.error('createSnippet - Error message:', error.message);
         console.error('createSnippet - Error details:', error.details);
-        console.log('createSnippet - Fallback to memory storage is already done');
+        
+        // If it's a column doesn't exist error, reset the cache and retry without that column
+        if (error.code === '42703' && error.message.includes('visibility')) {
+          console.log('createSnippet - Detected missing visibility column, updating cache and retrying');
+          visibilityColumnExists = false;
+          
+          // Create simplified object without visibility fields
+          const simpleDbSnippet = {
+            id: snippet.id,
+            title: snippet.title,
+            code: snippet.code,
+            description: snippet.description,
+            price: snippet.price,
+            rating: snippet.rating,
+            author: snippet.author,
+            author_id: snippet.authorId,
+            tags: snippet.tags,
+            language: snippet.language,
+            framework: snippet.framework,
+            category: snippet.category,
+            downloads: snippet.downloads,
+            created_at: snippet.createdAt,
+            updated_at: snippet.updatedAt
+          };
+          
+          console.log('createSnippet - Retrying with simplified object');
+          const { data: retryResult, error: retryError } = await supabaseAdmin!.from('snippets').insert(simpleDbSnippet).select();
+          
+          if (retryError) {
+            console.error('createSnippet - Retry also failed:', retryError);
+            supabaseStoreSuccess = false;
+          } else {
+            console.log('createSnippet - Retry successful:', retryResult);
+            supabaseStoreSuccess = true;
+          }
+        } else {
+          supabaseStoreSuccess = false;
+        }
       } else {
         console.log('createSnippet - Successfully stored in Supabase!');
         console.log('createSnippet - Insert result:', insertResult);
-        console.log('createSnippet - Successfully stored in both memory and Supabase');
+        supabaseStoreSuccess = true;
       }
     } catch (err) {
       console.error('createSnippet - Exception during Supabase insert:', err);
-      console.log('createSnippet - Fallback to memory storage is already done');
+      supabaseStoreSuccess = false;
     }
   } else {
-    console.log('createSnippet - Stored only in memory (Supabase admin not enabled)');
+    console.log('createSnippet - Supabase admin not enabled');
+    supabaseStoreSuccess = false;
   }
   
+  // FALLBACK STORAGE: Add to memory if Supabase failed or is not available
+  if (!supabaseStoreSuccess) {
+    console.log('createSnippet - Adding to memory as fallback storage');
+    memorySnippets.unshift(snippet);
+    console.log('createSnippet - Total memory snippets:', memorySnippets.length);
+  } else {
+    console.log('createSnippet - Also adding to memory cache for performance');
+    // Add to memory cache even if Supabase succeeded, for performance
+    memorySnippets.unshift(snippet);
+  }
+  
+  console.log('createSnippet - Storage summary - Supabase:', supabaseStoreSuccess ? 'SUCCESS' : 'FAILED', ', Memory: YES');
   return snippet;
+}
+
+// Cache for visibility column existence check
+let visibilityColumnExists: boolean | null = null;
+
+// Check if visibility column exists in the snippets table
+async function checkVisibilityColumnExists(): Promise<boolean> {
+  if (visibilityColumnExists !== null) {
+    return visibilityColumnExists;
+  }
+  
+  try {
+    // Try a simple query that would fail if visibility column doesn't exist
+    const { error } = await supabase!.from('snippets').select('visibility').limit(1);
+    visibilityColumnExists = !error;
+    return visibilityColumnExists;
+  } catch (error) {
+    visibilityColumnExists = false;
+    return false;
+  }
 }
 
 export interface ListSnippetsOptions {
@@ -774,7 +851,14 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
       }
       
       if(opts.publicOnly){
-        q = q.eq('visibility', 'public');
+        // Check if visibility column exists before applying filter
+        const hasVisibilityColumn = await checkVisibilityColumnExists();
+        if (hasVisibilityColumn) {
+          q = q.eq('visibility', 'public');
+        } else {
+          console.log('Visibility column not found - treating all snippets as public');
+          // Don't apply any filter - assume all snippets are public
+        }
       }
       
       if(opts.featured){

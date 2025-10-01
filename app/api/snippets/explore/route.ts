@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       sortBy,
       featured,
       limit,
-      // publicOnly: true // TEMPORARILY DISABLED for debugging - show all snippets
+      publicOnly: true // Re-enabled - now working correctly with visibility field
     });
     
     // Add debug information if requested
