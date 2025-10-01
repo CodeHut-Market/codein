@@ -17,7 +17,19 @@ import {
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import SnippetCard from '../components/SnippetCard'
+import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
+
+// Adapter function to convert CodeSnippet to format expected by RealTimeSnippetCard
+const adaptCodeSnippetForRealTime = (snippet: CodeSnippet) => ({
+  ...snippet,
+  viewCount: snippet.views || 0,
+  likeCount: snippet.likes || 0,
+  downloadCount: snippet.downloads || 0,
+  commentCount: snippet.comments?.length || 0,
+  isLiked: false, // This would come from user state
+  isBookmarked: false, // This would come from user state
+  author: snippet.author || { name: 'Anonymous', avatar: null }
+})
 
 export default function ExplorePage() {
   const searchParams = useSearchParams()
@@ -166,10 +178,11 @@ export default function ExplorePage() {
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div className="text-center space-y-4 relative">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 rounded-2xl blur-3xl"></div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">
-          Explore Code Snippets
-        </h1>
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">
+            Explore Code Snippets
+          </h1>
+        </div>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {searchParams.get("query")
             ? `Search results for "${searchParams.get("query")}" (${totalCount} found)`
@@ -261,8 +274,8 @@ export default function ExplorePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredSnippets.map((snippet) => (
               <div key={snippet.id} className="relative">
-                <SnippetCard 
-                  snippet={snippet} 
+                <RealTimeSnippetCard 
+                  snippet={adaptCodeSnippetForRealTime(snippet)}
                   onPurchaseComplete={() => fetchSnippets(1, false)}
                 />
                 <div className="absolute -top-2 -right-2 z-10">
@@ -291,10 +304,10 @@ export default function ExplorePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {snippets.length > 0 ? (
               snippets.map((snippet) => (
-                <SnippetCard 
+                <RealTimeSnippetCard 
                   key={snippet.id} 
-                  snippet={snippet} 
-                  onPurchaseComplete={() => fetchSnippets(1, false)} 
+                  snippet={adaptCodeSnippetForRealTime(snippet)}
+                  onPurchaseComplete={() => fetchSnippets(1, false)}
                 />
               ))
             ) : (

@@ -5,6 +5,7 @@ import Footer from "../components/Footer"
 import Navigation from "../components/Navigation"
 import "./globals.css"
 import Providers from "./providers"
+import { RealTimePerformanceMonitor } from "./components/ui/real-time-performance-monitor"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <RealTimePerformanceMonitor />
         </Providers>
       </body>
     </html>

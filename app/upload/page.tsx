@@ -9,7 +9,14 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from '@/components/ui/textarea'
-import type { User } from '@supabase/supabase-js'
+// Define a simple User type instead of importing from Supabase
+type User = {
+  id: string
+  email?: string
+  user_metadata?: {
+    username?: string
+  }
+}
 import {
     AlertTriangle,
     CheckCircle,
@@ -19,8 +26,9 @@ import {
     Loader2,
     Plus,
     ShieldAlert,
-    UploadCloud,
+// Remove Supabase import - not needed in this starter template
     Upload as UploadIcon,
+    UploadCloud,
     X
 } from 'lucide-react'
 import Link from 'next/link'
@@ -47,36 +55,20 @@ export default function UploadPage() {
   const [isPublic, setIsPublic] = useState(true)
   const [allowComments, setAllowComments] = useState(true)
   
+  // Drag and drop state
+  const [isDragging, setIsDragging] = useState(false)
+  const [uploadedFileName, setUploadedFileName] = useState('')
+  
   // Plagiarism detection
   const [plagStatus, setPlagStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [similarity, setSimilarity] = useState<number | null>(null)
   const [plagMessage, setPlagMessage] = useState('')
 
-  // Preview state
-  const [showPreview, setShowPreview] = useState(false)
-  
-  // Drag and drop state
-  const [isDragging, setIsDragging] = useState(false)
-  const [uploadedFileName, setUploadedFileName] = useState("")
-
   useEffect(() => {
-    if (isSupabaseEnabled()) {
-      supabase!.auth.getSession().then(({ data: { session } }) => {
-        setUser(session?.user ?? null)
-        setIsLoading(false)
-      })
-
-      const {
-        data: { subscription },
-      } = supabase!.auth.onAuthStateChange((_event, session) => {
-        setUser(session?.user ?? null)
-        setIsLoading(false)
-      })
-
-      return () => subscription.unsubscribe()
-    } else {
-      setIsLoading(false)
-    }
+    // TODO: Implement authentication logic here
+    // For now, set a mock user or fetch from your API
+    setIsLoading(false)
+    // Example: setUser({ id: '1', email: 'user@example.com' })
   }, [])
 
   const languages = [
