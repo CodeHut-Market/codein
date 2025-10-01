@@ -154,7 +154,7 @@ export default function EnhancedQuickActions() {
       description: 'Start coding something new',
       icon: <Plus size={20} />,
       action: () => console.log('Create new snippet'),
-      color: 'bg-blue-500 hover:bg-blue-600',
+      color: 'bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700',
       category: 'create',
       shortcut: 'Ctrl+N',
       priority: 1
@@ -165,7 +165,7 @@ export default function EnhancedQuickActions() {
       description: 'Import existing code',
       icon: <Upload size={20} />,
       action: () => console.log('Upload file'),
-      color: 'bg-green-500 hover:bg-green-600',
+      color: 'bg-gradient-to-br from-emerald-500 via-green-600 to-teal-600 hover:from-emerald-600 hover:via-green-700 hover:to-teal-700',
       category: 'create',
       shortcut: 'Ctrl+U',
       priority: 2
@@ -176,7 +176,7 @@ export default function EnhancedQuickActions() {
       description: 'Resume your work in progress',
       icon: <Edit size={20} />,
       action: () => console.log('Continue draft'),
-      color: 'bg-orange-500 hover:bg-orange-600',
+      color: 'bg-gradient-to-br from-orange-500 via-amber-600 to-yellow-600 hover:from-orange-600 hover:via-amber-700 hover:to-yellow-700',
       category: 'create',
       badge: userContext.draft_count.toString(),
       priority: 1,
@@ -191,7 +191,7 @@ export default function EnhancedQuickActions() {
       description: 'View and manage your code',
       icon: <Eye size={20} />,
       action: () => console.log('View my snippets'),
-      color: 'bg-purple-500 hover:bg-purple-600',
+      color: 'bg-gradient-to-br from-purple-500 via-violet-600 to-indigo-600 hover:from-purple-600 hover:via-violet-700 hover:to-indigo-700',
       category: 'manage',
       badge: userContext.snippet_count.toString(),
       priority: 2
@@ -202,7 +202,7 @@ export default function EnhancedQuickActions() {
       description: 'Your saved snippets',
       icon: <Star size={20} />,
       action: () => console.log('View favorites'),
-      color: 'bg-yellow-500 hover:bg-yellow-600',
+      color: 'bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 hover:from-yellow-600 hover:via-amber-600 hover:to-orange-600',
       category: 'manage',
       badge: userContext.favorite_count.toString(),
       priority: 3,
@@ -215,7 +215,7 @@ export default function EnhancedQuickActions() {
       description: 'Organize old snippets',
       icon: <Archive size={20} />,
       action: () => console.log('Manage archive'),
-      color: 'bg-gray-500 hover:bg-gray-600',
+      color: 'bg-gradient-to-br from-slate-500 via-gray-600 to-zinc-600 hover:from-slate-600 hover:via-gray-700 hover:to-zinc-700',
       category: 'manage',
       priority: 4
     },
@@ -227,7 +227,7 @@ export default function EnhancedQuickActions() {
       description: 'Discover trending snippets',
       icon: <TrendingUp size={20} />,
       action: () => console.log('Explore trending'),
-      color: 'bg-pink-500 hover:bg-pink-600',
+      color: 'bg-gradient-to-br from-pink-500 via-rose-600 to-red-600 hover:from-pink-600 hover:via-rose-700 hover:to-red-700',
       category: 'discover',
       priority: 2
     },
@@ -237,7 +237,7 @@ export default function EnhancedQuickActions() {
       description: 'Find specific code patterns',
       icon: <Search size={20} />,
       action: () => console.log('Advanced search'),
-      color: 'bg-indigo-500 hover:bg-indigo-600',
+      color: 'bg-gradient-to-br from-indigo-500 via-blue-600 to-cyan-600 hover:from-indigo-600 hover:via-blue-700 hover:to-cyan-700',
       category: 'discover',
       shortcut: 'Ctrl+K',
       priority: 1
@@ -248,7 +248,7 @@ export default function EnhancedQuickActions() {
       description: 'Code suggestions for you',
       icon: <Target size={20} />,
       action: () => console.log('View recommendations'),
-      color: 'bg-teal-500 hover:bg-teal-600',
+      color: 'bg-gradient-to-br from-teal-500 via-emerald-600 to-green-600 hover:from-teal-600 hover:via-emerald-700 hover:to-green-700',
       category: 'discover',
       priority: 3,
       contextual: true,
@@ -262,7 +262,7 @@ export default function EnhancedQuickActions() {
       description: 'Check latest interactions',
       icon: <Clock size={20} />,
       action: () => console.log('View recent activity'),
-      color: 'bg-cyan-500 hover:bg-cyan-600',
+      color: 'bg-gradient-to-br from-cyan-500 via-teal-600 to-blue-600 hover:from-cyan-600 hover:via-teal-700 hover:to-blue-700',
       category: 'engage',
       badge: recentActivity.length.toString(),
       priority: 1,
@@ -275,7 +275,7 @@ export default function EnhancedQuickActions() {
       description: 'Share your best snippets',
       icon: <Share2 size={20} />,
       action: () => console.log('Share collection'),
-      color: 'bg-rose-500 hover:bg-rose-600',
+      color: 'bg-gradient-to-br from-rose-500 via-pink-600 to-fuchsia-600 hover:from-rose-600 hover:via-pink-700 hover:to-fuchsia-700',
       category: 'engage',
       priority: 3,
       contextual: true,
@@ -287,7 +287,7 @@ export default function EnhancedQuickActions() {
       description: 'Help others improve their code',
       icon: <MessageSquare size={20} />,
       action: () => console.log('Give feedback'),
-      color: 'bg-emerald-500 hover:bg-emerald-600',
+      color: 'bg-gradient-to-br from-emerald-500 via-green-600 to-lime-600 hover:from-emerald-600 hover:via-green-700 hover:to-lime-700',
       category: 'engage',
       priority: 4
     },
@@ -299,7 +299,7 @@ export default function EnhancedQuickActions() {
       description: 'Check your code performance',
       icon: <TrendingUp size={20} />,
       action: () => console.log('View analytics'),
-      color: 'bg-violet-500 hover:bg-violet-600',
+      color: 'bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-600 hover:from-violet-600 hover:via-purple-700 hover:to-indigo-700',
       category: 'analyze',
       priority: 2,
       contextual: true,
@@ -311,7 +311,7 @@ export default function EnhancedQuickActions() {
       description: 'Monthly progress summary',
       icon: <CheckCircle size={20} />,
       action: () => console.log('View performance'),
-      color: 'bg-lime-500 hover:bg-lime-600',
+      color: 'bg-gradient-to-br from-lime-500 via-green-600 to-emerald-600 hover:from-lime-600 hover:via-green-700 hover:to-emerald-700',
       category: 'analyze',
       priority: 3
     }
@@ -360,48 +360,52 @@ export default function EnhancedQuickActions() {
   return (
     <div className="space-y-6">
       {/* Context-Aware Greeting */}
-      <div className="text-center py-4">
-        <h2 className="text-2xl font-bold">
+      <div className="text-center py-6 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 rounded-2xl -z-10" />
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           Good {userContext.time_of_day}, Developer! 
-          <Zap className="inline-block ml-2 text-yellow-500" size={24} />
+          <Zap className="inline-block ml-2 text-yellow-500 animate-pulse" size={28} />
         </h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-2 text-lg">
           What would you like to work on today?
         </p>
       </div>
 
       {/* Quick Actions Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
         {displayActions.map(action => (
           <Card 
             key={action.id} 
-            className="group hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-blue-200"
+            className="group hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer border border-gray-200/50 hover:border-white/30 bg-white/70 backdrop-blur-sm hover:scale-105 hover:-translate-y-1"
             onClick={action.action}
           >
-            <CardContent className="p-4 text-center space-y-3">
+            <CardContent className="p-6 text-center space-y-4 relative overflow-hidden">
+              {/* Background gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-gray-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
               <div className={cn(
-                "w-12 h-12 mx-auto rounded-lg flex items-center justify-center text-white transition-transform group-hover:scale-110",
+                "w-14 h-14 mx-auto rounded-xl flex items-center justify-center text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-lg group-hover:shadow-xl",
                 action.color
               )}>
                 {action.icon}
               </div>
               
-              <div>
-                <h4 className="font-semibold text-sm mb-1 flex items-center justify-center gap-2">
+              <div className="relative z-10">
+                <h4 className="font-bold text-sm mb-2 flex items-center justify-center gap-2 group-hover:text-gray-800 transition-colors">
                   {action.title}
                   {action.badge && (
-                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border-0">
                       {action.badge}
                     </Badge>
                   )}
                 </h4>
-                <p className="text-xs text-muted-foreground line-clamp-2">
+                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                   {action.description}
                 </p>
               </div>
 
               {action.shortcut && (
-                <div className="text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded">
+                <div className="text-xs text-gray-600 bg-gradient-to-r from-gray-100 to-gray-200 px-3 py-1.5 rounded-full font-mono border border-gray-300/50 shadow-sm">
                   {action.shortcut}
                 </div>
               )}
@@ -416,17 +420,17 @@ export default function EnhancedQuickActions() {
           <Button
             variant="outline"
             onClick={() => setShowAllActions(!showAllActions)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-gradient-to-r from-white to-gray-50 hover:from-blue-50 hover:to-purple-50 border-gray-200 hover:border-blue-200 text-gray-700 hover:text-blue-700 transition-all duration-300 px-6 py-3 rounded-xl shadow-sm hover:shadow-md"
           >
             {showAllActions ? (
               <>
                 Show Less
-                <RefreshCw size={16} className="rotate-180" />
+                <RefreshCw size={16} className="rotate-180 transition-transform duration-300" />
               </>
             ) : (
               <>
                 Show More Actions ({relevantActions.length - 6})
-                <RefreshCw size={16} />
+                <RefreshCw size={16} className="transition-transform duration-300" />
               </>
             )}
           </Button>
@@ -436,28 +440,32 @@ export default function EnhancedQuickActions() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
         {recentActivity.length > 0 && (
-          <Card>
+          <Card className="bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/50 border border-blue-100/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Clock size={18} />
+                <h3 className="font-bold flex items-center gap-2 text-blue-800">
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg">
+                    <Clock size={18} />
+                  </div>
                   Recent Activity
                 </h3>
-                <Badge variant="secondary">{recentActivity.length}</Badge>
+                <Badge variant="secondary" className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-0">
+                  {recentActivity.length}
+                </Badge>
               </div>
               
               <div className="space-y-3">
                 {recentActivity.slice(0, 3).map(activity => (
                   <div 
                     key={activity.id} 
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-r from-white to-blue-50/30 hover:from-blue-50 hover:to-indigo-50 cursor-pointer transition-all duration-200 border border-transparent hover:border-blue-200/50 shadow-sm hover:shadow-md"
                     onClick={activity.action}
                   >
                     <div className="mt-0.5">
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
+                      <p className="text-sm font-semibold truncate text-gray-800">
                         {activity.title}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -469,7 +477,7 @@ export default function EnhancedQuickActions() {
               </div>
 
               {recentActivity.length > 3 && (
-                <Button variant="ghost" size="sm" className="w-full mt-3">
+                <Button variant="ghost" size="sm" className="w-full mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 text-blue-700 border border-blue-200/50">
                   View All Activity ({recentActivity.length})
                 </Button>
               )}
@@ -479,40 +487,44 @@ export default function EnhancedQuickActions() {
 
         {/* Draft Snippets */}
         {drafts.length > 0 && (
-          <Card>
+          <Card className="bg-gradient-to-br from-orange-50/50 via-white to-amber-50/50 border border-orange-100/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Edit size={18} />
+                <h3 className="font-bold flex items-center gap-2 text-orange-800">
+                  <div className="p-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg">
+                    <Edit size={18} />
+                  </div>
                   Continue Your Work
                 </h3>
-                <Badge variant="secondary">{drafts.length}</Badge>
+                <Badge variant="secondary" className="bg-gradient-to-r from-orange-100 to-amber-100 text-orange-800 border-0">
+                  {drafts.length}
+                </Badge>
               </div>
               
               <div className="space-y-3">
                 {drafts.slice(0, 3).map(draft => (
                   <div 
                     key={draft.id} 
-                    className="p-3 rounded-lg border hover:border-blue-200 cursor-pointer transition-colors"
+                    className="p-4 rounded-xl bg-gradient-to-r from-white to-orange-50/30 hover:from-orange-50 hover:to-amber-50 cursor-pointer transition-all duration-200 border border-transparent hover:border-orange-200/50 shadow-sm hover:shadow-md"
                     onClick={() => console.log('Open draft', draft.id)}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-sm truncate flex-1">
+                    <div className="flex items-start justify-between mb-3">
+                      <h4 className="font-semibold text-sm truncate flex-1 text-gray-800">
                         {draft.title}
                       </h4>
-                      <Badge variant="outline" className="text-xs ml-2">
+                      <Badge variant="outline" className="text-xs ml-2 bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 border-orange-200">
                         {draft.language}
                       </Badge>
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-medium">{draft.progress}%</span>
+                        <span className="text-muted-foreground font-medium">Progress</span>
+                        <span className="font-bold text-orange-700">{draft.progress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                      <div className="w-full bg-gray-200 rounded-full h-2 shadow-inner">
                         <div 
-                          className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                          className="bg-gradient-to-r from-orange-500 to-amber-500 h-2 rounded-full transition-all duration-500 shadow-sm"
                           style={{ width: `${draft.progress}%` }}
                         />
                       </div>
@@ -525,7 +537,7 @@ export default function EnhancedQuickActions() {
               </div>
 
               {drafts.length > 3 && (
-                <Button variant="ghost" size="sm" className="w-full mt-3">
+                <Button variant="ghost" size="sm" className="w-full mt-4 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 text-orange-700 border border-orange-200/50">
                   View All Drafts ({drafts.length})
                 </Button>
               )}
@@ -535,20 +547,26 @@ export default function EnhancedQuickActions() {
       </div>
 
       {/* Contextual Tips */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-        <CardContent className="p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-              <Rocket size={20} />
+      <Card className="bg-gradient-to-br from-purple-50/80 via-blue-50/80 to-indigo-50/80 border border-purple-200/50 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-transparent to-blue-100/20" />
+        <CardContent className="p-8 relative z-10">
+          <div className="flex items-start gap-5">
+            <div className="p-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl shadow-lg">
+              <Rocket size={24} />
             </div>
             <div>
-              <h3 className="font-semibold mb-2">💡 Pro Tip</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-bold mb-3 text-lg flex items-center gap-2">
+                <span className="text-2xl">💡</span>
+                <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  Pro Tip
+                </span>
+              </h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 {userContext.time_of_day === 'morning' 
-                  ? "Start your day by reviewing yesterday's activity and setting coding goals!"
+                  ? "Start your day by reviewing yesterday's activity and setting coding goals! ☀️"
                   : userContext.time_of_day === 'afternoon'
-                  ? "Perfect time to create new snippets and explore trending code!"
-                  : "Wind down by organizing your snippets and planning tomorrow's coding session!"}
+                  ? "Perfect time to create new snippets and explore trending code! 🚀"
+                  : "Wind down by organizing your snippets and planning tomorrow's coding session! 🌙"}
               </p>
             </div>
           </div>
