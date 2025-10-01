@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       sortBy,
       featured,
       limit,
-      publicOnly: true // Only show public snippets in explore
+      // publicOnly: true // TEMPORARILY DISABLED for debugging - show all snippets
     });
     
     // Add debug information if requested
