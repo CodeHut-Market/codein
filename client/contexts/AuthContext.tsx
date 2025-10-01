@@ -229,7 +229,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 // Hook for making authenticated API calls
 export const useAuthenticatedFetch = () => {
-  const { token } = useAuth();
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuthenticatedFetch must be used within an AuthProvider");
+  }
+  const { token } = context;
 
   const authenticatedFetch = async (url: string, options: RequestInit = {}) => {
     const headers = {
