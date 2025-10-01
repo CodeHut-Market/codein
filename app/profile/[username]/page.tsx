@@ -142,8 +142,9 @@ export default function UserProfilePage() {
   const [avatarError, setAvatarError] = useState(false);
 
   // Check if the current user is viewing their own profile
+  // Primary check: User ID match (most reliable for all authentication methods)
   const isOwner = currentUser && profileData 
-    ? currentUser.username === profileData.user.username || currentUser.username === username
+    ? currentUser.id === profileData.user.id
     : false;
 
   useEffect(() => {
@@ -156,6 +157,14 @@ export default function UserProfilePage() {
     try {
       setLoading(true);
       setError("");
+      
+      // Clean up any old localStorage data first
+      if (currentUser) {
+        localStorage.removeItem(`profile_data_${username}`);
+        localStorage.removeItem(`user_profile_${currentUser.id}`);
+      }
+      
+      // Use the existing API endpoint for fetching user by username
       const response = await fetch(`/api/users/username/${username}`);
 
       if (!response.ok) {
@@ -168,6 +177,7 @@ export default function UserProfilePage() {
 
       const data: ProfileData = await response.json();
       setProfileData(data);
+      
     } catch (error) {
       console.error("Error fetching user profile:", error);
       setError(
