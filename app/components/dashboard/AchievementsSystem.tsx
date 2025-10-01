@@ -271,7 +271,7 @@ export default function AchievementsSystem() {
   }, []);
 
   const getIconComponent = (iconName: string, size = 24) => {
-    const icons: { [key: string]: React.ComponentType<{ size?: number; className?: string }> } = {
+    const icons: { [key: string]: any } = {
       Code, Trophy, Crown, Star, Zap, Target, Users, Heart, Download, Eye,
       MessageSquare, TrendingUp, Shield, Flame, Sparkles, Rocket, Award
     };

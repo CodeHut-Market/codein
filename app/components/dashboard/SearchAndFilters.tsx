@@ -298,7 +298,13 @@ export default function SearchAndFilters({ snippets, onFilteredResults }: Search
                     from: filters.dateRange.from,
                     to: filters.dateRange.to
                   }}
-                  onSelect={(range) => handleDateRangeChange(range || { from: undefined, to: undefined })}
+                  onSelect={(range) => {
+                    if (range) {
+                      handleDateRangeChange({ from: range.from, to: range.to });
+                    } else {
+                      handleDateRangeChange({ from: undefined, to: undefined });
+                    }
+                  }}
                   numberOfMonths={2}
                 />
               </PopoverContent>
