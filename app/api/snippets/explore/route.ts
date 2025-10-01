@@ -40,7 +40,14 @@ export async function GET(req: NextRequest) {
     if (debug) {
       console.log('GET /api/snippets/explore - Debug mode');
       console.log('GET /api/snippets/explore - Results count:', results.length);
-      console.log('GET /api/snippets/explore - Results IDs:', results.map(s => `${s.id} - ${s.title}`));
+      console.log('GET /api/snippets/explore - Results IDs:', results.map(s => `${s.id} - ${s.title} - visibility: ${s.visibility}`));
+      console.log('GET /api/snippets/explore - Results details:', results.map(s => ({
+        id: s.id,
+        title: s.title, 
+        visibility: s.visibility,
+        author: s.author,
+        createdAt: s.createdAt
+      })));
     }
     
     // Filter and paginate results
