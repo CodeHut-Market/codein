@@ -39,16 +39,6 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     
-    console.log('GET /api/snippets/my-snippets - Parameters:', {
-      userId: userData.id,
-      query,
-      language,
-      category,
-      sortBy,
-      page,
-      limit
-    });
-    
     // Fetch user's snippets (both public and private)
     const results = await listSnippets({
       query,
@@ -58,8 +48,6 @@ export async function GET(req: NextRequest) {
       limit: undefined, // Don't limit here, we'll paginate manually
       userId: userData.id // Filter by user ID
     });
-    
-    console.log('GET /api/snippets/my-snippets - Found snippets:', results.length);
     
     // Filter and paginate results
     const startIndex = (page - 1) * limit;

@@ -15,16 +15,6 @@ export async function GET(req: NextRequest) {
     const featured = searchParams.get('featured') === 'true';
     const debug = searchParams.get('debug') === 'true';
     
-    console.log('GET /api/snippets/explore - Parameters:', {
-      query,
-      language,
-      category,
-      sortBy,
-      page,
-      limit,
-      featured
-    });
-    
     // Fetch public snippets only for explore page
     const results = await listSnippets({
       query,
@@ -35,20 +25,6 @@ export async function GET(req: NextRequest) {
       limit,
       publicOnly: true // Re-enabled - now working correctly with visibility field
     });
-    
-    // Add debug information if requested
-    if (debug) {
-      console.log('GET /api/snippets/explore - Debug mode');
-      console.log('GET /api/snippets/explore - Results count:', results.length);
-      console.log('GET /api/snippets/explore - Results IDs:', results.map(s => `${s.id} - ${s.title} - visibility: ${s.visibility}`));
-      console.log('GET /api/snippets/explore - Results details:', results.map(s => ({
-        id: s.id,
-        title: s.title, 
-        visibility: s.visibility,
-        author: s.author,
-        createdAt: s.createdAt
-      })));
-    }
     
     // Filter and paginate results
     const startIndex = (page - 1) * limit;
