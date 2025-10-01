@@ -166,12 +166,10 @@ export default function ExplorePage() {
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div className="text-center space-y-4 relative">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 rounded-2xl blur-3xl"></div>
         <div className="flex items-center justify-center gap-4 mb-4">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">
             Explore Code Snippets
           </h1>
-          <ConnectionStatusIndicator size="sm" />
         </div>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {searchParams.get("query")

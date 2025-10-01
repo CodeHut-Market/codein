@@ -30,7 +30,7 @@ export function CodeHighlighter({
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const { resolvedTheme } = useTheme();
-  const { success, error } = useToast();
+  const { success, error } = useToastContext();
 
   // Map common language names to Prism.js language identifiers
   const getLanguageId = (lang: string): string => {

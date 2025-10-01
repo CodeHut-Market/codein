@@ -222,7 +222,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
   
   const handleLikeUpdate = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
-    const { new: newRecord, eventType } = payload;
+    const { new: newRecord, old: oldRecord, eventType } = payload;
     
     if (eventType === 'INSERT' && newRecord) {
       setMetrics(prev => ({
@@ -232,19 +232,19 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           [newRecord.snippet_id]: (prev.snippetLikes[newRecord.snippet_id] || 0) + 1
         }
       }));
-    } else if (eventType === 'DELETE' && newRecord) {
+    } else if (eventType === 'DELETE' && oldRecord) {
       setMetrics(prev => ({
         ...prev,
         snippetLikes: {
           ...prev.snippetLikes,
-          [newRecord.snippet_id]: Math.max((prev.snippetLikes[newRecord.snippet_id] || 0) - 1, 0)
+          [oldRecord.snippet_id]: Math.max((prev.snippetLikes[oldRecord.snippet_id] || 0) - 1, 0)
         }
       }));
     }
   }, []);
   
   const handleFollowUpdate = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
-    const { new: newRecord, eventType } = payload;
+    const { new: newRecord, old: oldRecord, eventType } = payload;
     
     if (eventType === 'INSERT' && newRecord) {
       setMetrics(prev => ({
@@ -254,19 +254,19 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           [newRecord.followed_id]: (prev.userFollowers[newRecord.followed_id] || 0) + 1
         }
       }));
-    } else if (eventType === 'DELETE' && newRecord) {
+    } else if (eventType === 'DELETE' && oldRecord) {
       setMetrics(prev => ({
         ...prev,
         userFollowers: {
           ...prev.userFollowers,
-          [newRecord.followed_id]: Math.max((prev.userFollowers[newRecord.followed_id] || 0) - 1, 0)
+          [oldRecord.followed_id]: Math.max((prev.userFollowers[oldRecord.followed_id] || 0) - 1, 0)
         }
       }));
     }
   }, []);
   
   const handleCommentUpdate = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
-    const { new: newRecord, eventType } = payload;
+    const { new: newRecord, old: oldRecord, eventType } = payload;
     
     if (eventType === 'INSERT' && newRecord) {
       setMetrics(prev => ({
@@ -276,12 +276,12 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           [newRecord.snippet_id]: (prev.snippetComments[newRecord.snippet_id] || 0) + 1
         }
       }));
-    } else if (eventType === 'DELETE' && newRecord) {
+    } else if (eventType === 'DELETE' && oldRecord) {
       setMetrics(prev => ({
         ...prev,
         snippetComments: {
           ...prev.snippetComments,
-          [newRecord.snippet_id]: Math.max((prev.snippetComments[newRecord.snippet_id] || 0) - 1, 0)
+          [oldRecord.snippet_id]: Math.max((prev.snippetComments[oldRecord.snippet_id] || 0) - 1, 0)
         }
       }));
     }
