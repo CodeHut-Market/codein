@@ -5,7 +5,7 @@ import { Bell, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth } from "../../client/contexts/AuthContext";
 import { NAV_ITEMS } from "../config/navigation";
 import NotificationsMenu from "./NotificationsMenu";
 import UserMenu from "./UserMenu";

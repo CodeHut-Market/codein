@@ -9,14 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from '@/components/ui/textarea'
-// Define a simple User type instead of importing from Supabase
-type User = {
-  id: string
-  email?: string
-  user_metadata?: {
-    username?: string
-  }
-}
+import { useAuth } from "../../client/contexts/AuthContext"
 import {
     AlertTriangle,
     CheckCircle,
@@ -38,8 +31,7 @@ import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
 
 export default function UploadPage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const { user, isLoading } = useAuth()
   
   // Form state
   const [title, setTitle] = useState('')
@@ -64,12 +56,7 @@ export default function UploadPage() {
   const [similarity, setSimilarity] = useState<number | null>(null)
   const [plagMessage, setPlagMessage] = useState('')
 
-  useEffect(() => {
-    // TODO: Implement authentication logic here
-    // For now, set a mock user or fetch from your API
-    setIsLoading(false)
-    // Example: setUser({ id: '1', email: 'user@example.com' })
-  }, [])
+  // Authentication is now handled by AuthContext
 
   const languages = [
     'typescript', 'javascript', 'python', 'java', 'cpp', 'csharp', 'go', 

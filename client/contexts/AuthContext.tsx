@@ -27,6 +27,8 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (userData: User, accessToken: string) => void;
+  signIn: (email: string, password: string) => Promise<{ data?: any; error?: any }>;
+  signInWithProvider: (provider: 'github' | 'google') => Promise<{ data?: any; error?: any }>;
   signUp: (email: string, password: string, metadata?: any) => Promise<{ data?: any; error?: any }>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
@@ -56,6 +58,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check for existing session on app load
   useEffect(() => {
     const checkAuthState = async () => {
+      // First, check if we have Supabase session
+      if (isSupabaseEnabled()) {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session && session.user) {
+          // Create user object from Supabase session
+          const userData: User = {
+            id: session.user.id,
+            username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'user',
+            email: session.user.email || '',
+            bio: session.user.user_metadata?.bio || '',
+            avatar: session.user.user_metadata?.avatar_url || '',
+            totalSnippets: 0,
+            totalDownloads: 0,
+            rating: 0,
+            role: 'user',
+            isActive: true,
+            emailVerified: session.user.email_confirmed_at ? true : false,
+            createdAt: session.user.created_at || new Date().toISOString(),
+            lastLoginAt: new Date().toISOString()
+          };
+          
+          setUser(userData);
+          setToken(session.access_token);
+          localStorage.setItem("token", session.access_token);
+          localStorage.setItem("user", JSON.stringify(userData));
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Fallback to localStorage check
       const storedToken = localStorage.getItem("token");
       const storedUser = localStorage.getItem("user");
 
@@ -98,6 +132,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkAuthState();
+
+    // Listen to Supabase auth state changes
+    if (isSupabaseEnabled()) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          console.log('Supabase auth state changed:', event, session);
+          
+          if (event === 'SIGNED_IN' && session) {
+            const userData: User = {
+              id: session.user.id,
+              username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'user',
+              email: session.user.email || '',
+              bio: session.user.user_metadata?.bio || '',
+              avatar: session.user.user_metadata?.avatar_url || '',
+              totalSnippets: 0,
+              totalDownloads: 0,
+              rating: 0,
+              role: 'user',
+              isActive: true,
+              emailVerified: session.user.email_confirmed_at ? true : false,
+              createdAt: session.user.created_at || new Date().toISOString(),
+              lastLoginAt: new Date().toISOString()
+            };
+            
+            setUser(userData);
+            setToken(session.access_token);
+            localStorage.setItem("token", session.access_token);
+            localStorage.setItem("user", JSON.stringify(userData));
+          } else if (event === 'SIGNED_OUT') {
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+          }
+          setIsLoading(false);
+        }
+      );
+
+      return () => subscription.unsubscribe();
+    }
   }, []);
 
   const login = (userData: User, accessToken: string) => {
@@ -105,6 +179,105 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(accessToken);
     localStorage.setItem("token", accessToken);
     localStorage.setItem("user", JSON.stringify(userData));
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      
+      if (isSupabaseEnabled()) {
+        // Try Supabase sign in first if available
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          return { error: { message: error.message } };
+        }
+
+        if (data.user && data.session) {
+          // Create user object from Supabase data
+          const userData: User = {
+            id: data.user.id,
+            username: data.user.user_metadata?.username || data.user.email?.split('@')[0] || 'user',
+            email: data.user.email || '',
+            bio: data.user.user_metadata?.bio || '',
+            avatar: data.user.user_metadata?.avatar_url || '',
+            totalSnippets: 0,
+            totalDownloads: 0,
+            rating: 0,
+            role: 'user',
+            isActive: true,
+            emailVerified: data.user.email_confirmed_at ? true : false,
+            createdAt: data.user.created_at || new Date().toISOString(),
+            lastLoginAt: new Date().toISOString()
+          };
+          
+          login(userData, data.session.access_token);
+          return { data, error: null };
+        }
+      } else {
+        // Fallback to API-based signin
+        const response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+        
+        if (response.ok && result.user && result.token) {
+          login(result.user, result.token);
+          return { data: result, error: null };
+        } else {
+          return { error: { message: result.error || 'Sign in failed' } };
+        }
+      }
+    } catch (error) {
+      console.error('SignIn error:', error);
+      return { 
+        error: { 
+          message: error instanceof Error ? error.message : 'An unexpected error occurred during sign in' 
+        } 
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithProvider = async (provider: 'github' | 'google') => {
+    try {
+      setIsLoading(true);
+      
+      if (isSupabaseEnabled()) {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback`
+          }
+        });
+
+        if (error) {
+          return { error: { message: error.message } };
+        }
+
+        return { data, error: null };
+      } else {
+        return { error: { message: 'OAuth sign in not available without Supabase' } };
+      }
+    } catch (error) {
+      console.error('OAuth sign in error:', error);
+      return { 
+        error: { 
+          message: error instanceof Error ? error.message : 'An unexpected error occurred during OAuth sign in' 
+        } 
+      };
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const signUp = async (email: string, password: string, metadata?: any) => {
@@ -218,6 +391,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     token,
     login,
     signUp,
+    signIn,
+    signInWithProvider,
     logout,
     updateUser,
     isLoading,
