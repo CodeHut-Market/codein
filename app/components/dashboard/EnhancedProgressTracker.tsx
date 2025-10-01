@@ -670,8 +670,17 @@ export default function EnhancedProgressTracker() {
               </CardHeader>
               <CardContent>
                 {(() => {
+                  if (monthlyStats.length === 0) {
+                    return (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">No data available yet</p>
+                      </div>
+                    );
+                  }
+                  
                   const bestMonth = monthlyStats.reduce((best, current) => 
-                    current.snippets_created > best.snippets_created ? current : best
+                    current.snippets_created > best.snippets_created ? current : best,
+                    monthlyStats[0]
                   );
                   
                   return (

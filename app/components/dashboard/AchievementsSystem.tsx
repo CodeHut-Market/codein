@@ -533,8 +533,8 @@ export default function AchievementsSystem() {
                 </select>
               </div>
               <Button
-                variant={showUnlockedOnly ? "default" : "outline"}
-                size="sm"
+                variant={showUnlockedOnly ? ("default" as const) : ("outline" as const)}
+                size={"sm" as const}
                 onClick={() => setShowUnlockedOnly(!showUnlockedOnly)}
               >
                 {showUnlockedOnly ? 'Show All' : 'Unlocked Only'}

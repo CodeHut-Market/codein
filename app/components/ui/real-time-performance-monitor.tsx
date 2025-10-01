@@ -1,0 +1,190 @@
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import { Activity, Zap, Timer, Database, Wifi } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
+import { Progress } from './progress';
+import { Badge } from './badge';
+import { useRealTime } from '../../contexts/RealTimeContext';
+
+interface PerformanceMetrics {
+  connectionLatency: number;
+  subscriptionCount: number;
+  updateFrequency: number;
+  memoryUsage: number;
+  dataTransferred: number;
+  lastUpdateTime: Date;
+}
+
+export const RealTimePerformanceMonitor: React.FC = () => {
+  const { connectionState } = useRealTime();
+  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+    connectionLatency: 0,
+    subscriptionCount: 0,
+    updateFrequency: 0,
+    memoryUsage: 0,
+    dataTransferred: 0,
+    lastUpdateTime: new Date()
+  });
+  
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Monitor performance metrics
+  useEffect(() => {
+    const startTime = performance.now();
+    let updateCount = 0;
+    const startMemory = (performance as any).memory?.usedJSHeapSize || 0;
+    
+    const interval = setInterval(() => {
+      const currentTime = performance.now();
+      const currentMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      
+      setMetrics(prev => ({
+        ...prev,
+        connectionLatency: Math.round(currentTime - startTime),
+        updateFrequency: updateCount,
+        memoryUsage: Math.round((currentMemory - startMemory) / 1024 / 1024), // MB
+        lastUpdateTime: new Date()
+      }));
+      
+      updateCount++;
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Track subscription count (this would need to be exposed from RealTimeContext)
+  useEffect(() => {
+    // Placeholder - in real implementation, this would come from the context
+    setMetrics(prev => ({
+      ...prev,
+      subscriptionCount: Math.floor(Math.random() * 10) + 1
+    }));
+  }, [connectionState]);
+  
+  const getConnectionQuality = () => {
+    if (connectionState.status !== 'connected') return 'poor';
+    if (metrics.connectionLatency < 100) return 'excellent';
+    if (metrics.connectionLatency < 300) return 'good';
+    if (metrics.connectionLatency < 500) return 'fair';
+    return 'poor';
+  };
+  
+  const getQualityColor = (quality: string) => {
+    switch (quality) {
+      case 'excellent': return 'text-green-600';
+      case 'good': return 'text-blue-600';
+      case 'fair': return 'text-yellow-600';
+      case 'poor': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
+  };
+  
+  const quality = getConnectionQuality();
+  
+  if (!isVisible) {
+    return (
+      <button
+        onClick={() => setIsVisible(true)}
+        className="fixed bottom-4 right-4 p-2 bg-muted/50 hover:bg-muted border rounded-full shadow-lg z-50 transition-all"
+        title="Show performance monitor"
+      >
+        <Activity size={16} />
+      </button>
+    );
+  }
+  
+  return (
+    <Card className="fixed bottom-4 right-4 w-80 shadow-xl z-50 border-2">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Activity size={16} className="text-primary" />
+            <CardTitle className="text-sm">Real-Time Performance</CardTitle>
+          </div>
+          <button
+            onClick={() => setIsVisible(false)}
+            className="text-muted-foreground hover:text-foreground text-xs"
+          >
+            ✕
+          </button>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-3">
+        {/* Connection Status */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wifi size={14} />
+            <span className="text-sm">Connection</span>
+          </div>
+          <Badge 
+            variant={quality === 'excellent' || quality === 'good' ? 'default' : 'destructive'}
+            className={`text-xs ${getQualityColor(quality)}`}
+          >
+            {connectionState.status === 'connected' ? quality : connectionState.status}
+          </Badge>
+        </div>
+        
+        {/* Latency */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2">
+              <Timer size={14} />
+              <span>Latency</span>
+            </div>
+            <span>{metrics.connectionLatency}ms</span>
+          </div>
+          <Progress 
+            value={Math.min((metrics.connectionLatency / 1000) * 100, 100)} 
+            className="h-1"
+          />
+        </div>
+        
+        {/* Active Subscriptions */}
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2">
+            <Database size={14} />
+            <span>Subscriptions</span>
+          </div>
+          <span>{metrics.subscriptionCount}</span>
+        </div>
+        
+        {/* Update Frequency */}
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2">
+            <Zap size={14} />
+            <span>Updates/sec</span>
+          </div>
+          <span>{(metrics.updateFrequency / 60).toFixed(1)}</span>
+        </div>
+        
+        {/* Memory Usage */}
+        {metrics.memoryUsage > 0 && (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-sm">
+              <span>Memory</span>
+              <span>{metrics.memoryUsage}MB</span>
+            </div>
+            <Progress 
+              value={Math.min((metrics.memoryUsage / 100) * 100, 100)} 
+              className="h-1"
+            />
+          </div>
+        )}
+        
+        {/* Last Update */}
+        <div className="text-xs text-muted-foreground text-center pt-2 border-t">
+          Last update: {metrics.lastUpdateTime.toLocaleTimeString()}
+        </div>
+        
+        {/* Reconnection Info */}
+        {connectionState.reconnectAttempts > 0 && (
+          <div className="text-xs text-yellow-600 text-center">
+            Reconnection attempts: {connectionState.reconnectAttempts}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

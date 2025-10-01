@@ -18,6 +18,22 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import SnippetCard from '../components/SnippetCard'
+import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
+import { ConnectionStatusIndicator } from '../components/ui/connection-status'
+
+// Adapter function to convert CodeSnippet to RealTimeSnippetCard format
+const adaptCodeSnippetForRealTime = (snippet: CodeSnippet) => ({
+  ...snippet,
+  user_id: snippet.authorId,
+  created_at: snippet.createdAt,
+  updated_at: snippet.updatedAt,
+  is_public: snippet.visibility !== 'private',
+  user: {
+    username: snippet.author,
+    avatar_url: undefined,
+    display_name: snippet.author
+  }
+});
 
 export default function ExplorePage() {
   const searchParams = useSearchParams()
@@ -129,9 +145,12 @@ export default function ExplorePage() {
       {/* Header */}
       <div className="text-center space-y-4 relative">
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 rounded-2xl blur-3xl"></div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">
-          Explore Code Snippets
-        </h1>
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">
+            Explore Code Snippets
+          </h1>
+          <ConnectionStatusIndicator size="sm" />
+        </div>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {searchParams.get("query")
             ? `Search results for "${searchParams.get("query")}" (${totalCount} found)`
@@ -223,9 +242,8 @@ export default function ExplorePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredSnippets.map((snippet) => (
               <div key={snippet.id} className="relative">
-                <SnippetCard 
-                  snippet={snippet} 
-                  onPurchaseComplete={fetchSnippets}
+                <RealTimeSnippetCard 
+                  snippet={adaptCodeSnippetForRealTime(snippet)}
                 />
                 <div className="absolute -top-2 -right-2 z-10">
                   <Badge className="bg-yellow-500 text-yellow-50 shadow-lg">
@@ -253,10 +271,9 @@ export default function ExplorePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {snippets.length > 0 ? (
               snippets.map((snippet) => (
-                <SnippetCard 
+                <RealTimeSnippetCard 
                   key={snippet.id} 
-                  snippet={snippet} 
-                  onPurchaseComplete={fetchSnippets} 
+                  snippet={adaptCodeSnippetForRealTime(snippet)}
                 />
               ))
             ) : (

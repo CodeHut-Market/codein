@@ -32,6 +32,7 @@ import TagsManager from '../components/dashboard/TagsManager'
 import EnhancedProgressTracker from '../components/dashboard/EnhancedProgressTracker'
 import AchievementsSystem from '../components/dashboard/AchievementsSystem'
 import EnhancedQuickActions from '../components/dashboard/EnhancedQuickActions'
+import { RealTimeDashboardStats } from '../components/dashboard/RealTimeDashboardStats'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -201,60 +202,8 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-l-4 border-l-primary/60 hover:border-l-primary hover:shadow-lg transition-all duration-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-primary/5 to-transparent">
-            <CardTitle className="text-sm font-medium">Total Snippets</CardTitle>
-            <Code2 className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{loadingData ? '...' : stats.totalSnippets}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.publicSnippets} public, {stats.privateSnippets} private
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-l-4 border-l-emerald-500/60 hover:border-l-emerald-500 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-emerald-500/5 to-transparent">
-            <CardTitle className="text-sm font-medium">Total Views</CardTitle>
-            <Eye className="h-4 w-4 text-emerald-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{loadingData ? '...' : stats.totalViews.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Total downloads: {stats.totalDownloads}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-l-4 border-l-rose-500/60 hover:border-l-rose-500 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-rose-500/5 to-transparent">
-            <CardTitle className="text-sm font-medium">Total Likes</CardTitle>
-            <Heart className="h-4 w-4 text-rose-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-rose-500">{loadingData ? '...' : stats.totalLikes}</div>
-            <p className="text-xs text-muted-foreground">
-              Avg rating: {stats.averageRating.toFixed(1)}/5
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-l-4 border-l-violet-500/60 hover:border-l-violet-500 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-violet-500/5 to-transparent">
-            <CardTitle className="text-sm font-medium">Followers</CardTitle>
-            <Users className="h-4 w-4 text-violet-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-violet-600">{loadingData ? '...' : userSnippets.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Recent uploads
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Real-Time Stats */}
+      <RealTimeDashboardStats />
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
