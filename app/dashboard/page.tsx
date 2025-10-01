@@ -11,7 +11,9 @@ import {
     PlusCircle,
     TrendingUp,
     Upload,
-    Users
+    Users,
+    Search,
+    Filter
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -22,6 +24,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Progress } from "../components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
+import AnalyticsChart from '../components/dashboard/AnalyticsChart'
+import ActivityFeed from '../components/dashboard/ActivityFeed'
+import TrendingSnippets from '../components/dashboard/TrendingSnippets'
+import SearchAndFilters from '../components/dashboard/SearchAndFilters'
+import TagsManager from '../components/dashboard/TagsManager'
+import EnhancedProgressTracker from '../components/dashboard/EnhancedProgressTracker'
+import AchievementsSystem from '../components/dashboard/AchievementsSystem'
+import EnhancedQuickActions from '../components/dashboard/EnhancedQuickActions'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -34,7 +44,8 @@ export default function DashboardPage() {
     totalViews: 0,
     totalLikes: 0,
     totalDownloads: 0,
-    averageRating: 0
+    averageRating: 0,
+    monthlyGrowth: 0
   })
   const [loadingData, setLoadingData] = useState(false)
 
@@ -247,102 +258,32 @@ export default function DashboardPage() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="bg-muted/50 border border-primary/10">
+        <TabsList className="bg-muted/50 border border-primary/10 grid grid-cols-9 w-full">
           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80">Overview</TabsTrigger>
-          <TabsTrigger value="snippets" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-600/80">Recent Snippets</TabsTrigger>
-          <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-violet-600/80">Activity</TabsTrigger>
           <TabsTrigger value="analytics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-amber-600/80">Analytics</TabsTrigger>
+          <TabsTrigger value="snippets" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-600/80">My Snippets</TabsTrigger>
+          <TabsTrigger value="search" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-600/80">Search</TabsTrigger>
+          <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-violet-600/80">Activity</TabsTrigger>
+          <TabsTrigger value="trending" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-orange-600/80">Trending</TabsTrigger>
+          <TabsTrigger value="tags" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-600/80">Tags</TabsTrigger>
+          <TabsTrigger value="progress" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-green-600/80">Progress</TabsTrigger>
+          <TabsTrigger value="achievements" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-600 data-[state=active]:to-yellow-600/80">Achievements</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>
-                  Common tasks to manage your code snippets
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-2">
-                <Link href="/upload">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload New Snippet
-                  </Button>
-                </Link>
-                <Link href="/explore">
-                  <Button variant="outline" className="w-full justify-start">
-                    <TrendingUp className="mr-2 h-4 w-4" />
-                    Browse Trending
-                  </Button>
-                </Link>
-                <Link href="/favorites">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Heart className="mr-2 h-4 w-4" />
-                    View Favorites
-                  </Button>
-                </Link>
-                <Link href="/profile">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Users className="mr-2 h-4 w-4" />
-                    Edit Profile
-                  </Button>
-                </Link>
-                <Link href="/transactions">
-                  <Button variant="outline" className="w-full justify-start">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Transaction History
-                  </Button>
-                </Link>
-                <Link href="/dashboard/profile">
-                  <Button variant="outline" className="w-full justify-start">
-                    <BarChart3 className="mr-2 h-4 w-4" />
-                    Profile Dashboard
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          <EnhancedQuickActions />
+        </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Progress</CardTitle>
-                <CardDescription>
-                  Your activity this month
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Total Snippets</span>
-                    <span>{stats.totalSnippets}</span>
-                  </div>
-                  <Progress value={Math.min((stats.totalSnippets / 10) * 100, 100)} className="mt-2" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Public vs Private</span>
-                    <span>{stats.publicSnippets}/{stats.privateSnippets}</span>
-                  </div>
-                  <Progress value={stats.totalSnippets > 0 ? (stats.publicSnippets / stats.totalSnippets) * 100 : 0} className="mt-2" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Avg Rating</span>
-                    <span>{stats.averageRating.toFixed(1)}/5</span>
-                  </div>
-                  <Progress value={(stats.averageRating / 5) * 100} className="mt-2" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        <TabsContent value="analytics" className="space-y-4">
+          <AnalyticsChart userId={user?.id || ''} />
         </TabsContent>
         
         <TabsContent value="snippets" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Snippets</CardTitle>
+              <CardTitle>My Snippets</CardTitle>
               <CardDescription>
-                Your latest code submissions
+                Manage all your code submissions
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -366,11 +307,14 @@ export default function DashboardPage() {
                     href={`/snippet/${snippet.id}`}
                     className="block"
                   >
-                    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer group">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="font-semibold hover:text-primary transition-colors">{snippet.title}</h3>
                           <Badge variant="secondary">{snippet.language}</Badge>
+                          <Badge variant={snippet.visibility === 'private' ? 'outline' : 'default'} className="text-xs">
+                            {snippet.visibility}
+                          </Badge>
                         </div>
                         <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                           <span className="flex items-center">
@@ -386,14 +330,22 @@ export default function DashboardPage() {
                         <div className="flex gap-1 mt-2">
                           {snippet.tags.map((tag) => (
                             <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
+                              #{tag}
                             </Badge>
                           ))}
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={(e) => e.preventDefault()}>
-                        <BarChart3 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="sm" onClick={(e) => { e.preventDefault(); console.log('Edit snippet:', snippet.id); }}>
+                          Edit
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={(e) => { e.preventDefault(); console.log('Duplicate snippet:', snippet.id); }}>
+                          Duplicate
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={(e) => e.preventDefault()}>
+                          <BarChart3 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </Link>
                   ))}
@@ -402,93 +354,78 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        
-        <TabsContent value="activity" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>
-                Your latest actions and interactions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loadingData ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="text-muted-foreground">Loading activity...</div>
-                </div>
-              ) : recentSnippets.length === 0 ? (
-                <div className="text-center py-8">
-                  <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No recent activity</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {recentSnippets.slice(0, 3).map((snippet, index) => (
-                    <div key={snippet.id} className="flex items-start space-x-3">
-                      <Upload className="h-4 w-4 mt-1 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm">
-                          Uploaded new snippet
-                          <span className="font-medium"> "{snippet.title}"</span>
-                        </p>
-                        <p className="text-xs text-muted-foreground">{snippet.createdAt}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+
+        <TabsContent value="search" className="space-y-4">
+          <SearchAndFilters 
+            snippets={recentSnippets.map(snippet => ({
+              ...snippet,
+              description: `Sample description for ${snippet.title}`,
+              createdAt: new Date(snippet.createdAt),
+              updatedAt: new Date(snippet.createdAt)
+            }))}
+            onFilteredResults={(results) => console.log('Filtered results:', results)}
+          />
         </TabsContent>
         
-        <TabsContent value="analytics" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <TabsContent value="activity" className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <ActivityFeed currentUserId={user?.id || ''} />
+            
             <Card>
               <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
+                <CardTitle>Activity Summary</CardTitle>
                 <CardDescription>
-                  How your snippets are performing
+                  Your engagement metrics this week
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Average Views per Snippet</span>
-                  <span className="font-bold">{Math.round(stats.totalViews / stats.totalSnippets)}</span>
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Upload className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm">Snippets Uploaded</span>
+                  </div>
+                  <span className="font-bold">3</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Like-to-View Ratio</span>
-                  <span className="font-bold">{Math.round((stats.totalLikes / stats.totalViews) * 100)}%</span>
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Heart className="h-4 w-4 text-red-500" />
+                    <span className="text-sm">Likes Received</span>
+                  </div>
+                  <span className="font-bold">27</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Most Popular Language</span>
-                  <Badge>JavaScript</Badge>
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Eye className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">Profile Views</span>
+                  </div>
+                  <span className="font-bold">156</span>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Growth Trends</CardTitle>
-                <CardDescription>
-                  Your account growth over time
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Monthly Growth</span>
-                  <span className="font-bold text-green-600">+{stats.monthlyGrowth}%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">New Followers (30d)</span>
-                  <span className="font-bold">+23</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Engagement Score</span>
-                  <span className="font-bold">8.7/10</span>
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-4 w-4 text-purple-500" />
+                    <span className="text-sm">New Followers</span>
+                  </div>
+                  <span className="font-bold">8</span>
                 </div>
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="trending" className="space-y-4">
+          <TrendingSnippets limit={10} />
+        </TabsContent>
+        
+        <TabsContent value="tags" className="space-y-4">
+          <TagsManager />
+        </TabsContent>
+        
+        <TabsContent value="progress" className="space-y-4">
+          <EnhancedProgressTracker />
+        </TabsContent>
+        
+        <TabsContent value="achievements" className="space-y-4">
+          <AchievementsSystem />
         </TabsContent>
       </Tabs>
     </div>

@@ -4,7 +4,7 @@ import { Check, Copy, Download } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vs, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { oneLight, oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { useToastContext } from '../../../components/ToastProvider';
 import { Button } from './button';
 
@@ -208,7 +208,7 @@ export function CodeHighlighter({
       <div className="relative">
         <SyntaxHighlighter
           language={languageId}
-          style={isDark ? vscDarkPlus : vs}
+          style={isDark ? oneDark : oneLight}
           showLineNumbers={showLineNumbers}
           customStyle={{
             margin: 0,
