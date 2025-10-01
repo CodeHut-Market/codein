@@ -44,52 +44,65 @@ export async function GET(req: NextRequest){
 
 export async function POST(req: NextRequest){
   try {
+    console.log('========================================');
     console.log('POST /api/snippets - Starting snippet creation');
+    console.log('POST /api/snippets - Request URL:', req.url);
+    console.log('POST /api/snippets - Request headers:', Object.fromEntries(req.headers.entries()));
+    
     const body: Partial<CreateCodeSnippetRequest> = await req.json();
-    console.log('POST /api/snippets - Received body:', { 
+    console.log('POST /api/snippets - Full request body:', JSON.stringify(body, null, 2));
+    console.log('POST /api/snippets - Received body summary:', { 
       title: body.title, 
       language: body.language, 
       hasCode: !!body.code,
       codeLength: body.code?.length,
       visibility: body.visibility,
-      category: body.category 
+      allowComments: body.allowComments,
+      category: body.category,
+      price: body.price,
+      tags: body.tags
     });
     
     // Validate required fields
     if(!body.title || !body.code || !body.language){
-      console.log('POST /api/snippets - Missing required fields:', { 
+      const errorMsg = 'Missing required fields: title, code, and language are required';
+      console.error('POST /api/snippets - VALIDATION FAILED:', { 
         hasTitle: !!body.title, 
         hasCode: !!body.code, 
         hasLanguage: !!body.language 
       });
-      return NextResponse.json({ error: 'Missing required fields: title, code, and language are required'}, { status: 400 });
+      return NextResponse.json({ error: errorMsg }, { status: 400 });
     }
 
     // Require user authentication for upload
     const userDataHeader = req.headers.get('x-user-data');
+    console.log('POST /api/snippets - User data header:', userDataHeader);
+    
     if (!userDataHeader) {
-      console.log('POST /api/snippets - No user authentication found, rejecting upload');
+      console.error('POST /api/snippets - AUTHENTICATION FAILED: No user data header found');
       return NextResponse.json({ error: 'Authentication required to upload snippets.' }, { status: 401 });
     }
     
     let userData;
     try {
       userData = JSON.parse(userDataHeader);
+      console.log('POST /api/snippets - Parsed user data:', JSON.stringify(userData, null, 2));
     } catch (e) {
-      console.warn('POST /api/snippets - Failed to parse user data header');
+      console.error('POST /api/snippets - PARSE ERROR: Failed to parse user data header:', e);
       return NextResponse.json({ error: 'Invalid user data.' }, { status: 400 });
     }
     
     if (!userData.id || !userData.username) {
+      console.error('POST /api/snippets - INVALID USER DATA:', { hasId: !!userData.id, hasUsername: !!userData.username });
       return NextResponse.json({ error: 'Incomplete user data.' }, { status: 400 });
     }
     
     const author = userData.username;
     const authorId = userData.id;
-    console.log('POST /api/snippets - Authenticated user:', { author, authorId });
+    console.log('POST /api/snippets - ✅ Authenticated user:', { author, authorId });
     
     // Enhanced snippet creation with new fields
-    const snippet = await createSnippet({
+    const snippetInput = {
       title: body.title.trim(),
       code: body.code,
       description: body.description?.trim() || '',
@@ -102,19 +115,35 @@ export async function POST(req: NextRequest){
       allowComments: body.allowComments !== false, // default to true
       author: author,
       authorId: authorId
-    });
+    };
     
-    console.log('POST /api/snippets - Successfully created snippet with ID:', snippet.id);
+    console.log('POST /api/snippets - Calling createSnippet with input:', JSON.stringify(snippetInput, null, 2));
+    
+    const snippet = await createSnippet(snippetInput);
+    
+    console.log('POST /api/snippets - ✅ SUCCESS! Created snippet:', {
+      id: snippet.id,
+      title: snippet.title,
+      author: snippet.author,
+      authorId: snippet.authorId
+    });
+    console.log('========================================');
+    
     return NextResponse.json({ 
       snippet, 
       message: 'Snippet created successfully'
     }, { status: 201 });
     
   } catch(e){
-    console.error('POST /api/snippets - Error creating snippet:', e);
+    console.error('========================================');
+    console.error('POST /api/snippets - ❌ CRITICAL ERROR creating snippet:', e);
+    console.error('POST /api/snippets - Error stack:', e instanceof Error ? e.stack : 'No stack trace');
+    console.error('POST /api/snippets - Error message:', e instanceof Error ? e.message : 'Unknown error');
+    console.error('========================================');
     return NextResponse.json({ 
       error: 'Failed to create snippet', 
-      details: e instanceof Error ? e.message : 'Unknown error'
+      details: e instanceof Error ? e.message : 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' && e instanceof Error ? e.stack : undefined
     }, { status: 500 });
   }
 }

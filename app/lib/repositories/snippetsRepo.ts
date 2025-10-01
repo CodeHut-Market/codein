@@ -1047,48 +1047,75 @@ function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
 }
 
 export async function getSnippetById(id: string): Promise<CodeSnippet | null>{
-  console.log('getSnippetById - Looking for snippet with ID:', id);
+  console.log('========================================');
+  console.log('getSnippetById - START - Looking for snippet with ID:', id);
   console.log('getSnippetById - Memory snippets count:', memorySnippets.length);
   console.log('getSnippetById - Memory snippets IDs:', memorySnippets.map(s => s.id));
   
   // Check memory first for quick access
   const memoryResult = memorySnippets.find(s=> s.id === id);
   if (memoryResult) {
-    console.log('getSnippetById - Found in memory:', memoryResult.title);
+    console.log('getSnippetById - ✅ Found in memory:', memoryResult.title);
     console.log('getSnippetById - Memory snippet code preview:', memoryResult.code.slice(0, 50) + '...');
+    console.log('========================================');
     return memoryResult;
   }
   
-  console.log('getSnippetById - NOT found in memory');
+  console.log('getSnippetById - ❌ NOT found in memory');
   console.log('getSnippetById - Supabase enabled:', isSupabaseEnabled());
+  console.log('getSnippetById - Supabase URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.log('getSnippetById - Supabase Key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
   
   // Try Supabase database (primary storage since memory doesn't persist in serverless)
   if(isSupabaseEnabled()){
     try {
-      console.log('getSnippetById - Querying Supabase database');
+      console.log('getSnippetById - 🔍 Querying Supabase database for ID:', id);
       const { data, error } = await supabase!.from('snippets').select('*').eq('id', id).maybeSingle();
+      
       if(error){ 
-        console.error('getSnippetById - Supabase get error:', error);
+        console.error('getSnippetById - ❌ Supabase get error:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        console.log('========================================');
         return null;
       }
+      
       if(!data) {
-        console.log('getSnippetById - No data returned from Supabase');
+        console.log('getSnippetById - ❌ No data returned from Supabase for ID:', id);
+        console.log('getSnippetById - This means the snippet is NOT in the database!');
+        console.log('========================================');
         return null;
       }
-      console.log('getSnippetById - Found in Supabase:', data.title);
-      console.log('getSnippetById - Supabase data preview:', JSON.stringify(data, null, 2).slice(0, 200) + '...');
+      
+      console.log('getSnippetById - ✅ Found in Supabase:', data.title);
+      console.log('getSnippetById - Supabase full data:', JSON.stringify(data, null, 2));
       const snippet = mapRowToSnippet(data as any);
+      console.log('getSnippetById - Mapped snippet:', {
+        id: snippet.id,
+        title: snippet.title,
+        author: snippet.author,
+        authorId: snippet.authorId,
+        language: snippet.language
+      });
+      
       // Add to memory for faster future access in this request
       memorySnippets.unshift(snippet);
       console.log('getSnippetById - Added to memory cache for this request');
+      console.log('========================================');
       return snippet;
     } catch (err) {
-      console.error('getSnippetById - Exception during Supabase query:', err);
+      console.error('getSnippetById - ❌ EXCEPTION during Supabase query:', err);
+      console.error('getSnippetById - Exception stack:', err instanceof Error ? err.stack : 'No stack trace');
+      console.log('========================================');
       return null;
     }
   }
   
-  console.log('getSnippetById - Snippet not found anywhere!');
+  console.log('getSnippetById - ❌ Snippet not found anywhere! (Supabase disabled or not found)');
+  console.log('========================================');
   return null;
 }
 
