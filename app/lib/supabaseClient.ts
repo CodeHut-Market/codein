@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 // Environment variables (configure in .env.local)
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Check if environment variables are properly configured (not placeholder values)
 const isValidSupabaseUrl = (url: string | undefined): boolean => {
@@ -73,6 +74,26 @@ export const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY &&
 
 export function isSupabaseEnabled(){
   return !!supabase;
+}
+
+// Server-side Supabase client with service role key (bypasses RLS)
+export const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && 
+  isValidSupabaseUrl(SUPABASE_URL) && isValidSupabaseKey(SUPABASE_SERVICE_ROLE_KEY)) ? createClient(
+	SUPABASE_URL,
+	SUPABASE_SERVICE_ROLE_KEY,
+	{
+		auth: {
+			autoRefreshToken: false,
+			persistSession: false
+		},
+		db: {
+			schema: 'public'
+		}
+	}
+) : null;
+
+export function isSupabaseAdminEnabled(){
+  return !!supabaseAdmin;
 }
 
 // Enhanced authentication helper functions

@@ -32,7 +32,6 @@ import TagsManager from '../components/dashboard/TagsManager'
 import EnhancedProgressTracker from '../components/dashboard/EnhancedProgressTracker'
 import AchievementsSystem from '../components/dashboard/AchievementsSystem'
 import EnhancedQuickActions from '../components/dashboard/EnhancedQuickActions'
-import { RealTimeDashboardStats } from '../components/dashboard/RealTimeDashboardStats'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -201,9 +200,6 @@ export default function DashboardPage() {
           </Button>
         </Link>
       </div>
-
-      {/* Real-Time Stats */}
-      <RealTimeDashboardStats />
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">

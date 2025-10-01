@@ -4,8 +4,7 @@ import { Check, Copy, Download } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import atomOneLight from 'react-syntax-highlighter/dist/styles/atom-one-light';
-import atomOneDark from 'react-syntax-highlighter/dist/styles/atom-one-dark';
+import { vs, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useToastContext } from '../../../components/ToastProvider';
 import { Button } from './button';
 
@@ -31,7 +30,7 @@ export function CodeHighlighter({
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const { resolvedTheme } = useTheme();
-  const { success, error } = useToastContext();
+  const { success, error } = useToast();
 
   // Map common language names to Prism.js language identifiers
   const getLanguageId = (lang: string): string => {
@@ -209,7 +208,7 @@ export function CodeHighlighter({
       <div className="relative">
         <SyntaxHighlighter
           language={languageId}
-          style={isDark ? atomOneDark : atomOneLight}
+          style={isDark ? vscDarkPlus : vs}
           showLineNumbers={showLineNumbers}
           customStyle={{
             margin: 0,

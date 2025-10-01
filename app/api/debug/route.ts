@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isSupabaseEnabled, supabase } from '../../lib/supabaseClient';
+import { isSupabaseAdminEnabled, isSupabaseEnabled, supabase } from '../../lib/supabaseClient';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,8 +8,10 @@ export async function GET(request: NextRequest) {
     const debugInfo = {
       timestamp: new Date().toISOString(),
       supabaseEnabled: isSupabaseEnabled(),
+      supabaseAdminEnabled: isSupabaseAdminEnabled(),
       hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
       supabaseUrlValid: process.env.NEXT_PUBLIC_SUPABASE_URL && 
         !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder') &&
         !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-supabase-url-here'),

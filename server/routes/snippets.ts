@@ -1,22 +1,27 @@
 import {
-  CodeSnippet,
-  DeleteCodeSnippetResponse,
-  ErrorResponse,
-  UpdateCodeSnippetRequest,
-  UpdateCodeSnippetResponse
+    CodeSnippet,
+    DeleteCodeSnippetResponse,
+    ErrorResponse,
+    UpdateCodeSnippetRequest,
+    UpdateCodeSnippetResponse
 } from "@shared/api";
 import { RequestHandler } from "express";
 import { codeSnippets } from "../database";
 import {
-  createSnippet as dbCreateSnippet,
-  pool
+    createSnippet as dbCreateSnippet,
+    pool
 } from "../db/database";
-import { 
-  supabaseClient, 
-  supabaseHelpers, 
-  isSupabaseAvailable,
-  SupabaseSnippet 
+import {
+    isSupabaseAvailable,
+    supabaseClient,
+    supabaseHelpers,
+    SupabaseSnippet
 } from "../lib/supabaseClient";
+import {
+    hybridCodeSearch,
+    semanticCodeSearch,
+    storeCodeEmbedding
+} from "../lib/vectorDatabase";
 
 /**
  * GET /api/snippets
@@ -605,6 +610,19 @@ export const createCodeSnippet: RequestHandler = async (req, res) => {
         // Convert to API format
         const snippet = supabaseHelpers.mapSupabaseSnippetToAPI(data as SupabaseSnippet);
 
+        // Store vector embedding for semantic search (async, don't wait)
+        storeCodeEmbedding(snippetId, code, title, description)
+          .then(success => {
+            if (success) {
+              console.log('✅ Vector embedding stored for snippet:', snippetId);
+            } else {
+              console.warn('⚠️  Failed to store vector embedding for snippet:', snippetId);
+            }
+          })
+          .catch(error => {
+            console.error('❌ Error storing vector embedding:', error);
+          });
+
         const response = {
           ...snippet,
           status: "approved",
@@ -707,6 +725,155 @@ export const createCodeSnippet: RequestHandler = async (req, res) => {
     const errorResponse: ErrorResponse = {
       error: "Internal Server Error",
       message: "Failed to create snippet",
+      statusCode: 500,
+    };
+    res.status(500).json(errorResponse);
+  }
+};
+
+/**
+ * GET /api/snippets/search/semantic
+ * Perform semantic search on code snippets using vector embeddings
+ */
+export const semanticSearchSnippets: RequestHandler = async (req, res) => {
+  try {
+    const {
+      query,
+      limit = "10",
+      threshold = "0.7",
+      hybrid = "true" // Enable hybrid search by default
+    } = req.query;
+
+    if (!query || typeof query !== 'string') {
+      const errorResponse: ErrorResponse = {
+        error: "Bad Request",
+        message: "Search query is required",
+        statusCode: 400,
+      };
+      return res.status(400).json(errorResponse);
+    }
+
+    const limitNum = parseInt(limit as string);
+    const thresholdNum = parseFloat(threshold as string);
+    const useHybrid = hybrid === "true";
+
+    // If hybrid search is enabled, first get traditional text search results
+    if (useHybrid && isSupabaseAvailable() && supabaseClient) {
+      try {
+        // Get text search results
+        const { data: textResults, error: textError } = await supabaseClient
+          .from('snippets')
+          .select('*')
+          .or(`title.ilike.%${query}%,description.ilike.%${query}%,language.ilike.%${query}%`)
+          .limit(limitNum);
+
+        if (textError) {
+          console.error('Text search error:', textError);
+        }
+
+        // Perform hybrid search combining text and semantic results
+        const hybridResults = await hybridCodeSearch(
+          query as string,
+          textResults || [],
+          limitNum
+        );
+
+        // Get full snippet data for the results
+        const snippetIds = hybridResults.map(result => result.id);
+        const { data: snippets, error: snippetError } = await supabaseClient
+          .from('snippets')
+          .select('*')
+          .in('id', snippetIds);
+
+        if (snippetError) {
+          console.error('Snippet fetch error:', snippetError);
+          throw snippetError;
+        }
+
+        // Map and sort results by relevance
+        const resultMap = new Map(hybridResults.map(r => [r.id, r]));
+        const sortedSnippets = (snippets || [])
+          .map((snippet: SupabaseSnippet) => ({
+            ...supabaseHelpers.mapSupabaseSnippetToAPI(snippet),
+            relevanceScore: resultMap.get(snippet.id)?.relevanceScore || 0,
+            searchType: resultMap.get(snippet.id)?.searchType || 'unknown'
+          }))
+          .sort((a, b) => b.relevanceScore - a.relevanceScore);
+
+        return res.json({
+          snippets: sortedSnippets,
+          searchType: 'hybrid',
+          query: query,
+          total: sortedSnippets.length
+        });
+      } catch (hybridError) {
+        console.error('Hybrid search failed, falling back to semantic only:', hybridError);
+        // Fall through to semantic-only search
+      }
+    }
+
+    // Semantic search only
+    try {
+      const semanticResults = await semanticCodeSearch(
+        query as string,
+        limitNum,
+        thresholdNum
+      );
+
+      // Get full snippet data for semantic results
+      if (semanticResults.length > 0 && isSupabaseAvailable() && supabaseClient) {
+        const snippetIds = semanticResults.map(result => result.snippet_id);
+        const { data: snippets, error } = await supabaseClient
+          .from('snippets')
+          .select('*')
+          .in('id', snippetIds);
+
+        if (error) {
+          console.error('Snippet fetch error:', error);
+          throw error;
+        }
+
+        // Map results with similarity scores
+        const resultMap = new Map(semanticResults.map(r => [r.snippet_id, r]));
+        const sortedSnippets = (snippets || [])
+          .map((snippet: SupabaseSnippet) => ({
+            ...supabaseHelpers.mapSupabaseSnippetToAPI(snippet),
+            similarity: resultMap.get(snippet.id)?.similarity || 0
+          }))
+          .sort((a, b) => b.similarity - a.similarity);
+
+        return res.json({
+          snippets: sortedSnippets,
+          searchType: 'semantic',
+          query: query,
+          total: sortedSnippets.length
+        });
+      }
+
+      // Return semantic results without full snippet data
+      return res.json({
+        snippets: semanticResults,
+        searchType: 'semantic',
+        query: query,
+        total: semanticResults.length
+      });
+    } catch (semanticError) {
+      console.error('Semantic search error:', semanticError);
+      
+      // Final fallback to traditional search
+      return res.json({
+        snippets: [],
+        searchType: 'fallback',
+        query: query,
+        total: 0,
+        message: 'Vector search unavailable, please use traditional search'
+      });
+    }
+  } catch (error) {
+    console.error("Semantic search error:", error);
+    const errorResponse: ErrorResponse = {
+      error: "Internal Server Error",
+      message: "Failed to perform semantic search",
       statusCode: 500,
     };
     res.status(500).json(errorResponse);

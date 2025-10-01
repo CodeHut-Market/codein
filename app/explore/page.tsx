@@ -18,70 +18,83 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import SnippetCard from '../components/SnippetCard'
-import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
-import { ConnectionStatusIndicator } from '../components/ui/connection-status'
-
-// Adapter function to convert CodeSnippet to RealTimeSnippetCard format
-const adaptCodeSnippetForRealTime = (snippet: CodeSnippet) => ({
-  ...snippet,
-  user_id: snippet.authorId,
-  created_at: snippet.createdAt,
-  updated_at: snippet.updatedAt,
-  is_public: snippet.visibility !== 'private',
-  user: {
-    username: snippet.author,
-    avatar_url: undefined,
-    display_name: snippet.author
-  }
-});
 
 export default function ExplorePage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [snippets, setSnippets] = useState<CodeSnippet[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "")
   const [totalCount, setTotalCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedLanguage, setSelectedLanguage] = useState('all')
   const [sortBy, setSortBy] = useState('trending')
   const [featuredSnippets, setFeaturedSnippets] = useState<CodeSnippet[]>([])
 
   useEffect(() => {
-    fetchSnippets()
+    // Reset pagination when filters change
+    setCurrentPage(1)
+    setSnippets([])
+    fetchSnippets(1, false) // Reset to page 1, replace all snippets
     fetchFeaturedSnippets()
   }, [searchParams, selectedCategory, selectedLanguage, sortBy])
 
-  const fetchSnippets = async () => {
+  const fetchSnippets = async (page: number = 1, append: boolean = false) => {
     try {
-      setLoading(true)
+      if (!append) {
+        setLoading(true)
+      } else {
+        setLoadingMore(true)
+      }
+      
       const params = new URLSearchParams()
       const q = searchParams.get("query")
       if (q) params.set("query", q)
       if (selectedLanguage !== 'all') params.set("language", selectedLanguage)
       if (selectedCategory !== 'all') params.set("category", selectedCategory)
       if (sortBy !== 'trending') params.set("sortBy", sortBy)
+      params.set("page", page.toString())
+      params.set("limit", "12") // Load 12 items per page for better grid layout
       
       const res = await fetch(`/api/snippets/explore?${params.toString()}`, { cache: "no-store" })
       if (!res.ok) {
-        setSnippets([])
-        setTotalCount(0)
+        if (!append) {
+          setSnippets([])
+          setTotalCount(0)
+        }
         return
       }
+      
       const data = await res.json()
       if (Array.isArray(data.snippets)) {
-        setSnippets(data.snippets)
+        if (append) {
+          // Append new snippets to existing ones
+          setSnippets(prev => [...prev, ...data.snippets])
+        } else {
+          // Replace all snippets
+          setSnippets(data.snippets)
+        }
         setTotalCount(data.total || data.snippets.length)
+        setTotalPages(data.totalPages || 1)
+        setCurrentPage(page)
       } else {
-        setSnippets([])
-        setTotalCount(0)
+        if (!append) {
+          setSnippets([])
+          setTotalCount(0)
+        }
       }
     } catch (e) {
       console.error(e)
-      setSnippets([])
-      setTotalCount(0)
+      if (!append) {
+        setSnippets([])
+        setTotalCount(0)
+      }
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
 
@@ -112,7 +125,16 @@ export default function ExplorePage() {
   }
 
   const handleFilterChange = () => {
-    fetchSnippets()
+    // Reset pagination and fetch from page 1
+    setCurrentPage(1)
+    setSnippets([])
+    fetchSnippets(1, false)
+  }
+
+  const handleLoadMore = () => {
+    if (currentPage < totalPages && !loadingMore) {
+      fetchSnippets(currentPage + 1, true)
+    }
   }
 
   const categories = [
@@ -242,8 +264,9 @@ export default function ExplorePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredSnippets.map((snippet) => (
               <div key={snippet.id} className="relative">
-                <RealTimeSnippetCard 
-                  snippet={adaptCodeSnippetForRealTime(snippet)}
+                <SnippetCard 
+                  snippet={snippet}
+                  onPurchaseComplete={() => fetchSnippets(1, false)}
                 />
                 <div className="absolute -top-2 -right-2 z-10">
                   <Badge className="bg-yellow-500 text-yellow-50 shadow-lg">
@@ -271,9 +294,10 @@ export default function ExplorePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {snippets.length > 0 ? (
               snippets.map((snippet) => (
-                <RealTimeSnippetCard 
+                <SnippetCard 
                   key={snippet.id} 
-                  snippet={adaptCodeSnippetForRealTime(snippet)}
+                  snippet={snippet}
+                  onPurchaseComplete={() => fetchSnippets(1, false)}
                 />
               ))
             ) : (
@@ -353,12 +377,44 @@ export default function ExplorePage() {
         </TabsContent>
       </Tabs>
 
-      {/* Load More */}
-      <div className="text-center">
-        <Button variant="outline" size="lg">
-          Load More Snippets
-        </Button>
-      </div>
+      {/* Load More Button */}
+      {snippets.length > 0 && currentPage < totalPages && (
+        <div className="text-center">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="bg-gradient-to-r from-primary/5 to-emerald-500/5 hover:from-primary/10 hover:to-emerald-500/10 border-2 border-primary/20 hover:border-primary/30 transition-all duration-200"
+          >
+            {loadingMore ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent mr-2"></div>
+                Loading more...
+              </>
+            ) : (
+              <>
+                Load More Snippets
+                <span className="ml-2 text-sm text-muted-foreground">
+                  ({snippets.length} of {totalCount})
+                </span>
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+      
+      {/* End of results message */}
+      {snippets.length > 0 && currentPage >= totalPages && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">
+            🎉 You've seen all {totalCount} snippets! 
+            <span className="block mt-1 text-sm">
+              Try adjusting your filters to discover more content.
+            </span>
+          </p>
+        </div>
+      )}
     </div>
   )
 }

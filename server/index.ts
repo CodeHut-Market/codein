@@ -10,8 +10,12 @@ import {
 } from "./config/db";
 import { pool, testConnection } from "./db/database";
 
-// Import Supabase client
+// Import Supabase client and vector database
 import { testSupabaseConnection } from "./lib/supabaseClient";
+import {
+    createSemanticSearchFunction,
+    initializeVectorDatabase
+} from "./lib/vectorDatabase";
 
 // Import all route handlers
 import {
@@ -21,6 +25,7 @@ import {
     getSnippetById,
     getSnippets,
     getSnippetsByAuthor,
+    semanticSearchSnippets,
     updateCodeSnippet,
 } from "./routes/snippets";
 
@@ -89,6 +94,7 @@ export function createServer() {
   // Code Snippets API
   app.get("/api/snippets", getSnippets);
   app.get("/api/snippets/popular", getPopularSnippets);
+  app.get("/api/snippets/search/semantic", semanticSearchSnippets);
   app.get("/api/snippets/author/:authorId", getSnippetsByAuthor);
   app.get("/api/snippets/:id", getSnippetById);
   app.post("/api/snippets", authenticateToken, createCodeSnippet);
@@ -161,6 +167,18 @@ async function initializeDatabase() {
       const supabaseAvailable = await testSupabaseConnection();
       if (supabaseAvailable) {
         console.log("✅ Supabase database connection successful - using Supabase for snippet storage");
+        
+        // Initialize vector database for semantic search
+        const vectorInitialized = await initializeVectorDatabase();
+        if (vectorInitialized) {
+          console.log("✅ Vector database initialized successfully");
+          
+          // Create semantic search function
+          const functionCreated = await createSemanticSearchFunction();
+          if (functionCreated) {
+            console.log("✅ Semantic search function created");
+          }
+        }
       } else {
         console.log("ℹ️  Supabase not available - falling back to PostgreSQL/in-memory storage");
       }

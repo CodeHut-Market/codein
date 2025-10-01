@@ -2,13 +2,13 @@
 
 import { CheckCircle, Database, Loader2, Search, Upload, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useToastContext } from '../../components/ToastProvider';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
+import { useToast } from '../hooks/useToast';
 
 interface DatabaseStatus {
   status: string;
@@ -47,7 +47,7 @@ export default function DatabaseTestPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<any>(null);
-  const { success, error } = useToastContext();
+  const { success, error } = useToast();
 
   // Test snippet form
   const [testSnippet, setTestSnippet] = useState<TestSnippet>({

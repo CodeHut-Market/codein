@@ -145,10 +145,10 @@ export default function RippleThemeToggle({
           className={cn(
             iconSizes[size],
             "transition-all duration-300 ease-out",
-            // Icon-specific animations
-            theme === "light" && "text-amber-500 drop-shadow-sm",
-            theme === "dark" && "text-blue-300 drop-shadow-sm", 
-            theme === "system" && "text-gray-600 dark:text-gray-400"
+            // Icon-specific animations - only apply after mounting to prevent hydration mismatch
+            mounted && theme === "light" && "text-amber-500 drop-shadow-sm",
+            mounted && theme === "dark" && "text-blue-300 drop-shadow-sm", 
+            mounted && theme === "system" && "text-gray-600 dark:text-gray-400"
           )}
         />
       </div>
@@ -231,27 +231,26 @@ export default function RippleThemeToggle({
   );
 }
 
-// CSS-in-JS alternative using a style tag (since we can't easily modify globals)
-export const RippleThemeToggleStyles = () => (
-  <style jsx global>{`
-    @keyframes ripple-expand {
-      0% {
-        width: 0;
-        height: 0;
-        opacity: 0.8;
-      }
-      50% {
-        opacity: 0.4;
-      }
-      100% {
-        width: 200px;
-        height: 200px;
-        opacity: 0;
-      }
+// Note: The ripple animation is defined in globals.css
+// Add these styles to your globals.css:
+/*
+  @keyframes ripple-expand {
+    0% {
+      width: 0;
+      height: 0;
+      opacity: 0.8;
     }
-    
-    .animate-ripple {
-      animation-fill-mode: forwards;
+    50% {
+      opacity: 0.4;
     }
-  `}</style>
-);
+    100% {
+      width: 200px;
+      height: 200px;
+      opacity: 0;
+    }
+  }
+  
+  .animate-ripple {
+    animation-fill-mode: forwards;
+  }
+*/
