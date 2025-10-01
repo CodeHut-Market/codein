@@ -7,7 +7,7 @@ import { Badge } from '../ui/badge';
 import { useRealTime } from '../../contexts/RealTimeContext';
 import { ConnectionStatusIndicator } from '../ui/connection-status';
 import { supabase } from '../../lib/supabaseClient';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../../../client/contexts/AuthContext';
 
 interface DashboardStats {
   totalSnippets: number;
