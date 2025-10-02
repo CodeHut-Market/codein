@@ -7,640 +7,385 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  ArrowUp,
+  ArrowRight,
   Bookmark,
   Calendar,
-  Clock,
   Code,
   Crown,
   Eye,
   Gift,
+  Globe,
   Heart,
   MessageCircle,
-  MessageSquare,
   Search,
+  Sparkles,
   Star,
   Trophy,
+  TrendingUp,
   Users,
   Zap
 } from 'lucide-react'
 import { useState } from 'react'
 
 export default function CommunityPage() {
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedTab, setSelectedTab] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Community statistics
+  const communityStats = [
+    { icon: Users, value: '25,000+', label: 'Active Members', color: 'text-blue-500' },
+    { icon: Code, value: '50,000+', label: 'Code Snippets', color: 'text-green-500' },
+    { icon: MessageCircle, value: '100,000+', label: 'Discussions', color: 'text-purple-500' },
+    { icon: Star, value: '500,000+', label: 'Stars Given', color: 'text-yellow-500' }
+  ]
+
+  // Featured community categories
+  const categories = [
+    { name: 'Web Development', icon: Globe, count: '12.5k', trending: true },
+    { name: 'Mobile Apps', icon: Users, count: '8.3k', trending: false },
+    { name: 'Data Science', icon: TrendingUp, count: '6.7k', trending: true },
+    { name: 'DevOps', icon: Zap, count: '4.2k', trending: false },
+    { name: 'AI & ML', icon: Sparkles, count: '9.1k', trending: true },
+    { name: 'Game Dev', icon: Trophy, count: '3.8k', trending: false }
+  ]
+
+  // Featured members data
   const featuredMembers = [
     {
       name: 'Sarah Chen',
-      role: 'Full Stack Developer',
+      role: 'Full Stack Architect',
       avatar: 'https://github.com/shadcn.png',
       contributions: 234,
       followers: 1523,
       specialties: ['React', 'Node.js', 'TypeScript'],
-      verified: true
+      badge: 'Expert'
     },
     {
       name: 'Alex Rodriguez',
-      role: 'Senior Frontend Engineer',
+      role: 'UI/UX Engineer',
       avatar: 'https://github.com/shadcn.png',
       contributions: 189,
       followers: 987,
-      specialties: ['Vue.js', 'CSS', 'Design'],
-      verified: true
+      specialties: ['Vue.js', 'Design Systems', 'CSS'],
+      badge: 'Mentor'
     },
     {
-      name: 'Emily Watson',
-      role: 'DevOps Engineer',
+      name: 'Michael Kim',
+      role: 'DevOps Specialist',
       avatar: 'https://github.com/shadcn.png',
       contributions: 156,
       followers: 743,
-      specialties: ['Docker', 'AWS', 'Python'],
-      verified: false
+      specialties: ['Docker', 'AWS', 'Kubernetes'],
+      badge: 'Contributor'
+    },
+    {
+      name: 'Emma Wilson',
+      role: 'Mobile Developer',
+      avatar: 'https://github.com/shadcn.png',
+      contributions: 201,
+      followers: 1234,
+      specialties: ['React Native', 'Flutter', 'iOS'],
+      badge: 'Rising Star'
     }
-  ]
-
-  const discussionTopics = [
-    {
-      id: 1,
-      title: 'Best practices for React hooks in 2024',
-      author: 'dev_master',
-      avatar: 'https://github.com/shadcn.png',
-      category: 'React',
-      replies: 23,
-      views: 1240,
-      likes: 45,
-      timeAgo: '2 hours ago',
-      tags: ['react', 'hooks', 'best-practices'],
-      isPinned: true,
-      hasNewReplies: true
-    },
-    {
-      id: 2,
-      title: 'TypeScript utility types you should know',
-      author: 'type_wizard',
-      avatar: 'https://github.com/shadcn.png',
-      category: 'TypeScript',
-      replies: 18,
-      views: 890,
-      likes: 67,
-      timeAgo: '4 hours ago',
-      tags: ['typescript', 'utility-types', 'advanced'],
-      isPinned: false,
-      hasNewReplies: true
-    },
-    {
-      id: 3,
-      title: 'Optimizing database queries for performance',
-      author: 'sql_guru',
-      avatar: 'https://github.com/shadcn.png',
-      category: 'Database',
-      replies: 31,
-      views: 1567,
-      likes: 89,
-      timeAgo: '6 hours ago',
-      tags: ['sql', 'performance', 'optimization'],
-      isPinned: false,
-      hasNewReplies: false
-    },
-    {
-      id: 4,
-      title: 'CSS Grid vs Flexbox: When to use what?',
-      author: 'style_master',
-      avatar: 'https://github.com/shadcn.png',
-      category: 'CSS',
-      replies: 42,
-      views: 2134,
-      likes: 156,
-      timeAgo: '8 hours ago',
-      tags: ['css', 'layout', 'grid', 'flexbox'],
-      isPinned: false,
-      hasNewReplies: true
-    }
-  ]
-
-  const events = [
-    {
-      id: 1,
-      title: 'CodeHut Weekly Challenge: Build a Todo App',
-      type: 'Challenge',
-      date: '2024-01-15',
-      time: '10:00 AM EST',
-      participants: 156,
-      prize: '$500',
-      status: 'active',
-      difficulty: 'intermediate'
-    },
-    {
-      id: 2,
-      title: 'Live Coding Session: Advanced React Patterns',
-      type: 'Workshop',
-      date: '2024-01-18',
-      time: '2:00 PM EST',
-      participants: 89,
-      host: 'Sarah Chen',
-      status: 'upcoming',
-      difficulty: 'advanced'
-    },
-    {
-      id: 3,
-      title: 'Code Review Friday: Submit Your Snippets',
-      type: 'Review Session',
-      date: '2024-01-19',
-      time: '3:00 PM EST',
-      participants: 67,
-      status: 'upcoming',
-      difficulty: 'all-levels'
-    }
-  ]
-
-  const showcaseSnippets = [
-    {
-      id: 1,
-      title: 'Custom React Hook for API Calls',
-      author: 'dev_hero',
-      avatar: 'https://github.com/shadcn.png',
-      language: 'JavaScript',
-      views: 2340,
-      likes: 89,
-      bookmarks: 156,
-      tags: ['react', 'hooks', 'api'],
-      description: 'A comprehensive custom hook for handling API calls with loading states, error handling, and caching.',
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Python Data Validation Decorator',
-      author: 'py_expert',
-      avatar: 'https://github.com/shadcn.png',
-      language: 'Python',
-      views: 1890,
-      likes: 67,
-      bookmarks: 134,
-      tags: ['python', 'decorator', 'validation'],
-      description: 'Elegant decorator for validating function parameters with type checking and custom rules.',
-      featured: true
-    },
-    {
-      id: 3,
-      title: 'CSS Animation Library',
-      author: 'anim_master',
-      avatar: 'https://github.com/shadcn.png',
-      language: 'CSS',
-      views: 1456,
-      likes: 78,
-      bookmarks: 98,
-      tags: ['css', 'animation', 'library'],
-      description: 'Lightweight CSS animation library with smooth transitions and performance optimizations.',
-      featured: false
-    }
-  ]
-
-  const leaderboard = [
-    { rank: 1, name: 'CodeMaster', points: 2340, change: '+12' },
-    { rank: 2, name: 'DevGuru', points: 2156, change: '+8' },
-    { rank: 3, name: 'ByteWizard', points: 1987, change: '-2' },
-    { rank: 4, name: 'ScriptNinja', points: 1834, change: '+15' },
-    { rank: 5, name: 'AlgoExpert', points: 1723, change: '+5' }
-  ]
-
-  const categories = [
-    { id: 'all', name: 'All', count: 234 },
-    { id: 'react', name: 'React', count: 45 },
-    { id: 'typescript', name: 'TypeScript', count: 38 },
-    { id: 'python', name: 'Python', count: 56 },
-    { id: 'javascript', name: 'JavaScript', count: 67 },
-    { id: 'css', name: 'CSS', count: 28 }
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold">
-          Developer <span className="text-primary">Community</span>
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          Connect, learn, and grow with thousands of developers worldwide
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative container mx-auto px-6 py-20">
+          <div className="text-center space-y-8 max-w-4xl mx-auto">
+            <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Join 25,000+ developers worldwide
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+              Developer
+              <span className="block bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
+                Community
+              </span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Connect with passionate developers, share knowledge, and build amazing projects together. 
+              Your journey to becoming a better developer starts here.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-4 h-auto">
+                <Users className="w-5 h-5 mr-2" />
+                Join Community
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-4 h-auto backdrop-blur-sm">
+                <Globe className="w-5 h-5 mr-2" />
+                Explore Content
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Floating elements for visual appeal */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full backdrop-blur-sm animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-16 h-16 bg-yellow-400/20 rounded-full backdrop-blur-sm animate-pulse"></div>
+        <div className="absolute top-1/2 right-20 w-12 h-12 bg-pink-400/20 rounded-full backdrop-blur-sm animate-pulse"></div>
+      </section>
 
-      {/* Stats */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">12,456</div>
-            <div className="text-sm text-muted-foreground">Active Members</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Code className="h-8 w-8 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">34,567</div>
-            <div className="text-sm text-muted-foreground">Code Snippets</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <MessageCircle className="h-8 w-8 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">8,901</div>
-            <div className="text-sm text-muted-foreground">Discussions</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Trophy className="h-8 w-8 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">234</div>
-            <div className="text-sm text-muted-foreground">Challenges Won</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="discussions" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="discussions">Discussions</TabsTrigger>
-          <TabsTrigger value="showcase">Showcase</TabsTrigger>
-          <TabsTrigger value="events">Events</TabsTrigger>
-          <TabsTrigger value="members">Members</TabsTrigger>
-          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-        </TabsList>
-
-        {/* Discussions */}
-        <TabsContent value="discussions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center">
-                    <MessageCircle className="h-5 w-5 mr-2" />
-                    Community Discussions
-                  </CardTitle>
-                  <CardDescription>
-                    Ask questions, share knowledge, and connect with other developers
-                  </CardDescription>
+      <div className="container mx-auto px-6 py-16 space-y-16">
+        {/* Community Stats */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {communityStats.map((stat, index) => (
+            <Card key={index} className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
+              <CardContent className="py-8">
+                <stat.icon className={`h-12 w-12 mx-auto mb-4 ${stat.color} group-hover:scale-110 transition-transform`} />
+                <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                  {stat.value}
                 </div>
-                <Button>Start Discussion</Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Search and Filter */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <div className="text-muted-foreground font-medium">{stat.label}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
+
+        {/* Featured Categories */}
+        <section className="space-y-8">
+          <div className="text-center space-y-4">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Popular Categories
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Discover content across different domains and find your community
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            {categories.map((category, index) => (
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer border-0 shadow-md overflow-hidden">
+                <CardContent className="p-6 relative">
+                  {category.trending && (
+                    <div className="absolute top-3 right-3">
+                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
+                        Trending
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl text-white group-hover:scale-110 transition-transform">
+                        <category.icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg">{category.name}</h3>
+                        <p className="text-muted-foreground">{category.count} members</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Search Section */}
+        <section className="max-w-3xl mx-auto">
+          <Card className="border-0 shadow-xl bg-gradient-to-r from-white to-gray-50">
+            <CardContent className="p-8">
+              <div className="text-center space-y-6">
+                <h3 className="text-2xl font-bold">Find Your Tribe</h3>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
                   <Input
-                    placeholder="Search discussions..."
+                    placeholder="Search discussions, members, or topics..."
+                    className="pl-12 text-lg py-4 h-auto border-0 bg-white shadow-md focus:shadow-lg transition-shadow"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
                   />
                 </div>
-                <div className="flex gap-2">
-                  {categories.map((category) => (
-                    <Button
-                      key={category.id}
-                      variant={selectedCategory === category.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedCategory(category.id)}
-                    >
-                      {category.name} ({category.count})
-                    </Button>
-                  ))}
-                </div>
               </div>
+            </CardContent>
+          </Card>
+        </section>
 
-              {/* Discussion List */}
-              <div className="space-y-4">
-                {discussionTopics.map((topic) => (
-                  <Card key={topic.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex space-x-4">
-                        <Avatar>
-                          <AvatarImage src={topic.avatar} />
-                          <AvatarFallback>{topic.author[0]}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-start justify-between">
-                            <div className="space-y-1">
-                              <div className="flex items-center space-x-2">
-                                {topic.isPinned && <Zap className="h-4 w-4 text-yellow-500" />}
-                                <h3 className="font-semibold hover:text-primary cursor-pointer">
-                                  {topic.title}
-                                </h3>
-                                {topic.hasNewReplies && (
-                                  <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                    New
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                                <span>by {topic.author}</span>
-                                <span>{topic.timeAgo}</span>
-                                <Badge variant="outline">{topic.category}</Badge>
-                              </div>
+        {/* Main Content Tabs */}
+        <section>
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-8">
+            <div className="flex justify-center">
+              <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50 p-1">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="members" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  Top Members
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-12">
+              {/* Recent Discussions Preview */}
+              <div className="space-y-6">
+                <h3 className="text-3xl font-bold text-center">Latest Discussions</h3>
+                <div className="grid gap-6">
+                  {[
+                    {
+                      title: "Best practices for React state management in 2024",
+                      author: "react_expert",
+                      replies: 23,
+                      likes: 45,
+                      tags: ["react", "state-management", "hooks"],
+                      time: "2 hours ago"
+                    },
+                    {
+                      title: "Python vs JavaScript for backend development",
+                      author: "fullstack_dev",
+                      replies: 67,
+                      likes: 89,
+                      tags: ["python", "javascript", "backend"],
+                      time: "4 hours ago"
+                    },
+                    {
+                      title: "Building scalable microservices with Docker",
+                      author: "devops_ninja",
+                      replies: 34,
+                      likes: 56,
+                      tags: ["docker", "microservices", "devops"],
+                      time: "1 day ago"
+                    }
+                  ].map((discussion, index) => (
+                    <Card key={index} className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-0 shadow-md">
+                      <CardContent className="p-6">
+                        <div className="space-y-4">
+                          <h4 className="font-bold text-xl group-hover:text-primary transition-colors">
+                            {discussion.title}
+                          </h4>
+                          
+                          <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                            <div className="flex items-center space-x-2">
+                              <Avatar className="h-6 w-6">
+                                <AvatarFallback className="text-xs">{discussion.author[0].toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium">{discussion.author}</span>
                             </div>
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <div className="flex items-center space-x-1">
-                                <ArrowUp className="h-4 w-4" />
-                                <span>{topic.likes}</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <Eye className="h-4 w-4" />
-                                <span>{topic.views}</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <MessageSquare className="h-4 w-4" />
-                                <span>{topic.replies}</span>
-                              </div>
-                            </div>
+                            <span className="flex items-center">
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              {discussion.replies}
+                            </span>
+                            <span className="flex items-center">
+                              <Heart className="h-4 w-4 mr-1" />
+                              {discussion.likes}
+                            </span>
+                            <span>{discussion.time}</span>
                           </div>
-                          <div className="flex flex-wrap gap-1">
-                            {topic.tags.map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
-                                {tag}
+                          
+                          <div className="flex flex-wrap gap-2">
+                            {discussion.tags.map((tag) => (
+                              <Badge key={tag} variant="secondary" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+                                #{tag}
                               </Badge>
                             ))}
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </TabsContent>
 
-        {/* Showcase */}
-        <TabsContent value="showcase" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Star className="h-5 w-5 mr-2" />
-                Community Showcase
-              </CardTitle>
-              <CardDescription>
-                Discover amazing code snippets from our community members
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {showcaseSnippets.map((snippet) => (
-                  <Card key={snippet.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <h3 className="font-semibold text-sm">{snippet.title}</h3>
-                            {snippet.featured && (
-                              <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                <Star className="w-3 h-3 mr-1" />
-                                Featured
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground">{snippet.description}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Avatar className="w-6 h-6">
-                          <AvatarImage src={snippet.avatar} />
-                          <AvatarFallback>{snippet.author[0]}</AvatarFallback>
+            {/* Members Tab */}
+            <TabsContent value="members" className="space-y-8">
+              <div className="text-center space-y-4">
+                <h3 className="text-3xl font-bold">Community Champions</h3>
+                <p className="text-xl text-muted-foreground">Meet our most active and helpful community members</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredMembers.map((member, index) => (
+                  <Card key={index} className="text-center group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-md">
+                    <CardContent className="p-6 space-y-6">
+                      <div className="relative">
+                        <Avatar className="h-20 w-20 mx-auto ring-4 ring-purple-100 group-hover:ring-purple-200 transition-all">
+                          <AvatarImage src={member.avatar} />
+                          <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-purple-500 text-white">
+                            {member.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm text-muted-foreground">{snippet.author}</span>
-                        <Badge variant="outline" className="text-xs">{snippet.language}</Badge>
+                        <Badge className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">
+                          {member.badge}
+                        </Badge>
                       </div>
-                    </CardHeader>
-                    <CardContent className="pt-2">
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-1">
-                            <Eye className="h-3 w-3" />
-                            <span>{snippet.views}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Heart className="h-3 w-3" />
-                            <span>{snippet.likes}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Bookmark className="h-3 w-3" />
-                            <span>{snippet.bookmarks}</span>
-                          </div>
+                      
+                      <div>
+                        <h4 className="font-bold text-lg">{member.name}</h4>
+                        <p className="text-muted-foreground">{member.role}</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <div className="font-bold text-lg text-primary">{member.contributions}</div>
+                          <div className="text-muted-foreground">Contributions</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-lg text-primary">{member.followers}</div>
+                          <div className="text-muted-foreground">Followers</div>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {snippet.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
+                      
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {member.specialties.slice(0, 2).map((specialty) => (
+                          <Badge key={specialty} variant="outline" className="text-xs">
+                            {specialty}
                           </Badge>
                         ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Events */}
-        <TabsContent value="events" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
-                Community Events
-              </CardTitle>
-              <CardDescription>
-                Join coding challenges, workshops, and community activities
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {events.map((event) => (
-                <Card key={event.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2 flex-1">
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold">{event.title}</h3>
-                          <Badge 
-                            variant={event.status === 'active' ? 'default' : 'secondary'}
-                            className={event.status === 'active' ? 'bg-green-500' : ''}
-                          >
-                            {event.status}
+                        {member.specialties.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{member.specialties.length - 2}
                           </Badge>
-                          <Badge variant="outline">{event.type}</Badge>
-                          <Badge variant="outline">{event.difficulty}</Badge>
-                        </div>
-                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{event.date}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-4 w-4" />
-                            <span>{event.time}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Users className="h-4 w-4" />
-                            <span>{event.participants} participants</span>
-                          </div>
-                          {event.prize && (
-                            <div className="flex items-center space-x-1">
-                              <Gift className="h-4 w-4" />
-                              <span>{event.prize} prize</span>
-                            </div>
-                          )}
-                          {event.host && (
-                            <div className="flex items-center space-x-1">
-                              <span>Host: {event.host}</span>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
-                      <Button>
-                        {event.status === 'active' ? 'Join Now' : 'Register'}
+                      
+                      <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 border-0">
+                        Connect
                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Members */}
-        <TabsContent value="members" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Users className="h-5 w-5 mr-2" />
-                Featured Members
-              </CardTitle>
-              <CardDescription>
-                Meet the most active and helpful members of our community
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {featuredMembers.map((member) => (
-                  <Card key={member.name} className="text-center hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="space-y-4">
-                        <div className="relative mx-auto w-20 h-20">
-                          <Avatar className="w-20 h-20">
-                            <AvatarImage src={member.avatar} />
-                            <AvatarFallback>{member.name[0]}</AvatarFallback>
-                          </Avatar>
-                          {member.verified && (
-                            <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1">
-                              <Crown className="h-3 w-3 text-white" />
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold">{member.name}</h3>
-                          <p className="text-sm text-muted-foreground">{member.role}</p>
-                        </div>
-                        <div className="flex justify-center space-x-4 text-sm">
-                          <div className="text-center">
-                            <div className="font-semibold">{member.contributions}</div>
-                            <div className="text-muted-foreground">Snippets</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="font-semibold">{member.followers}</div>
-                            <div className="text-muted-foreground">Followers</div>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap justify-center gap-1">
-                          {member.specialties.map((specialty) => (
-                            <Badge key={specialty} variant="secondary" className="text-xs">
-                              {specialty}
-                            </Badge>
-                          ))}
-                        </div>
-                        <Button size="sm" className="w-full">
-                          Follow
-                        </Button>
-                      </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </TabsContent>
+          </Tabs>
+        </section>
 
-        {/* Leaderboard */}
-        <TabsContent value="leaderboard" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Trophy className="h-5 w-5 mr-2" />
-                Community Leaderboard
-              </CardTitle>
-              <CardDescription>
-                Top contributors this month based on community engagement
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {leaderboard.map((user) => (
-                  <div key={user.rank} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold">
-                        {user.rank}
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarFallback>{user.name[0]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-semibold">{user.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {user.points} points
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge 
-                        variant={user.change.startsWith('+') ? 'default' : 'secondary'}
-                        className={user.change.startsWith('+') ? 'bg-green-500' : 'bg-red-500'}
-                      >
-                        {user.change}
-                      </Badge>
-                      {user.rank <= 3 && (
-                        <Trophy className={`h-5 w-5 ${user.rank === 1 ? 'text-yellow-500' : user.rank === 2 ? 'text-gray-400' : 'text-amber-600'}`} />
-                      )}
-                    </div>
-                  </div>
-                ))}
+        {/* CTA Section */}
+        <section className="relative overflow-hidden">
+          <Card className="border-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white shadow-2xl">
+            <CardContent className="relative p-12 text-center space-y-8">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="relative space-y-6">
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  Ready to Join?
+                </h2>
+                <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+                  Connect with developers, share your knowledge, and grow your skills together. 
+                  Your coding journey starts here.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                  <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-4 h-auto">
+                    <MessageCircle className="w-5 h-5 mr-2" />
+                    Start Discussion
+                  </Button>
+                  <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-4 h-auto backdrop-blur-sm">
+                    <Users className="w-5 h-5 mr-2" />
+                    Browse Community
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* CTA Section */}
-      <Card className="bg-gradient-to-r from-primary/10 to-purple-600/10 border-primary/20">
-        <CardContent className="text-center py-12">
-          <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Connect with developers, share your knowledge, and grow your skills together
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Start Discussion
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8">
-              <Users className="w-5 h-5 mr-2" />
-              Browse Members
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        </section>
+      </div>
     </div>
   )
 }
