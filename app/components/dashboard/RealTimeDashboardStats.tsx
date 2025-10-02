@@ -46,7 +46,7 @@ const StatCard: React.FC<StatCardProps> = ({
   const hasNegativeTrend = trend && trend < 0;
   
   return (
-    <Card className={`transition-all duration-300 hover:shadow-lg ${className}`}>
+    <Card className={`dashboard-stats-card interactive-feedback transition-all duration-300 hover:shadow-lg transform hover:scale-105 ${className}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <div className="flex items-center gap-2">
@@ -61,7 +61,7 @@ const StatCard: React.FC<StatCardProps> = ({
       <CardContent>
         <div className="text-2xl font-bold">
           {isLoading ? (
-            <div className="animate-pulse bg-muted h-8 w-16 rounded"></div>
+            <div className="loading-pulse h-8 w-16 rounded"></div>
           ) : (
             typeof displayValue === 'number' 
               ? displayValue.toLocaleString() 
@@ -241,7 +241,7 @@ export const RealTimeDashboardStats: React.FC = () => {
           icon={<Activity className="h-4 w-4 text-blue-600" />}
           trend={stats.monthlyGrowth}
           isLoading={isLoading}
-          className="border-l-4 border-l-blue-600"
+          className="stats-card-snippets interactive-element focus-visible"
         />
         
         <StatCard
@@ -251,7 +251,7 @@ export const RealTimeDashboardStats: React.FC = () => {
           description="Across all snippets"
           icon={<Eye className="h-4 w-4 text-emerald-600" />}
           isLoading={isLoading}
-          className="border-l-4 border-l-emerald-600"
+          className="stats-card-views interactive-element focus-visible"
         />
         
         <StatCard
@@ -261,7 +261,7 @@ export const RealTimeDashboardStats: React.FC = () => {
           description="Hearts from community"
           icon={<Heart className="h-4 w-4 text-rose-500" />}
           isLoading={isLoading}
-          className="border-l-4 border-l-rose-500"
+          className="stats-card-likes interactive-element focus-visible"
         />
         
         <StatCard
@@ -271,7 +271,7 @@ export const RealTimeDashboardStats: React.FC = () => {
           description="People following you"
           icon={<Users className="h-4 w-4 text-purple-600" />}
           isLoading={isLoading}
-          className="border-l-4 border-l-purple-600"
+          className="stats-card-followers interactive-element focus-visible"
         />
       </div>
       

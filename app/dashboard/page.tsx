@@ -18,6 +18,8 @@ import {
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import '../mobile-tabs-override.css'
+import '../dashboard-animations.css'
+import '../dashboard-themes.css'
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
 import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
@@ -141,12 +143,49 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-8 min-h-screen">
+        <div className="space-y-8">
+          {/* Enhanced Loading Header */}
+          <div className="relative">
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-500/5 via-violet-500/5 to-emerald-500/5 rounded-3xl blur-3xl"></div>
+            <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-6 shadow-xl">
+              <div className="flex items-center space-x-4">
+                <div className="h-20 w-20 bg-gradient-to-br from-primary/20 to-emerald-500/20 rounded-full animate-pulse"></div>
+                <div className="flex-1 space-y-3">
+                  <div className="h-8 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-xl animate-pulse gradient-animation"></div>
+                  <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-lg w-3/4 animate-pulse gradient-animation"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Loading Tabs */}
+          <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-2 shadow-xl">
+            <div className="grid grid-cols-3 lg:grid-cols-9 gap-2">
+              {Array(9).fill(0).map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`h-12 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-xl animate-pulse gradient-animation ${i > 2 ? 'hidden lg:block' : ''}`}
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Enhanced Loading Stats Cards */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {Array(4).fill(0).map((_, i) => (
-              <div key={i} className="h-24 bg-muted rounded"></div>
+              <div 
+                key={i} 
+                className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-6 shadow-xl loading-pulse"
+                style={{ animationDelay: `${i * 0.2}s` }}
+              >
+                <div className="space-y-4">
+                  <div className="h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-lg w-2/3 animate-pulse gradient-animation"></div>
+                  <div className="h-12 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-xl w-1/2 animate-pulse gradient-animation"></div>
+                  <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-lg w-full animate-pulse gradient-animation"></div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -178,78 +217,174 @@ export default function DashboardPage() {
     <div className="mobile-dashboard container mx-auto px-4 pt-4 pb-8 space-y-6 md:py-8 md:space-y-8 
                     min-h-screen safe-area-inset-top safe-area-inset-bottom 
                     mt-safe-top mb-safe-bottom max-w-full overflow-x-hidden">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 rounded-2xl blur-3xl"></div>
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          <Avatar className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-primary/20 shadow-lg flex-shrink-0">
-            <AvatarImage src={user.user_metadata?.avatar_url} alt={getUserDisplayName(user)} />
-            <AvatarFallback className="text-sm sm:text-lg bg-gradient-to-br from-primary/20 to-emerald-500/20">
-              {getUserInitials(user)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-foreground via-violet-600 to-emerald-600 bg-clip-text text-transparent truncate">
-              Welcome back, {getUserDisplayName(user)}!
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Here's what's happening with your code snippets
-            </p>
+      {/* Enhanced Modern Header */}
+      <div className="relative">
+        {/* Animated Background Effects */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-500/8 via-violet-500/8 to-emerald-500/8 rounded-3xl blur-3xl animate-pulse"></div>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/3 via-transparent to-emerald-500/3 rounded-2xl"></div>
+        
+        <div className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-6 shadow-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            
+            {/* Enhanced User Profile Section */}
+            <div className="flex items-center space-x-4">
+              <div className="relative group">
+                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-3 border-white shadow-2xl flex-shrink-0 ring-4 ring-primary/10 transition-all duration-300 group-hover:ring-primary/20 group-hover:scale-105">
+                  <AvatarImage src={user.user_metadata?.avatar_url} alt={getUserDisplayName(user)} />
+                  <AvatarFallback className="text-lg sm:text-xl font-bold bg-gradient-to-br from-primary via-blue-500 to-emerald-500 text-white">
+                    {getUserInitials(user)}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Enhanced Online Status */}
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-3 border-white dark:border-gray-900 rounded-full animate-pulse shadow-lg">
+                  <div className="absolute inset-1 bg-emerald-400 rounded-full animate-ping"></div>
+                </div>
+              </div>
+              
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-700 to-emerald-600 dark:from-white dark:via-blue-300 dark:to-emerald-400 bg-clip-text text-transparent leading-tight">
+                    Welcome back, {getUserDisplayName(user)}!
+                  </h1>
+                  <div className="hidden sm:block text-2xl animate-bounce">👋</div>
+                </div>
+                <p className="text-sm sm:text-base text-muted-foreground font-medium">
+                  🚀 Ready to build something incredible today?
+                </p>
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-50 dark:bg-emerald-900/20 rounded-full">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    Online
+                  </span>
+                  <span className="hidden sm:inline">Last activity: Today</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Enhanced Action Buttons */}
+            <div className="flex gap-3">
+              <Link href="/upload">
+                <Button className="group flex items-center gap-2 bg-gradient-to-r from-primary via-blue-600 to-emerald-500 hover:from-primary/90 hover:via-blue-600/90 hover:to-emerald-500/90 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 px-6 py-3 font-semibold text-white border-0">
+                  <PlusCircle className="h-5 w-5 transition-transform group-hover:rotate-180 duration-300" />
+                  <span className="hidden sm:inline">Create New Snippet</span>
+                  <span className="sm:hidden">Create</span>
+                </Button>
+              </Link>
+              
+              <Button variant="outline" className="group border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 px-4 hover:scale-105">
+                <Upload className="h-4 w-4 transition-transform group-hover:-translate-y-1 duration-300" />
+              </Button>
+            </div>
           </div>
         </div>
-        <Link href="/upload" className="shrink-0">
-          <Button className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-600/90 hover:to-primary/90 transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2">
-            <PlusCircle className="h-4 w-4" />
-            <span className="hidden sm:inline">New Snippet</span>
-            <span className="sm:hidden">New</span>
-          </Button>
-        </Link>
       </div>
 
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4 w-full">
-        {/* MOBILE-FIRST Tab Navigation - No Overflow Guaranteed */}
+      {/* Enhanced Modern Tab Navigation */}
+      <Tabs defaultValue="overview" className="space-y-6 w-full">
         <div className="w-full dashboard-container">
           
-          {/* Mobile Layout: Simple 3-Tab Flex */}
+          {/* Enhanced Mobile Layout */}
           <div className="mobile-tabs block sm:hidden">
-            <div className="tabs-list-mobile">
+            <TabsList className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-2 border-white/30 dark:border-gray-700/30 w-full p-1.5 rounded-2xl shadow-xl">
               <TabsTrigger 
                 value="overview" 
-                className="tabs-trigger-mobile"
+                className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-primary/10 data-[state=active]:scale-105"
               >
-                Overview
+                <span className="relative z-10">📊 Overview</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="analytics" 
-                className="tabs-trigger-mobile"
+                className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-amber-500/10 data-[state=active]:scale-105"
               >
-                Analytics
+                <span className="relative z-10">📈 Analytics</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="snippets" 
-                className="tabs-trigger-mobile"
+                className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-emerald-500/10 data-[state=active]:scale-105"
               >
-                Snippets
+                <span className="relative z-10">💾 Snippets</span>
               </TabsTrigger>
-            </div>
-          </div>
-
-          {/* Desktop Layout: Full Grid */}
-          <div className="desktop-tabs hidden sm:block">
-            <TabsList className="bg-muted/50 border border-primary/10 w-full p-2 grid grid-cols-3 lg:grid-cols-9 gap-1">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-primary text-sm px-3 py-2">Overview</TabsTrigger>
-              <TabsTrigger value="analytics" className="data-[state=active]:bg-amber-600 text-sm px-3 py-2">Analytics</TabsTrigger>
-              <TabsTrigger value="snippets" className="data-[state=active]:bg-emerald-600 text-sm px-3 py-2">Snippets</TabsTrigger>
-              <TabsTrigger value="search" className="hidden lg:block data-[state=active]:bg-blue-600 text-sm px-3 py-2">Search</TabsTrigger>
-              <TabsTrigger value="activity" className="hidden lg:block data-[state=active]:bg-violet-600 text-sm px-3 py-2">Activity</TabsTrigger>
-              <TabsTrigger value="trending" className="hidden lg:block data-[state=active]:bg-orange-600 text-sm px-3 py-2">Trending</TabsTrigger>
-              <TabsTrigger value="tags" className="hidden lg:block data-[state=active]:bg-purple-600 text-sm px-3 py-2">Tags</TabsTrigger>
-              <TabsTrigger value="progress" className="hidden lg:block data-[state=active]:bg-green-600 text-sm px-3 py-2">Progress</TabsTrigger>
-              <TabsTrigger value="achievements" className="hidden lg:block data-[state=active]:bg-yellow-600 text-sm px-3 py-2">Achievements</TabsTrigger>
             </TabsList>
           </div>
-          
+
+          {/* Enhanced Desktop Layout */}
+          <div className="desktop-tabs hidden sm:block">
+            <div className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-2 shadow-xl">
+              <TabsList className="bg-transparent w-full p-0 grid grid-cols-3 lg:grid-cols-9 gap-2 h-auto">
+                <TabsTrigger value="overview" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0 data-[state=active]:border-0">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">📊</span>
+                    <span>Overview</span>
+                  </span>
+                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="analytics" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">📈</span>
+                    <span>Analytics</span>
+                  </span>
+                  <div className="absolute inset-0 bg-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="snippets" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">💾</span>
+                    <span>Snippets</span>
+                  </span>
+                  <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="search" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">🔍</span>
+                    <span>Search</span>
+                  </span>
+                  <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="activity" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">⚡</span>
+                    <span>Activity</span>
+                  </span>
+                  <div className="absolute inset-0 bg-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="trending" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">🔥</span>
+                    <span>Trending</span>
+                  </span>
+                  <div className="absolute inset-0 bg-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="tags" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">🏷️</span>
+                    <span>Tags</span>
+                  </span>
+                  <div className="absolute inset-0 bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="progress" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">📊</span>
+                    <span>Progress</span>
+                  </span>
+                  <div className="absolute inset-0 bg-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+
+                <TabsTrigger value="achievements" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-amber-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-lg">🏆</span>
+                    <span>Achievements</span>
+                  </span>
+                  <div className="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </div>
         </div>
 
         
