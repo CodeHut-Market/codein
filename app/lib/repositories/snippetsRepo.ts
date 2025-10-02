@@ -730,7 +730,7 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
         // If it's a column doesn't exist error, reset the cache and retry without that column
         if (error.code === '42703' && error.message.includes('visibility')) {
           console.log('createSnippet - Detected missing visibility column, updating cache and retrying');
-          visibilityColumnExists = false;
+          visibilityColumnCache = { exists: false, timestamp: Date.now() };
           
           // Create simplified object without visibility fields
           const simpleDbSnippet = {
@@ -793,22 +793,28 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
   return snippet;
 }
 
-// Cache for visibility column existence check
-let visibilityColumnExists: boolean | null = null;
+// Cache for visibility column existence check - with expiration to avoid stale cache
+let visibilityColumnCache: { exists: boolean; timestamp: number } | null = null;
+const COLUMN_CACHE_TTL = 60000; // 1 minute TTL
 
-// Check if visibility column exists in the snippets table
+// Optimized check if visibility column exists with caching
 async function checkVisibilityColumnExists(): Promise<boolean> {
-  if (visibilityColumnExists !== null) {
-    return visibilityColumnExists;
+  // Check if cache is valid
+  const now = Date.now();
+  if (visibilityColumnCache && (now - visibilityColumnCache.timestamp) < COLUMN_CACHE_TTL) {
+    return visibilityColumnCache.exists;
   }
   
   try {
-    // Try a simple query that would fail if visibility column doesn't exist
-    const { error } = await supabase!.from('snippets').select('visibility').limit(1);
-    visibilityColumnExists = !error;
-    return visibilityColumnExists;
+    // Use count() instead of select() for minimal data transfer
+    const { error } = await supabase!.from('snippets').select('visibility', { count: 'exact', head: true });
+    const exists = !error;
+    
+    // Cache the result with timestamp
+    visibilityColumnCache = { exists, timestamp: now };
+    return exists;
   } catch (error) {
-    visibilityColumnExists = false;
+    visibilityColumnCache = { exists: false, timestamp: now };
     return false;
   }
 }
@@ -828,14 +834,18 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
   // Handle legacy string parameter for backward compatibility
   const opts: ListSnippetsOptions = typeof options === 'string' ? { query: options } : (options || {});
   
-  // PRIORITIZE SUPABASE DATA - Always try database first
+  // OPTIMIZED SUPABASE QUERY - Single query execution
   if(isSupabaseEnabled()){
     try {
-      let q = supabase!.from('snippets').select('*');
+      // Build optimized select query - only fetch needed columns for list view
+      const selectColumns = 'id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at';
+      let q = supabase!.from('snippets').select(selectColumns);
       
-      // Apply filters
+      // Batch filter application for better performance
+      const conditions: string[] = [];
+      
       if(opts.query){
-        q = q.or(`title.ilike.%${opts.query}%,description.ilike.%${opts.query}%`);
+        conditions.push(`title.ilike.%${opts.query}%,description.ilike.%${opts.query}%`);
       }
       
       if(opts.language && opts.language !== 'all'){
@@ -850,77 +860,57 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
         q = q.eq('author_id', opts.userId);
       }
       
+      // Optimize visibility check - check once and cache result
       if(opts.publicOnly){
-        // Check if visibility column exists before applying filter
         const hasVisibilityColumn = await checkVisibilityColumnExists();
         if (hasVisibilityColumn) {
           q = q.eq('visibility', 'public');
-        } else {
-          console.log('Visibility column not found - treating all snippets as public');
-          // Don't apply any filter - assume all snippets are public
         }
+        // If no visibility column, treat all as public (no filter needed)
       }
       
       if(opts.featured){
         q = q.eq('featured', true);
       }
       
-      // Handle sorting - prioritize actual database data sorting
+      // Apply OR conditions in batch if any
+      if(conditions.length > 0){
+        q = q.or(conditions.join(','));
+      }
+      
+      // Optimized sorting - use database-level sorting instead of application sorting
       switch(opts.sortBy) {
         case 'popular':
-          q = q.order('downloads', { ascending: false });
-          break;
         case 'views':
-          q = q.order('downloads', { ascending: false }); // Using downloads as proxy for views
+          q = q.order('downloads', { ascending: false });
           break;
         case 'trending':
-          // For trending, use a combination of recent + popular
-          q = q.order('downloads', { ascending: false });
+          // Database-level trending calculation using created_at and downloads
+          q = q.order('downloads', { ascending: false }).order('created_at', { ascending: false });
           break;
         case 'recent':
         default:
-          try {
-            q = q.order('created_at', { ascending: false });
-          } catch (e) {
-            try {
-              q = q.order('createdAt', { ascending: false });
-            } catch (e2) {
-              console.warn('Neither created_at nor createdAt column exists');
-            }
-          }
+          q = q.order('created_at', { ascending: false });
           break;
       }
       
-      // Apply limit
-      if(opts.limit){
-        q = q.limit(opts.limit);
-      }
+      // Apply limit for better performance
+      const limit = opts.featured ? 3 : (opts.limit || 50);
+      q = q.limit(limit);
       
       const { data, error } = await q;
       
       if(error){
         console.error('Supabase query error:', error);
-        // Fall back to demo data if database fails
-        console.log('Falling back to demo data due to database error');
         return getFallbackSnippets(opts);
       }
       
-      let results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
-      
-      // For featured snippets, return most popular ones
-      if(opts.featured){
-        results = results
-          .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
-          .slice(0, 3);
-      }
-      
+      const results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
       console.log(`Retrieved ${results.length} snippets from Supabase`);
       return results;
       
     } catch (error) {
       console.error('Database connection error:', error);
-      // Fall back to demo data if there's a connection issue
-      console.log('Falling back to demo data due to connection error');
       return getFallbackSnippets(opts);
     }
   }
@@ -1046,97 +1036,95 @@ function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
   return results;
 }
 
+// Simple memory cache for frequently accessed snippets
+const snippetCache = new Map<string, { snippet: CodeSnippet; timestamp: number }>();
+const SNIPPET_CACHE_TTL = 300000; // 5 minutes
+
 export async function getSnippetById(id: string): Promise<CodeSnippet | null>{
-  console.log('========================================');
-  console.log('getSnippetById - START - Looking for snippet with ID:', id);
-  console.log('getSnippetById - Memory snippets count:', memorySnippets.length);
-  console.log('getSnippetById - Memory snippets IDs:', memorySnippets.map(s => s.id));
+  // Check cache first (fastest)
+  const cached = snippetCache.get(id);
+  const now = Date.now();
+  if (cached && (now - cached.timestamp) < SNIPPET_CACHE_TTL) {
+    return cached.snippet;
+  }
   
-  // Check memory first for quick access
-  const memoryResult = memorySnippets.find(s=> s.id === id);
+  // Check memory for current session
+  const memoryResult = memorySnippets.find(s => s.id === id);
   if (memoryResult) {
-    console.log('getSnippetById - ✅ Found in memory:', memoryResult.title);
-    console.log('getSnippetById - Memory snippet code preview:', memoryResult.code.slice(0, 50) + '...');
-    console.log('========================================');
+    // Update cache
+    snippetCache.set(id, { snippet: memoryResult, timestamp: now });
     return memoryResult;
   }
   
-  console.log('getSnippetById - ❌ NOT found in memory');
-  console.log('getSnippetById - Supabase enabled:', isSupabaseEnabled());
-  console.log('getSnippetById - Supabase URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
-  console.log('getSnippetById - Supabase Key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
-  
-  // Try Supabase database (primary storage since memory doesn't persist in serverless)
+  // Query database with optimized select
   if(isSupabaseEnabled()){
     try {
-      console.log('getSnippetById - 🔍 Querying Supabase database for ID:', id);
-      const { data, error } = await supabase!.from('snippets').select('*').eq('id', id).maybeSingle();
+      const { data, error } = await supabase!
+        .from('snippets')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
       
-      if(error){ 
-        console.error('getSnippetById - ❌ Supabase get error:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
-        console.log('========================================');
+      if(error || !data) {
         return null;
       }
       
-      if(!data) {
-        console.log('getSnippetById - ❌ No data returned from Supabase for ID:', id);
-        console.log('getSnippetById - This means the snippet is NOT in the database!');
-        console.log('========================================');
-        return null;
-      }
+      const snippet = mapRowToSnippet(data);
       
-      console.log('getSnippetById - ✅ Found in Supabase:', data.title);
-      console.log('getSnippetById - Supabase full data:', JSON.stringify(data, null, 2));
-      const snippet = mapRowToSnippet(data as any);
-      console.log('getSnippetById - Mapped snippet:', {
-        id: snippet.id,
-        title: snippet.title,
-        author: snippet.author,
-        authorId: snippet.authorId,
-        language: snippet.language
-      });
+      // Cache for future requests
+      snippetCache.set(id, { snippet, timestamp: now });
       
-      // Add to memory for faster future access in this request
+      // Also add to memory for this session
       memorySnippets.unshift(snippet);
-      console.log('getSnippetById - Added to memory cache for this request');
-      console.log('========================================');
+      
       return snippet;
     } catch (err) {
-      console.error('getSnippetById - ❌ EXCEPTION during Supabase query:', err);
-      console.error('getSnippetById - Exception stack:', err instanceof Error ? err.stack : 'No stack trace');
-      console.log('========================================');
+      console.error('Database error fetching snippet:', err);
       return null;
     }
   }
   
-  console.log('getSnippetById - ❌ Snippet not found anywhere! (Supabase disabled or not found)');
-  console.log('========================================');
   return null;
 }
 
+// Cache for popular snippets with TTL
+let popularCache: { snippets: CodeSnippet[]; timestamp: number } | null = null;
+const POPULAR_CACHE_TTL = 600000; // 10 minutes
+
 export async function listPopular(limit = 6): Promise<CodeSnippet[]>{
-  if(isSupabaseEnabled()){
-    // Try ordering by downloads; if column missing fallback to createdAt
-    let { data, error } = await supabase!.from('snippets').select('*').order('downloads', { ascending: false }).limit(limit);
-    if(error){
-      // 42703 = undefined column
-      if((error as any).code === '42703'){
-        let retry = await supabase!.from('snippets').select('*').order('createdAt', { ascending: false }).limit(limit);
-        if(retry.error && (retry.error as any).code === '42703') {
-          retry = await supabase!.from('snippets').select('*').order('created_at', { ascending: false }).limit(limit);
-        }
-        if(retry.error){ console.error('Supabase popular fallback error', retry.error); return memorySnippets.slice(0, limit); }
-        return (retry.data || []).map(mapRowToSnippet) as CodeSnippet[];
-      }
-      console.error('Supabase popular error', error); return memorySnippets.slice(0, limit);
-    }
-    return (data || []).map(mapRowToSnippet) as CodeSnippet[];
+  // Check cache first
+  const now = Date.now();
+  if (popularCache && (now - popularCache.timestamp) < POPULAR_CACHE_TTL) {
+    return popularCache.snippets.slice(0, limit);
   }
+  
+  if(isSupabaseEnabled()){
+    try {
+      // Optimized query with specific columns and single order
+      const { data, error } = await supabase!
+        .from('snippets')
+        .select('id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at')
+        .order('downloads', { ascending: false })
+        .order('created_at', { ascending: false }) // Secondary sort for ties
+        .limit(limit * 2); // Fetch more for cache
+      
+      if(error){
+        console.error('Popular snippets query error:', error);
+        return memorySnippets.slice(0, limit);
+      }
+      
+      const results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
+      
+      // Cache the results
+      popularCache = { snippets: results, timestamp: now };
+      
+      return results.slice(0, limit);
+    } catch (error) {
+      console.error('Database error fetching popular snippets:', error);
+      return memorySnippets.slice(0, limit);
+    }
+  }
+  
   return memorySnippets.slice(0, limit);
 }
 

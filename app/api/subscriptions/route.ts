@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
     // 5. Send confirmation emails
     // 6. Grant access to UI Library
 
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Processing subscription (remove artificial delay for production)
 
     // Mock success response
     const subscriptionId = `sub_${Date.now().toString(36)}`;
