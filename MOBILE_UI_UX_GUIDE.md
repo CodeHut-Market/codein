@@ -5,6 +5,7 @@ Your CodeHut project has been upgraded with **next-level mobile UI/UX** componen
 ## 🚀 What's Been Added
 
 ### 1. Enhanced Mobile Navigation
+
 - **Modern slide-out navigation** with smooth animations
 - **Gesture support** for swipe actions
 - **Touch-friendly targets** (minimum 44px)
@@ -227,9 +228,9 @@ import {
   </AccessibleButton>
 </FocusProvider>
 ```
-
 ## 🎨 Design System
 
+### Breakpoints
 ### Breakpoints
 ```css
 mobile-s: 320px   /* Small phones */

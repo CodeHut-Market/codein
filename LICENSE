@@ -1,21 +1,36 @@
-MIT License
+# PROPRIETARY SOFTWARE LICENSE
 
-Copyright (c) 2021 Supabase, Inc. and contributors
+Copyright (c) 2025 CodeIn. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+IMPORTANT NOTICE: This software is proprietary and confidential.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+UNAUTHORIZED USE PROHIBITED:
+This software, including all source code, documentation, design files, and 
+associated materials (the "Software"), is the exclusive property of CodeIn 
+and is protected by copyright, trademark, patent, and other intellectual 
+property laws.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+NO LICENSE GRANTED:
+No license, express or implied, is granted to any person under this notice.
+The Software is provided solely for authorized use by CodeIn and its 
+designated partners.
+
+PROHIBITED ACTIVITIES:
+- Copying, reproducing, or duplicating any part of the Software
+- Reverse engineering, decompiling, or disassembling the Software  
+- Creating derivative works based on the Software
+- Distributing, selling, or sublicensing the Software
+- Using the Software to create competing products or services
+- Extracting or reusing code, designs, or business logic
+- Accessing or using the Software without explicit written permission
+
+LEGAL CONSEQUENCES:
+Unauthorized use, copying, or distribution of this Software constitutes 
+copyright infringement and may result in severe civil and criminal penalties.
+Violators will be prosecuted to the full extent of the law.
+
+CONTACT:
+For licensing inquiries: legal@codein.com
+For questions: contact@codein.com
+
+This notice shall be included in all copies or substantial portions of the Software.
