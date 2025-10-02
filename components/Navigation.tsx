@@ -78,7 +78,7 @@ export default function Navigation({ className }: NavigationProps) {
   }
 
   return (
-    <nav className={`bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border sticky top-0 z-50 ${className}`}>
+    <nav className={`bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border sticky top-0 z-40 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -203,8 +203,15 @@ export default function Navigation({ className }: NavigationProps) {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-border">
+          <>
+            {/* Mobile Menu Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 md:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            {/* Mobile Menu Panel */}
+            <div className="absolute top-full left-0 right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 border-t border-border shadow-xl z-60 md:hidden">
+              <div className="px-2 pt-2 pb-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
               {navItems.map((item) => {
                 const isActive = pathname === item.href
                 return (
@@ -292,8 +299,9 @@ export default function Navigation({ className }: NavigationProps) {
                   </div>
                 </>
               )}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </nav>

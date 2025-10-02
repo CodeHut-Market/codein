@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import './mobile-tabs-override.css'
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
 import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
@@ -174,47 +175,83 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="mobile-dashboard container mx-auto px-4 pt-4 pb-8 space-y-6 md:py-8 md:space-y-8 
+                    min-h-screen safe-area-inset-top safe-area-inset-bottom 
+                    mt-safe-top mb-safe-bottom max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between relative">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative">
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 rounded-2xl blur-3xl"></div>
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-16 w-16 border-2 border-primary/20 shadow-lg">
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          <Avatar className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-primary/20 shadow-lg flex-shrink-0">
             <AvatarImage src={user.user_metadata?.avatar_url} alt={getUserDisplayName(user)} />
-            <AvatarFallback className="text-lg bg-gradient-to-br from-primary/20 to-emerald-500/20">
+            <AvatarFallback className="text-sm sm:text-lg bg-gradient-to-br from-primary/20 to-emerald-500/20">
               {getUserInitials(user)}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground via-violet-600 to-emerald-600 bg-clip-text text-transparent">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-foreground via-violet-600 to-emerald-600 bg-clip-text text-transparent truncate">
               Welcome back, {getUserDisplayName(user)}!
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Here's what's happening with your code snippets
             </p>
           </div>
         </div>
-        <Link href="/upload">
-          <Button className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-600/90 hover:to-primary/90 transition-all duration-200 shadow-lg hover:shadow-emerald-500/25">
+        <Link href="/upload" className="shrink-0">
+          <Button className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-600/90 hover:to-primary/90 transition-all duration-200 shadow-lg hover:shadow-emerald-500/25 text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2">
             <PlusCircle className="h-4 w-4" />
-            <span>New Snippet</span>
+            <span className="hidden sm:inline">New Snippet</span>
+            <span className="sm:hidden">New</span>
           </Button>
         </Link>
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="bg-muted/50 border border-primary/10 grid grid-cols-9 w-full">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80">Overview</TabsTrigger>
-          <TabsTrigger value="analytics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-amber-600/80">Analytics</TabsTrigger>
-          <TabsTrigger value="snippets" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-600/80">My Snippets</TabsTrigger>
-          <TabsTrigger value="search" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-600/80">Search</TabsTrigger>
-          <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-violet-600/80">Activity</TabsTrigger>
-          <TabsTrigger value="trending" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-orange-600/80">Trending</TabsTrigger>
-          <TabsTrigger value="tags" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-600/80">Tags</TabsTrigger>
-          <TabsTrigger value="progress" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-green-600/80">Progress</TabsTrigger>
-          <TabsTrigger value="achievements" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-600 data-[state=active]:to-yellow-600/80">Achievements</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="overview" className="space-y-4 w-full">
+        {/* MOBILE-FIRST Tab Navigation - No Overflow Guaranteed */}
+        <div className="w-full dashboard-container">
+          
+          {/* Mobile Layout: Simple 3-Tab Flex */}
+          <div className="mobile-tabs block sm:hidden">
+            <div className="tabs-list-mobile">
+              <TabsTrigger 
+                value="overview" 
+                className="tabs-trigger-mobile"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="analytics" 
+                className="tabs-trigger-mobile"
+              >
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger 
+                value="snippets" 
+                className="tabs-trigger-mobile"
+              >
+                Snippets
+              </TabsTrigger>
+            </div>
+          </div>
+
+          {/* Desktop Layout: Full Grid */}
+          <div className="desktop-tabs hidden sm:block">
+            <TabsList className="bg-muted/50 border border-primary/10 w-full p-2 grid grid-cols-3 lg:grid-cols-9 gap-1">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-primary text-sm px-3 py-2">Overview</TabsTrigger>
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-amber-600 text-sm px-3 py-2">Analytics</TabsTrigger>
+              <TabsTrigger value="snippets" className="data-[state=active]:bg-emerald-600 text-sm px-3 py-2">Snippets</TabsTrigger>
+              <TabsTrigger value="search" className="hidden lg:block data-[state=active]:bg-blue-600 text-sm px-3 py-2">Search</TabsTrigger>
+              <TabsTrigger value="activity" className="hidden lg:block data-[state=active]:bg-violet-600 text-sm px-3 py-2">Activity</TabsTrigger>
+              <TabsTrigger value="trending" className="hidden lg:block data-[state=active]:bg-orange-600 text-sm px-3 py-2">Trending</TabsTrigger>
+              <TabsTrigger value="tags" className="hidden lg:block data-[state=active]:bg-purple-600 text-sm px-3 py-2">Tags</TabsTrigger>
+              <TabsTrigger value="progress" className="hidden lg:block data-[state=active]:bg-green-600 text-sm px-3 py-2">Progress</TabsTrigger>
+              <TabsTrigger value="achievements" className="hidden lg:block data-[state=active]:bg-yellow-600 text-sm px-3 py-2">Achievements</TabsTrigger>
+            </TabsList>
+          </div>
+          
+        </div>
+
         
         <TabsContent value="overview" className="space-y-4">
           <RealTimeDashboardStats />
