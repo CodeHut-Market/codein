@@ -16,6 +16,9 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 // Client for user authentication
 const supabaseClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+
 // GET /api/profile - Get current user's profile
 export async function GET(request: NextRequest) {
   try {
