@@ -1,464 +1,472 @@
 "use client"
 
 import {
-    Check,
+    Palette,
     Code,
-    CreditCard,
+    Component,
+    Layers,
+    Sparkles,
+    Star,
+    Download,
+    Github,
+    Eye,
+    Heart,
+    Copy,
+    CheckCircle,
+    ArrowRight,
+    Zap,
+    Shield,
+    Users,
     Crown,
     Gift,
-    Headphones,
     Rocket,
-    Shield,
-    Star,
-    Users,
-    Zap
+    Package
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { Label } from "../components/ui/label"
-import { Switch } from "../components/ui/switch"
+import { Progress } from "../components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 
-export default function PricingPage() {
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
+export default function UILibraryShowcase() {
+  const [activeTab, setActiveTab] = useState('components')
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [progress, setProgress] = useState(0)
 
-  const plans = [
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 0 : prev + 1))
+    }, 50)
+    return () => clearInterval(timer)
+  }, [])
+
+  const componentCategories = [
     {
-      name: 'Free',
-      description: 'Perfect for getting started',
-      price: { monthly: 0, yearly: 0 },
-      icon: <Code className="h-6 w-6" />,
+      id: 'components',
+      name: 'Components',
+      icon: Component,
+      count: 45
+    },
+    {
+      id: 'layouts',
+      name: 'Layouts',
+      icon: Layers,
+      count: 12
+    },
+    {
+      id: 'animations',
+      name: 'Animations',
+      icon: Sparkles,
+      count: 28
+    },
+    {
+      id: 'themes',
+      name: 'Themes',
+      icon: Palette,
+      count: 8
+    }
+  ]
+
+  const featuredComponents = [
+    {
+      name: 'Interactive Dashboard Cards',
+      category: 'Layout',
+      description: 'Beautiful, responsive cards with hover effects and micro-animations',
+      icon: Component,
+      preview: true,
+      downloads: 2340,
+      likes: 189,
+      price: 'Free',
+      gradient: 'from-blue-500 to-purple-600',
       features: [
-        '5 snippet uploads per month',
-        'Basic code highlighting',
-        'Public snippets only',
+        'Hover animations',
+        'Dark mode support',
+        'Responsive design',
+        'Customizable themes',
+        'TypeScript ready'
+      ]
+    },
+    {
+      name: 'Animated Buttons Suite',
+      category: 'Interactive',
+      description: 'Modern button components with ripple effects and loading states',
+      icon: Zap,
+      preview: true,
+      downloads: 3156,
+      likes: 256,
+      price: '$12',
+      gradient: 'from-green-500 to-teal-600',
+      features: [
+        'Ripple effects',
+        'Loading states',
+        'Icon integration',
+        'Multiple variants',
+        'Accessibility focused'
+      ]
+    },
+    {
+      name: 'Progress Indicators',
+      category: 'Feedback',
+      description: 'Elegant progress bars and loading animations for better UX',
+      icon: Sparkles,
+      preview: true,
+      downloads: 1987,
+      likes: 167,
+      price: '$8',
+      gradient: 'from-orange-500 to-red-600',
+      features: [
+        'Smooth animations',
+        'Custom colors',
+        'Multiple styles',
+        'Real-time updates',
+        'Lightweight code'
+      ]
+    },
+    {
+      name: 'Navigation Components',
+      category: 'Navigation',
+      description: 'Complete navigation suite with breadcrumbs, tabs, and sidebars',
+      icon: Layers,
+      preview: true,
+      downloads: 2789,
+      likes: 234,
+      price: '$15',
+      gradient: 'from-purple-500 to-pink-600',
+      features: [
+        'Mobile responsive',
+        'Breadcrumb system',
+        'Tab navigation',
+        'Sidebar layouts',
+        'Search integration'
+      ]
+    }
+  ]
+
+  const pricingTiers = [
+    {
+      name: 'Free Components',
+      price: '$0',
+      description: 'Perfect for getting started',
+      icon: Gift,
+      popular: false,
+      features: [
+        '15 free components',
+        'Basic documentation',
         'Community support',
-        'Standard search',
-        'Mobile app access'
-      ],
-      limitations: [
-        'No private snippets',
-        'No advanced features',
-        'Basic analytics'
+        'MIT license',
+        'Regular updates'
       ],
       buttonText: 'Get Started',
-      buttonVariant: 'outline' as const,
-      popular: false
+      buttonVariant: 'outline' as const
     },
     {
-      name: 'Pro',
+      name: 'Pro Library',
+      price: '$29',
       description: 'For serious developers',
-      price: { monthly: 9.99, yearly: 7.99 },
-      icon: <Zap className="h-6 w-6" />,
-      features: [
-        'Unlimited snippet uploads',
-        'Advanced syntax highlighting',
-        'Private & public snippets',
-        'Priority support',
-        'Advanced search & filters',
-        'Custom collections',
-        'Download in multiple formats',
-        'Analytics dashboard',
-        'Team collaboration (up to 5)',
-        'API access'
-      ],
-      buttonText: 'Start Pro Trial',
-      buttonVariant: 'default' as const,
+      icon: Crown,
       popular: true,
-      trialDays: 14
+      features: [
+        'All 90+ components',
+        'Advanced documentation',
+        'Priority support',
+        'Source code access',
+        'Custom themes',
+        'Figma design files',
+        'Video tutorials'
+      ],
+      buttonText: 'Start Free Trial',
+      buttonVariant: 'default' as const
     },
     {
-      name: 'Team',
-      description: 'For growing teams',
-      price: { monthly: 24.99, yearly: 19.99 },
-      icon: <Users className="h-6 w-6" />,
+      name: 'Team License',
+      price: '$99',
+      description: 'For development teams',
+      icon: Users,
+      popular: false,
       features: [
         'Everything in Pro',
-        'Unlimited team members',
-        'Team management dashboard',
-        'Shared snippet libraries',
-        'Advanced permissions',
-        'SSO integration',
-        'Dedicated account manager',
-        'Priority email support',
-        'Custom branding',
-        'Advanced analytics'
+        'Team collaboration',
+        'Unlimited projects',
+        'White-label rights',
+        'Custom components',
+        'Dedicated support',
+        'Training sessions'
       ],
       buttonText: 'Contact Sales',
-      buttonVariant: 'outline' as const,
-      popular: false
-    },
-    {
-      name: 'Enterprise',
-      description: 'Custom solutions for large organizations',
-      price: { monthly: 'Custom', yearly: 'Custom' },
-      icon: <Crown className="h-6 w-6" />,
-      features: [
-        'Everything in Team',
-        'Custom integrations',
-        'On-premise deployment',
-        'Advanced security features',
-        'Custom SLA',
-        '24/7 phone support',
-        'Training sessions',
-        'Custom development',
-        'Compliance support',
-        'White-label options'
-      ],
-      buttonText: 'Contact Sales',
-      buttonVariant: 'outline' as const,
-      popular: false
-    }
-  ]
-
-  const features = [
-    {
-      title: 'Code Management',
-      description: 'Organize, search, and share your code snippets efficiently',
-      icon: <Code className="h-5 w-5" />,
-      plans: ['Free', 'Pro', 'Team', 'Enterprise']
-    },
-    {
-      title: 'Advanced Analytics',
-      description: 'Track performance, views, and engagement metrics',
-      icon: <Rocket className="h-5 w-5" />,
-      plans: ['Pro', 'Team', 'Enterprise']
-    },
-    {
-      title: 'Team Collaboration',
-      description: 'Work together with shared libraries and permissions',
-      icon: <Users className="h-5 w-5" />,
-      plans: ['Team', 'Enterprise']
-    },
-    {
-      title: 'Priority Support',
-      description: '24/7 support with guaranteed response times',
-      icon: <Headphones className="h-5 w-5" />,
-      plans: ['Pro', 'Team', 'Enterprise']
-    },
-    {
-      title: 'Security & Compliance',
-      description: 'Enterprise-grade security and compliance features',
-      icon: <Shield className="h-5 w-5" />,
-      plans: ['Enterprise']
-    },
-    {
-      title: 'Custom Integrations',
-      description: 'Connect with your existing tools and workflows',
-      icon: <Zap className="h-5 w-5" />,
-      plans: ['Enterprise']
-    }
-  ]
-
-  const faqs = [
-    {
-      question: 'Can I change my plan at any time?',
-      answer: 'Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and billing adjustments are prorated.'
-    },
-    {
-      question: 'Is there a free trial for paid plans?',
-      answer: 'Yes, Pro and Team plans come with a 14-day free trial. No credit card required to start your trial.'
-    },
-    {
-      question: 'What payment methods do you accept?',
-      answer: 'We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and ACH transfers for Enterprise customers.'
-    },
-    {
-      question: 'Can I cancel my subscription anytime?',
-      answer: 'Yes, you can cancel your subscription at any time. You\'ll continue to have access until the end of your current billing period.'
-    },
-    {
-      question: 'Do you offer discounts for students or non-profits?',
-      answer: 'Yes, we offer 50% discounts for students and educational institutions, and 30% discounts for qualified non-profit organizations.'
-    },
-    {
-      question: 'What happens to my data if I cancel?',
-      answer: 'Your data remains accessible for 30 days after cancellation. You can export your snippets at any time during this period.'
-    }
-  ]
-
-  const testimonials = [
-    {
-      name: 'Sarah Chen',
-      role: 'Senior Developer at TechCorp',
-      avatar: 'https://github.com/shadcn.png',
-      quote: 'CodeHut has revolutionized how our team shares and manages code snippets. The collaboration features are amazing!'
-    },
-    {
-      name: 'Mike Rodriguez',
-      role: 'Freelance Full-Stack Developer',
-      avatar: 'https://github.com/shadcn.png',
-      quote: 'I\'ve saved hours every week with CodeHut\'s snippet organization. The Pro plan is worth every penny.'
-    },
-    {
-      name: 'Emma Wilson',
-      role: 'Engineering Manager at StartupXYZ',
-      avatar: 'https://github.com/shadcn.png',
-      quote: 'The Team plan has improved our code sharing and onboarding process significantly. Highly recommended!'
+      buttonVariant: 'outline' as const
     }
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-12">
-      {/* Header */}
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold">
-          Choose Your <span className="text-primary">CodeHut</span> Plan
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          From hobby projects to enterprise solutions. Find the perfect plan for your coding needs.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-900/20 dark:to-indigo-900/20">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 pt-24 pb-16">
+        <div className="text-center max-w-4xl mx-auto">
+          <Badge className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+            <Sparkles className="w-4 h-4 mr-2" />
+            UI Library Showcase
+          </Badge>
+          
+          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 leading-tight">
+            Beautiful Components
+            <br />
+            <span className="text-4xl md:text-6xl">Built for Developers</span>
+          </h1>
+          
+          <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
+            Discover our collection of premium React components with stunning animations,
+            <br />
+            perfect accessibility, and production-ready code.
+          </p>
 
-      {/* Billing Toggle */}
-      <div className="flex items-center justify-center">
-        <div className="flex items-center space-x-4 p-4 bg-muted/30 rounded-full border border-border/50 hover:border-border transition-colors">
-          <Label 
-            htmlFor="billing-toggle" 
-            className={`cursor-pointer transition-all select-none ${billingPeriod === 'monthly' ? 'font-semibold text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            Monthly
-          </Label>
-          <Switch
-            id="billing-toggle"
-            checked={billingPeriod === 'yearly'}
-            onCheckedChange={(checked) => setBillingPeriod(checked ? 'yearly' : 'monthly')}
-            className="data-[state=checked]:bg-green-600 hover:data-[state=checked]:bg-green-700 focus-visible:ring-green-200"
-          />
-          <div className="flex items-center space-x-2">
-            <Label 
-              htmlFor="billing-toggle" 
-              className={`cursor-pointer transition-all select-none ${billingPeriod === 'yearly' ? 'font-semibold text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Yearly
-            </Label>
-            {billingPeriod === 'yearly' && (
-              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 animate-in slide-in-from-right duration-200">
-                <Gift className="w-3 h-3 mr-1" />
-                Save 20%
-              </Badge>
-            )}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Eye className="w-5 h-5 mr-2" />
+              Explore Components
+            </Button>
+            <Button variant="outline" size="lg" className="px-8 py-4 rounded-full border-2 hover:bg-slate-50 dark:hover:bg-slate-800">
+              <Github className="w-5 h-5 mr-2" />
+              View on GitHub
+            </Button>
+          </div>
+
+          {/* Live Demo Progress Bar */}
+          <div className="max-w-md mx-auto">
+            <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400 mb-2">
+              <span>Live Demo Progress</span>
+              <span>{progress}%</span>
+            </div>
+            <Progress value={progress} className="h-2 bg-slate-200 dark:bg-slate-700" />
           </div>
         </div>
       </div>
 
-      {/* Pricing Cards */}
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
-        {plans.map((plan) => (
-          <Card 
-            key={plan.name} 
-            className={`relative transition-all duration-300 hover:shadow-xl ${
-              plan.popular 
-                ? 'border-2 border-primary shadow-xl scale-105 bg-gradient-to-b from-primary/5 to-transparent' 
-                : 'hover:shadow-lg hover:scale-102'
-            }`}
-          >
-            {plan.popular && (
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-4 py-1">
-                  <Star className="w-3 h-3 mr-1" />
-                  Most Popular
+      {/* Component Categories */}
+      <div className="container mx-auto px-4 py-16">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-12 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-2xl p-2">
+            {componentCategories.map((category) => (
+              <TabsTrigger
+                key={category.id}
+                value={category.id}
+                className="flex flex-col items-center gap-2 py-4 px-6 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-lg transition-all duration-200"
+              >
+                <category.icon className="w-6 h-6" />
+                <span className="font-medium">{category.name}</span>
+                <Badge variant="secondary" className="text-xs">
+                  {category.count}
                 </Badge>
-              </div>
-            )}
-            
-            <CardHeader className="text-center space-y-4">
-              <div className="mx-auto p-3 bg-primary/10 rounded-full w-fit">
-                {plan.icon}
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">{plan.name}</h3>
-                <p className="text-muted-foreground">{plan.description}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="text-3xl font-bold transition-all duration-300">
-                  {typeof plan.price[billingPeriod] === 'number' ? (
-                    plan.price[billingPeriod] === 0 ? (
-                      'Free'
-                    ) : (
-                      <>
-                        <span className="tabular-nums">${plan.price[billingPeriod]}</span>
-                        <span className="text-lg font-normal text-muted-foreground">
-                          /{billingPeriod === 'monthly' ? 'mo' : 'yr'}
-                        </span>
-                      </>
-                    )
-                  ) : (
-                    plan.price[billingPeriod]
-                  )}
-                </div>
-                {billingPeriod === 'yearly' && typeof plan.price.monthly === 'number' && plan.price.monthly > 0 && (
-                  <p className="text-sm text-muted-foreground line-through">
-                    ${(plan.price.monthly * 12).toFixed(2)}/yr
-                  </p>
-                )}
-                {plan.trialDays && (
-                  <p className="text-sm text-primary font-medium">
-                    {plan.trialDays}-day free trial
-                  </p>
-                )}
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-6">
-              <Link href={plan.name === 'Free' ? '/signup' : plan.buttonText === 'Start Pro Trial' ? '/signup' : '/contact'}>
-                <Button 
-                  className="w-full" 
-                  variant={plan.buttonVariant}
-                  size="lg"
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {/* Featured Components Grid */}
+          <TabsContent value="components" className="space-y-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                Featured Components
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Hand-picked components that showcase the best of our library
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {featuredComponents.map((component, index) => (
+                <Card
+                  key={component.name}
+                  className={`group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-gradient-to-br ${component.gradient} p-1 rounded-2xl`}
+                  onMouseEnter={() => setHoveredCard(index)}
+                  onMouseLeave={() => setHoveredCard(null)}
                 >
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  {plan.buttonText}
-                </Button>
-              </Link>
-              
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm uppercase tracking-wider">Features Included:</h4>
-                <ul className="space-y-2">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start space-x-2">
-                      <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                {plan.limitations && (
-                  <div className="pt-3 border-t">
-                    <ul className="space-y-2">
-                      {plan.limitations.map((limitation) => (
-                        <li key={limitation} className="flex items-start space-x-2">
-                          <div className="h-4 w-4 mt-0.5 flex-shrink-0 text-muted-foreground">×</div>
-                          <span className="text-sm text-muted-foreground">{limitation}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="bg-white dark:bg-slate-900 rounded-xl p-6 h-full">
+                    <CardHeader className="p-0 mb-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <component.icon className="w-8 h-8 text-slate-700 dark:text-slate-300" />
+                        <Badge variant="secondary" className="text-xs font-medium">
+                          {component.price}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                        {component.name}
+                      </CardTitle>
+                      <Badge variant="outline" className="w-fit text-xs">
+                        {component.category}
+                      </Badge>
+                    </CardHeader>
+                    
+                    <CardContent className="p-0 space-y-4">
+                      <CardDescription className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                        {component.description}
+                      </CardDescription>
+
+                      <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-1">
+                          <Download className="w-3 h-3" />
+                          {component.downloads.toLocaleString()}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          {component.likes}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {component.features.slice(0, 3).map((feature, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                            <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {feature}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2 pt-4">
+                        <Button size="sm" className="flex-1 text-xs">
+                          <Eye className="w-3 h-3 mr-1" />
+                          Preview
+                        </Button>
+                        <Button size="sm" variant="outline" className="flex-1 text-xs">
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                    </CardContent>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Other tab contents */}
+          <TabsContent value="layouts" className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <Layers className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-semibold mb-2">Layout Components</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                Responsive layout components coming soon...
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="animations" className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <Sparkles className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-semibold mb-2">Animation Library</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                Stunning animations and micro-interactions coming soon...
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="themes" className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <Palette className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-semibold mb-2">Theme System</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                Customizable themes and design tokens coming soon...
+              </p>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
-      {/* Feature Comparison */}
-      <Tabs defaultValue="features" className="max-w-6xl mx-auto">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="features">Feature Comparison</TabsTrigger>
-          <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
-          <TabsTrigger value="faqs">FAQs</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="features" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <Card key={feature.title}>
-                <CardHeader>
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      {feature.icon}
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">{feature.title}</CardTitle>
+      {/* Pricing Section */}
+      <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-300">
+              Choose the plan that fits your needs. All plans include our core components.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {pricingTiers.map((plan, index) => (
+              <Card
+                key={plan.name}
+                className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl ${
+                  plan.popular
+                    ? 'border-2 border-blue-500 transform scale-105 shadow-2xl'
+                    : 'border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-2 text-sm font-medium">
+                    Most Popular
+                  </div>
+                )}
+                
+                <CardHeader className={`text-center ${plan.popular ? 'pt-12' : 'pt-8'}`}>
+                  <div className="flex justify-center mb-4">
+                    <div className="p-3 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
+                      <plan.icon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
                     </div>
                   </div>
-                  <CardDescription>{feature.description}</CardDescription>
+                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                  <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+                    {plan.price}
+                    <span className="text-lg font-normal text-slate-500">/month</span>
+                  </div>
+                  <CardDescription className="text-slate-600 dark:text-slate-400">
+                    {plan.description}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {feature.plans.map((plan) => (
-                      <Badge key={plan} variant="secondary">
-                        {plan}
-                      </Badge>
+                
+                <CardContent className="space-y-6">
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-sm text-slate-700 dark:text-slate-300">{feature}</span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
+                  
+                  <Button
+                    variant={plan.buttonVariant}
+                    className={`w-full py-3 ${
+                      plan.popular
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+                        : ''
+                    }`}
+                  >
+                    {plan.buttonText}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </TabsContent>
-        
-        <TabsContent value="testimonials" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <Card key={testimonial.name} className="text-center">
-                <CardHeader>
-                  <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">{testimonial.name}</CardTitle>
-                    <CardDescription>{testimonial.role}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm italic">"{testimonial.quote}"</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="faqs" className="space-y-4">
-          {faqs.map((faq, index) => (
-            <Card key={index}>
-              <CardHeader>
-                <CardTitle className="text-lg">{faq.question}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{faq.answer}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
 
       {/* CTA Section */}
-      <Card className="bg-gradient-to-r from-primary/10 to-purple-600/10 border-primary/20">
-        <CardContent className="text-center py-12">
-          <h2 className="text-3xl font-bold mb-4">Ready to get started?</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who trust CodeHut to manage and share their code snippets.
+      <div className="container mx-auto px-4 py-20 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">
+            Ready to Build Amazing UIs?
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
+            Join thousands of developers who are already using our components to build
+            beautiful, accessible, and performant applications.
           </p>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup">
-              <Button size="lg" className="text-lg px-8">
-                Start Free Trial
-              </Button>
-            </Link>
-            <Link href="/demo">
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="text-lg px-8"
-              >
-                View Demo
-              </Button>
-            </Link>
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4">
+              <Rocket className="w-5 h-5 mr-2" />
+              Start Building Today
+            </Button>
+            <Button variant="outline" size="lg" className="px-8 py-4">
+              <Package className="w-5 h-5 mr-2" />
+              Browse Documentation
+            </Button>
           </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            No credit card required • Cancel anytime • 14-day free trial
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Money Back Guarantee */}
-      <Card className="max-w-2xl mx-auto">
-        <CardContent className="text-center py-8">
-          <Shield className="mx-auto h-12 w-12 text-green-600 mb-4" />
-          <h3 className="text-xl font-bold mb-2">30-Day Money-Back Guarantee</h3>
-          <p className="text-muted-foreground">
-            Not satisfied? Get a full refund within 30 days, no questions asked.
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
