@@ -632,10 +632,8 @@ function initializeMemorySnippets() {
   
   if (shouldUseDemoData) {
     memorySnippets = [...FALLBACK_DEMO_SNIPPETS];
-    console.log('Using demo data for development');
   } else {
     memorySnippets = [];
-    console.log('Using actual data - demo data disabled');
   }
 }
 
@@ -679,20 +677,13 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
     updatedAt: now
   };
   
-  console.log('createSnippet - Creating snippet with ID:', snippet.id);
-  console.log('createSnippet - Snippet title:', snippet.title);
-  console.log('createSnippet - Supabase admin enabled:', isSupabaseAdminEnabled());
-  
   let supabaseStoreSuccess = false;
   
   // PRIMARY STORAGE: Try Supabase first for persistence
   if(isSupabaseAdminEnabled()){
     try {
-      console.log('createSnippet - Attempting to store in Supabase (primary storage)');
-      
       // Check if visibility column exists before including it
       const hasVisibilityColumn = await checkVisibilityColumnExists();
-      console.log('createSnippet - Visibility column exists:', hasVisibilityColumn);
       
       // Map camelCase to snake_case for database with conditional fields
       const dbSnippet: any = {
@@ -719,13 +710,9 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
         dbSnippet.allow_comments = snippet.allowComments;
       }
       
-      console.log('createSnippet - Database snippet object:', JSON.stringify(dbSnippet, null, 2));
       const { data: insertResult, error } = await supabaseAdmin!.from('snippets').insert(dbSnippet).select();
       if(error) {
-        console.error('createSnippet - Supabase insert error:', JSON.stringify(error, null, 2));
-        console.error('createSnippet - Error code:', error.code);
-        console.error('createSnippet - Error message:', error.message);
-        console.error('createSnippet - Error details:', error.details);
+        console.error('Supabase insert error:', error.message);
         
         // If it's a column doesn't exist error, reset the cache and retry without that column
         if (error.code === '42703' && error.message.includes('visibility')) {
@@ -751,45 +738,36 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
             updated_at: snippet.updatedAt
           };
           
-          console.log('createSnippet - Retrying with simplified object');
           const { data: retryResult, error: retryError } = await supabaseAdmin!.from('snippets').insert(simpleDbSnippet).select();
           
           if (retryError) {
-            console.error('createSnippet - Retry also failed:', retryError);
+            console.error('Retry insert failed:', retryError.message);
             supabaseStoreSuccess = false;
           } else {
-            console.log('createSnippet - Retry successful:', retryResult);
             supabaseStoreSuccess = true;
           }
         } else {
           supabaseStoreSuccess = false;
         }
       } else {
-        console.log('createSnippet - Successfully stored in Supabase!');
-        console.log('createSnippet - Insert result:', insertResult);
         supabaseStoreSuccess = true;
       }
     } catch (err) {
-      console.error('createSnippet - Exception during Supabase insert:', err);
+      console.error('Exception during Supabase insert:', err);
       supabaseStoreSuccess = false;
     }
   } else {
-    console.log('createSnippet - Supabase admin not enabled');
     supabaseStoreSuccess = false;
   }
   
   // FALLBACK STORAGE: Add to memory if Supabase failed or is not available
   if (!supabaseStoreSuccess) {
-    console.log('createSnippet - Adding to memory as fallback storage');
     memorySnippets.unshift(snippet);
-    console.log('createSnippet - Total memory snippets:', memorySnippets.length);
   } else {
-    console.log('createSnippet - Also adding to memory cache for performance');
     // Add to memory cache even if Supabase succeeded, for performance
     memorySnippets.unshift(snippet);
   }
   
-  console.log('createSnippet - Storage summary - Supabase:', supabaseStoreSuccess ? 'SUCCESS' : 'FAILED', ', Memory: YES');
   return snippet;
 }
 
@@ -905,18 +883,26 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
         return getFallbackSnippets(opts);
       }
       
-      const results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
+      let results = (data || []).map(mapRowToSnippet) as CodeSnippet[];
+      
+      // For featured snippets, return most popular ones
+      if(opts.featured){
+        results = results
+          .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+          .slice(0, 3);
+      }
+      
       console.log(`Retrieved ${results.length} snippets from Supabase`);
       return results;
       
     } catch (error) {
       console.error('Database connection error:', error);
+      // Fall back to demo data if there's a connection issue
       return getFallbackSnippets(opts);
     }
   }
   
   // MEMORY FALLBACK - Only when Supabase is not available
-  console.warn('Supabase not enabled - using demo data');
   return getFallbackSnippets(opts);
 }
 
@@ -1056,7 +1042,7 @@ export async function getSnippetById(id: string): Promise<CodeSnippet | null>{
     return memoryResult;
   }
   
-  // Query database with optimized select
+  // Try Supabase database (primary storage since memory doesn't persist in serverless)
   if(isSupabaseEnabled()){
     try {
       const { data, error } = await supabase!
@@ -1065,11 +1051,16 @@ export async function getSnippetById(id: string): Promise<CodeSnippet | null>{
         .eq('id', id)
         .maybeSingle();
       
-      if(error || !data) {
+      if(error){ 
+        console.error('Supabase get error:', error.message);
         return null;
       }
       
-      const snippet = mapRowToSnippet(data);
+      if(!data) {
+        return null;
+      }
+      
+      const snippet = mapRowToSnippet(data as any);
       
       // Cache for future requests
       snippetCache.set(id, { snippet, timestamp: now });
@@ -1163,13 +1154,9 @@ function mapRowToSnippet(row: any): CodeSnippet {
 
 // Semantic search function for code snippets
 export async function semanticSearchSnippets(query: string, limit: number = 10): Promise<CodeSnippet[]> {
-  console.log(`semanticSearchSnippets - Query: "${query}", Limit: ${limit}`);
-  console.log('semanticSearchSnippets - Supabase enabled:', isSupabaseEnabled());
-  
   if (isSupabaseEnabled()) {
     try {
       // First try semantic search using vector database
-      console.log('semanticSearchSnippets - Attempting vector search...');
       
       // For now, let's try a simple hybrid approach:
       // 1. Do a text search first
@@ -1190,7 +1177,6 @@ export async function semanticSearchSnippets(query: string, limit: number = 10):
         console.error('semanticSearchSnippets - Text search error:', textError);
       } else {
         results = (textData || []).map(mapRowToSnippet);
-        console.log(`semanticSearchSnippets - Found ${results.length} results via text search`);
       }
       
       // If we have vector search available, we could enhance results here
@@ -1198,13 +1184,12 @@ export async function semanticSearchSnippets(query: string, limit: number = 10):
       return results;
       
     } catch (error) {
-      console.error('semanticSearchSnippets - Database error:', error);
+      console.error('Database error during search:', error);
       // Fall back to memory search
     }
   }
   
   // Fallback to memory/demo data search
-  console.log('semanticSearchSnippets - Using fallback memory search');
   return searchMemorySnippets(query, limit);
 }
 
