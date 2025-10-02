@@ -1,726 +1,480 @@
 "use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { CodeHighlighter } from '@/components/ui/syntax-highlighter';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import {
-    AlertCircle,
-    CheckCircle,
+    Palette,
     Code,
-    Copy,
-    Crown,
-    Download,
-    Eye,
-    Heart,
-    Info,
+    Component,
+    Layers,
     Sparkles,
     Star,
+    Download,
+    Github,
+    Eye,
+    Heart,
+    Copy,
+    CheckCircle,
+    ArrowRight,
+    Zap,
+    Shield,
     Users,
-    Zap
-} from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
-import LoadingSpinner, { LoadingOverlay } from '../../components/LoadingSpinner';
-import RippleThemeToggle from '../../components/RippleThemeToggle';
-import { useAsyncOperation, useLoading } from '../../hooks/useLoading';
+    Crown,
+    Gift,
+    Rocket,
+    Package
+} from 'lucide-react'
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { Badge } from "../components/ui/badge"
+import { Button } from "../components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
+import { Progress } from "../components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 
-export default function UILibraryPage() {
-  const [progress, setProgress] = useState(60);
-  const [sliderValue, setSliderValue] = useState([50]);
-  const [switchChecked, setSwitchChecked] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("");
-  const { isLoading, startLoading, stopLoading } = useLoading();
-  const { isLoading: asyncLoading, execute } = useAsyncOperation();
+export default function UILibraryShowcase() {
+  const [activeTab, setActiveTab] = useState('components')
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [progress, setProgress] = useState(0)
 
-  const loadingVariants = [
-    { key: 'default', name: 'Default Tech', description: 'Classic spinning loader with code icon' },
-    { key: 'code-matrix', name: 'Code Matrix', description: 'Matrix-style falling code characters' },
-    { key: 'terminal', name: 'Terminal', description: 'Terminal-style loading with green text' },
-    { key: 'circuit', name: 'Circuit Board', description: 'CPU with orbiting electron particles' },
-    { key: 'git-flow', name: 'Git Flow', description: 'Git branching with flowing commits' },
-    { key: 'neural', name: 'Neural Network', description: 'Neural network with connecting nodes' },
-  ] as const;
-
-  const badgeVariants = ['default', 'secondary', 'destructive', 'outline'] as const;
-  const buttonVariants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'] as const;
-  const buttonSizes = ['default', 'sm', 'lg', 'icon'] as const;
-
-  const sampleCode = `// Example React Component
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-
-export function ExampleComponent() {
-  const [count, setCount] = useState(0);
-  
   useEffect(() => {
-    document.title = \`Count: \${count}\`;
-  }, [count]);
+    const timer = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 100 : prev + 1))
+    }, 30)
+    return () => clearInterval(timer)
+  }, [])
+
+  const componentCategories = [
+    {
+      id: 'components',
+      name: 'Components',
+      icon: Component,
+      count: 45
+    },
+    {
+      id: 'layouts',
+      name: 'Layouts',
+      icon: Layers,
+      count: 12
+    },
+    {
+      id: 'animations',
+      name: 'Animations',
+      icon: Sparkles,
+      count: 28
+    },
+    {
+      id: 'themes',
+      name: 'Themes',
+      icon: Palette,
+      count: 8
+    }
+  ]
+
+  const featuredComponents = [
+    {
+      name: 'Interactive Dashboard Cards',
+      category: 'Layout',
+      description: 'Beautiful, responsive cards with hover effects and micro-animations',
+      icon: Component,
+      preview: true,
+      downloads: 2340,
+      likes: 189,
+      price: 'Free',
+      gradient: 'from-blue-500 to-purple-600',
+      features: [
+        'Hover animations',
+        'Dark mode support',
+        'Responsive design',
+        'Customizable themes',
+        'TypeScript ready'
+      ]
+    },
+    {
+      name: 'Animated Buttons Suite',
+      category: 'Interactive',
+      description: 'Modern button components with ripple effects and loading states',
+      icon: Zap,
+      preview: true,
+      downloads: 3156,
+      likes: 256,
+      price: '$12',
+      gradient: 'from-green-500 to-teal-600',
+      features: [
+        'Ripple effects',
+        'Loading states',
+        'Icon integration',
+        'Multiple variants',
+        'Accessibility focused'
+      ]
+    },
+    {
+      name: 'Progress Indicators',
+      category: 'Feedback',
+      description: 'Elegant progress bars and loading animations for better UX',
+      icon: Sparkles,
+      preview: true,
+      downloads: 1987,
+      likes: 167,
+      price: '$8',
+      gradient: 'from-orange-500 to-red-600',
+      features: [
+        'Smooth animations',
+        'Custom colors',
+        'Multiple styles',
+        'Real-time updates',
+        'Lightweight code'
+      ]
+    },
+    {
+      name: 'Navigation Components',
+      category: 'Navigation',
+      description: 'Complete navigation suite with breadcrumbs, tabs, and sidebars',
+      icon: Layers,
+      preview: true,
+      downloads: 2789,
+      likes: 234,
+      price: '$15',
+      gradient: 'from-purple-500 to-pink-600',
+      features: [
+        'Mobile responsive',
+        'Breadcrumb system',
+        'Tab navigation',
+        'Sidebar layouts',
+        'Search integration'
+      ]
+    }
+  ]
+
+  const pricingTiers = [
+    {
+      name: 'Free Components',
+      price: '$0',
+      description: 'Perfect for getting started',
+      icon: Gift,
+      popular: false,
+      features: [
+        '15 free components',
+        'Basic documentation',
+        'Community support',
+        'MIT license',
+        'Regular updates'
+      ],
+      buttonText: 'Get Started',
+      buttonVariant: 'outline' as const
+    },
+    {
+      name: 'Pro Library',
+      price: '$29',
+      description: 'For serious developers',
+      icon: Crown,
+      popular: true,
+      features: [
+        'All 90+ components',
+        'Advanced documentation',
+        'Priority support',
+        'Source code access',
+        'Custom themes',
+        'Figma design files',
+        'Video tutorials'
+      ],
+      buttonText: 'Start Free Trial',
+      buttonVariant: 'default' as const
+    },
+    {
+      name: 'Team License',
+      price: '$99',
+      description: 'For development teams',
+      icon: Users,
+      popular: false,
+      features: [
+        'Everything in Pro',
+        'Team collaboration',
+        'Unlimited projects',
+        'White-label rights',
+        'Custom components',
+        'Dedicated support',
+        'Training sessions'
+      ],
+      buttonText: 'Contact Sales',
+      buttonVariant: 'outline' as const
+    }
+  ]
 
   return (
-    <div className="p-6 space-y-4">
-      <h2 className="text-2xl font-bold">Counter: {count}</h2>
-      <Button onClick={() => setCount(c => c + 1)}>
-        Increment
-      </Button>
-    </div>
-  );
-}`;
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    // You could add a toast notification here
-  };
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <Badge className="bg-primary/10 text-primary border-primary/20">
-              <Crown className="w-3 h-3 mr-1" />
-              Premium UI Library
-            </Badge>
-          </div>
-          <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-purple-600 to-emerald-600 bg-clip-text text-transparent mb-6">
-            CodeHut UI Library
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-900/20 dark:to-indigo-900/20">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 pt-24 pb-16">
+        <div className="text-center max-w-4xl mx-auto">
+          <Badge className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+            <Sparkles className="w-4 h-4 mr-2" />
+            UI Library Showcase
+          </Badge>
+          
+          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 leading-tight">
+            Beautiful Components
+            <br />
+            <span className="text-4xl md:text-6xl">Built for Developers</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
-            Professional, ready-to-use React components and templates. Save months of development time with our premium UI library featuring custom animations and tech-themed designs.
+          
+          <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
+            Discover our collection of premium React components with stunning animations,
+            <br />
+            perfect accessibility, and production-ready code.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button size="lg" asChild className="bg-primary hover:bg-primary/90">
-              <Link href="/ui-library/subscribe?plan=pro">
-                <Crown className="w-4 h-4 mr-2" />
-                Start Pro Subscription
-              </Link>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Eye className="w-5 h-5 mr-2" />
+              Explore Components
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/ui-library/components">
-                <Eye className="w-4 h-4 mr-2" />
-                Browse Components
-              </Link>
+            <Button variant="outline" size="lg" className="px-8 py-4 rounded-full border-2 hover:bg-slate-50 dark:hover:bg-slate-800">
+              <Github className="w-5 h-5 mr-2" />
+              View on GitHub
             </Button>
           </div>
-          <div className="flex justify-center gap-4">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-300">
-              <Code className="h-3 w-3 mr-1" />
-              200+ Components
-            </Badge>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-300">
-              <Zap className="h-3 w-3 mr-1" />
-              Production Ready
-            </Badge>
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/20 dark:text-purple-300">
-              <Sparkles className="h-3 w-3 mr-1" />
-              Premium Quality
-            </Badge>
-          </div>
-        </div>
 
-        {/* Subscription Stats & CTA Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Card className="text-center">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-primary mb-2">200+</div>
-              <p className="text-sm text-muted-foreground">Premium Components</p>
-            </CardContent>
-          </Card>
-          <Card className="text-center">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-primary mb-2">5K+</div>
-              <p className="text-sm text-muted-foreground">Happy Subscribers</p>
-            </CardContent>
-          </Card>
-          <Card className="text-center">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-primary mb-2">50+</div>
-              <p className="text-sm text-muted-foreground">Monthly Updates</p>
-            </CardContent>
-          </Card>
-          <Card className="text-center">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-primary mb-2">99%</div>
-              <p className="text-sm text-muted-foreground">Satisfaction Rate</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Subscription Plans */}
-        <Card className="mb-12 bg-gradient-to-r from-primary/5 to-purple-600/5">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Choose Your Plan</CardTitle>
-            <CardDescription>Get unlimited access to our premium component library</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <Card className="border-2">
-                <CardHeader className="text-center">
-                  <CardTitle className="flex items-center justify-center">
-                    <Crown className="w-5 h-5 mr-2 text-primary" />
-                    Pro Plan
-                  </CardTitle>
-                  <div className="text-3xl font-bold">$19<span className="text-base font-normal text-muted-foreground">/month</span></div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Unlimited downloads</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Full source code access</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Priority support</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Commercial usage rights</li>
-                  </ul>
-                  <Button className="w-full" asChild>
-                    <Link href="/ui-library/subscribe?plan=pro">
-                      Start Pro Subscription
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-2 border-primary">
-                <CardHeader className="text-center">
-                  <CardTitle className="flex items-center justify-center">
-                    <Users className="w-5 h-5 mr-2 text-primary" />
-                    Team Plan
-                  </CardTitle>
-                  <div className="text-3xl font-bold">$49<span className="text-base font-normal text-muted-foreground">/month</span></div>
-                  <Badge className="bg-primary/10 text-primary">Most Popular</Badge>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Everything in Pro</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Up to 10 team members</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Team collaboration tools</li>
-                    <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Dedicated support</li>
-                  </ul>
-                  <Button className="w-full" asChild>
-                    <Link href="/ui-library/subscribe?plan=team">
-                      Start Team Subscription
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
+          {/* Live Demo Progress Bar */}
+          <div className="max-w-md mx-auto">
+            <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400 mb-2">
+              <span>Component Library Loading</span>
+              <span className="font-semibold">{progress}%</span>
             </div>
-          </CardContent>
-        </Card>
-        {/* Component Showcase Tabs */}
-        <Tabs defaultValue="loading" className="space-y-8">
-          <div className="flex justify-center">
-            <TabsList className="grid grid-cols-7 w-full max-w-4xl">
-              <TabsTrigger value="loading">Loading</TabsTrigger>
-              <TabsTrigger value="forms">Forms</TabsTrigger>
-              <TabsTrigger value="buttons">Buttons</TabsTrigger>
-              <TabsTrigger value="display">Display</TabsTrigger>
-              <TabsTrigger value="navigation">Navigation</TabsTrigger>
-              <TabsTrigger value="feedback">Feedback</TabsTrigger>
-              <TabsTrigger value="code">Code</TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* Loading Components */}
-          <TabsContent value="loading" className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Tech-Themed Loading Components</h2>
-              <p className="text-muted-foreground">Custom loading animations designed for developers</p>
+            <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 shadow-inner">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
             </div>
-
-            {/* Loading Variants Showcase */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {loadingVariants.map(({ key, name, description }) => (
-                <Card key={key}>
-                  <CardHeader className="text-center">
-                    <CardTitle className="text-lg">{name}</CardTitle>
-                    <CardDescription>{description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex flex-col items-center space-y-4">
-                    <div className="bg-muted/50 rounded-lg p-8 w-full flex justify-center">
-                      <LoadingSpinner variant={key} size="lg" message={`Loading...`} />
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToClipboard(`<LoadingSpinner variant="${key}" size="lg" message="Loading..." />`)}
-                    >
-                      <Copy className="h-3 w-3 mr-1" />
-                      Copy Code
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="mt-2 text-xs text-center text-slate-500 dark:text-slate-400">
+              {progress < 100 ? 'Loading components...' : '✨ Ready to explore!'}
             </div>
-
-            {/* Loading Sizes */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Size Variations</CardTitle>
-                <CardDescription>Different sizes for different use cases</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                  {(['sm', 'md', 'lg', 'xl'] as const).map(size => (
-                    <div key={size} className="space-y-4">
-                      <div className="bg-muted/50 rounded-lg p-6">
-                        <LoadingSpinner variant="code-matrix" size={size} message={`${size.toUpperCase()}`} />
-                      </div>
-                      <div className="text-sm font-mono text-muted-foreground">{size}</div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Interactive Demos */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Loading Overlay Demo</CardTitle>
-                  <CardDescription>Fullscreen loading overlay</CardDescription>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <Button
-                    onClick={() => {
-                      startLoading();
-                      setTimeout(stopLoading, 3000);
-                    }}
-                  >
-                    Show Overlay (3s)
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Async Operation</CardTitle>
-                  <CardDescription>Loading state management</CardDescription>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <Button
-                    onClick={() => execute(async () => {
-                      await new Promise(resolve => setTimeout(resolve, 2000));
-                    })}
-                    disabled={asyncLoading}
-                  >
-                    {asyncLoading ? 'Processing...' : 'Start Task'}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Form Components */}
-          <TabsContent value="forms" className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Form Components</h2>
-              <p className="text-muted-foreground">Input fields, selects, and form controls</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Input Components</CardTitle>
-                  <CardDescription>Text inputs and labels</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="Enter your email" />
-                  </div>
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" placeholder="Enter password" />
-                  </div>
-                  <div>
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea id="message" placeholder="Enter your message..." />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Select & Controls</CardTitle>
-                  <CardDescription>Dropdowns and interactive controls</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <Label htmlFor="select">Framework</Label>
-                    <Select value={selectedValue} onValueChange={setSelectedValue}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a framework" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="react">React</SelectItem>
-                        <SelectItem value="vue">Vue</SelectItem>
-                        <SelectItem value="angular">Angular</SelectItem>
-                        <SelectItem value="svelte">Svelte</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Slider ({sliderValue[0]}%)</Label>
-                    <Slider
-                      value={sliderValue}
-                      onValueChange={setSliderValue}
-                      max={100}
-                      step={1}
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="notifications"
-                      checked={switchChecked}
-                      onCheckedChange={setSwitchChecked}
-                    />
-                    <Label htmlFor="notifications">Enable notifications</Label>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Button Components */}
-          <TabsContent value="buttons" className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Button Components</h2>
-              <p className="text-muted-foreground">Various button styles and sizes</p>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Button Variants</CardTitle>
-                <CardDescription>Different button styles for various use cases</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  {buttonVariants.map(variant => (
-                    <div key={variant} className="space-y-2">
-                      <Button variant={variant} className="w-full">
-                        {variant}
-                      </Button>
-                      <div className="text-xs text-center text-muted-foreground font-mono">
-                        {variant}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Button Sizes</CardTitle>
-                <CardDescription>Different sizes for different contexts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-4 items-end">
-                  {buttonSizes.map(size => (
-                    <div key={size} className="space-y-2 text-center">
-                      <Button size={size}>
-                        {size === 'icon' ? <Heart className="h-4 w-4" /> : `Size ${size}`}
-                      </Button>
-                      <div className="text-xs text-muted-foreground font-mono">
-                        {size}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Icon Buttons</CardTitle>
-                <CardDescription>Buttons with icons for common actions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-4">
-                  <Button><Download className="h-4 w-4 mr-2" />Download</Button>
-                  <Button variant="outline"><Star className="h-4 w-4 mr-2" />Star</Button>
-                  <Button variant="secondary"><Copy className="h-4 w-4 mr-2" />Copy</Button>
-                  <Button variant="destructive"><Heart className="h-4 w-4 mr-2" />Like</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Display Components */}
-          <TabsContent value="display" className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Display Components</h2>
-              <p className="text-muted-foreground">Cards, badges, and display elements</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Badge Variants</CardTitle>
-                  <CardDescription>Status indicators and labels</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-4">
-                    {badgeVariants.map(variant => (
-                      <Badge key={variant} variant={variant}>
-                        {variant}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Progress Indicators</CardTitle>
-                  <CardDescription>Visual progress representation</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Progress</span>
-                      <span>{progress}%</span>
-                    </div>
-                    <Progress value={progress} />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => setProgress(Math.max(0, progress - 10))}>
-                      -10%
-                    </Button>
-                    <Button size="sm" onClick={() => setProgress(Math.min(100, progress + 10))}>
-                      +10%
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Avatar Component</CardTitle>
-                <CardDescription>User profile pictures and fallbacks</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4 items-center">
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <Avatar>
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <Avatar>
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      <Code className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Separator</CardTitle>
-                <CardDescription>Visual dividers for content sections</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>Section 1</div>
-                <Separator />
-                <div>Section 2</div>
-                <Separator />
-                <div>Section 3</div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Navigation Components */}
-          <TabsContent value="navigation" className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Navigation Components</h2>
-              <p className="text-muted-foreground">Tabs and navigation elements</p>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Tab Components</CardTitle>
-                <CardDescription>Organize content into tabbed sections</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="account">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="account">Account</TabsTrigger>
-                    <TabsTrigger value="password">Password</TabsTrigger>
-                    <TabsTrigger value="settings">Settings</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="account" className="mt-4 p-4 border rounded">
-                    <h3 className="font-semibold mb-2">Account Settings</h3>
-                    <p className="text-sm text-muted-foreground">Manage your account information and preferences.</p>
-                  </TabsContent>
-                  <TabsContent value="password" className="mt-4 p-4 border rounded">
-                    <h3 className="font-semibold mb-2">Password</h3>
-                    <p className="text-sm text-muted-foreground">Change your password and security settings.</p>
-                  </TabsContent>
-                  <TabsContent value="settings" className="mt-4 p-4 border rounded">
-                    <h3 className="font-semibold mb-2">General Settings</h3>
-                    <p className="text-sm text-muted-foreground">Configure your application preferences.</p>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Theme Toggle</CardTitle>
-                <CardDescription>Custom ripple-effect theme switcher</CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                <RippleThemeToggle />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Feedback Components */}
-          <TabsContent value="feedback" className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Feedback Components</h2>
-              <p className="text-muted-foreground">Status indicators and user feedback</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    Success State
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                    Completed successfully
-                  </Badge>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-                    Error State
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Badge variant="destructive">
-                    Something went wrong
-                  </Badge>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Info className="h-5 w-5 text-blue-600 mr-2" />
-                    Info State
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                    Additional information
-                  </Badge>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Code Components */}
-          <TabsContent value="code" className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Code Components</h2>
-              <p className="text-muted-foreground">Syntax highlighting and code display</p>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Syntax Highlighter</CardTitle>
-                <CardDescription>Custom syntax highlighting for code snippets</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CodeHighlighter
-                  code={sampleCode}
-                  language="javascript"
-                  showLineNumbers={true}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Code Block</CardTitle>
-                <CardDescription>Simple code display with copy functionality</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <pre className="bg-muted p-4 rounded-lg text-sm overflow-x-auto">
-                    <code>{`npm install @codehut/ui-components
-import { LoadingSpinner } from '@codehut/ui-components';
-
-<LoadingSpinner variant="code-matrix" size="lg" />`}</code>
-                  </pre>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="absolute top-2 right-2"
-                    onClick={() => copyToClipboard(`npm install @codehut/ui-components`)}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Footer CTA */}
-        <div className="text-center mt-16 p-8 bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-lg">
-          <h3 className="text-2xl font-bold text-foreground mb-4">
-            Ready to accelerate your development?
-          </h3>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Join thousands of developers who trust CodeHut UI Library for their projects. 
-            All components are built with TypeScript, Tailwind CSS, and Radix UI primitives.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Button size="lg" asChild>
-              <Link href="/ui-library/subscribe?plan=pro">
-                <Crown className="h-4 w-4 mr-2" />
-                Start Subscription
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/ui-library/components">
-                <Eye className="h-4 w-4 mr-2" />
-                Browse Components
-              </Link>
-            </Button>
           </div>
         </div>
       </div>
 
-      {/* Loading Overlay for demos */}
-      <LoadingOverlay 
-        isLoading={isLoading} 
-        variant="neural"
-        message="Loading overlay demo..." 
-      />
+      {/* Component Categories */}
+      <div className="container mx-auto px-4 py-16">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-12 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-2xl p-2">
+            {componentCategories.map((category) => (
+              <TabsTrigger
+                key={category.id}
+                value={category.id}
+                className="flex flex-col items-center gap-2 py-4 px-6 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-lg transition-all duration-200"
+              >
+                <category.icon className="w-6 h-6" />
+                <span className="font-medium">{category.name}</span>
+                <Badge variant="secondary" className="text-xs">
+                  {category.count}
+                </Badge>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {/* Featured Components Grid */}
+          <TabsContent value="components" className="space-y-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                Featured Components
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Hand-picked components that showcase the best of our library
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {featuredComponents.map((component, index) => (
+                <Card
+                  key={component.name}
+                  className={`group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-gradient-to-br ${component.gradient} p-1 rounded-2xl`}
+                  onMouseEnter={() => setHoveredCard(index)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                >
+                  <div className="bg-white dark:bg-slate-900 rounded-xl p-6 h-full">
+                    <CardHeader className="p-0 mb-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <component.icon className="w-8 h-8 text-slate-700 dark:text-slate-300" />
+                        <Badge variant="secondary" className="text-xs font-medium">
+                          {component.price}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                        {component.name}
+                      </CardTitle>
+                      <Badge variant="outline" className="w-fit text-xs">
+                        {component.category}
+                      </Badge>
+                    </CardHeader>
+                    
+                    <CardContent className="p-0 space-y-4">
+                      <CardDescription className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                        {component.description}
+                      </CardDescription>
+
+                      <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-1">
+                          <Download className="w-3 h-3" />
+                          {component.downloads.toLocaleString()}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          {component.likes}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {component.features.slice(0, 3).map((feature, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                            <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            {feature}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2 pt-4">
+                        <Button size="sm" className="flex-1 text-xs">
+                          <Eye className="w-3 h-3 mr-1" />
+                          Preview
+                        </Button>
+                        <Button size="sm" variant="outline" className="flex-1 text-xs">
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Other tab contents */}
+          <TabsContent value="layouts" className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <Layers className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-semibold mb-2">Layout Components</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                Responsive layout components coming soon...
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="animations" className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <Sparkles className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-semibold mb-2">Animation Library</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                Stunning animations and micro-interactions coming soon...
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="themes" className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <Palette className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-semibold mb-2">Theme System</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                Customizable themes and design tokens coming soon...
+              </p>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Pricing Section */}
+      <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-300">
+              Choose the plan that fits your needs. All plans include our core components.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {pricingTiers.map((plan, index) => (
+              <Card
+                key={plan.name}
+                className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl ${
+                  plan.popular
+                    ? 'border-2 border-blue-500 transform scale-105 shadow-2xl'
+                    : 'border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-2 text-sm font-medium">
+                    Most Popular
+                  </div>
+                )}
+                
+                <CardHeader className={`text-center ${plan.popular ? 'pt-12' : 'pt-8'}`}>
+                  <div className="flex justify-center mb-4">
+                    <div className="p-3 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
+                      <plan.icon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                    </div>
+                  </div>
+                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                  <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+                    {plan.price}
+                    <span className="text-lg font-normal text-slate-500">/month</span>
+                  </div>
+                  <CardDescription className="text-slate-600 dark:text-slate-400">
+                    {plan.description}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="space-y-6">
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-sm text-slate-700 dark:text-slate-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Button
+                    variant={plan.buttonVariant}
+                    className={`w-full py-3 ${
+                      plan.popular
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+                        : ''
+                    }`}
+                  >
+                    {plan.buttonText}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="container mx-auto px-4 py-20 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">
+            Ready to Build Amazing UIs?
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
+            Join thousands of developers who are already using our components to build
+            beautiful, accessible, and performant applications.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4">
+              <Rocket className="w-5 h-5 mr-2" />
+              Start Building Today
+            </Button>
+            <Button variant="outline" size="lg" className="px-8 py-4">
+              <Package className="w-5 h-5 mr-2" />
+              Browse Documentation
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
