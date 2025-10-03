@@ -128,15 +128,15 @@ export default function SnippetCard({
 
     return (
     <>
-      <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] hover-gradient-emerald border-l-4 border-l-emerald-400 dark:border-l-emerald-500">
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-start mb-2">
-            <CardTitle className="text-lg leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-              {snippet.title}
+      <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] hover-gradient-emerald border-l-4 border-l-emerald-400 dark:border-l-emerald-500 h-full flex flex-col">
+        <CardHeader className="pb-3 flex-shrink-0">
+          <div className="flex justify-between items-start mb-2 gap-2">
+            <CardTitle className="text-lg leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex-1 min-w-0">
+              <span className="break-words line-clamp-2">{snippet.title}</span>
             </CardTitle>
             <Badge
               variant={snippet.price === 0 ? "secondary" : "default"}
-              className={`ml-2 shrink-0 ${
+              className={`shrink-0 ${
                 snippet.price === 0 
                   ? "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800" 
                   : "bg-gradient-to-r from-violet-500 to-purple-600 text-white border-0"
@@ -145,13 +145,13 @@ export default function SnippetCard({
               {snippet.price === 0 ? "Free" : `₹${snippet.price}`}
             </Badge>
           </div>
-          <CardDescription className="text-sm leading-relaxed">
+          <CardDescription className="text-sm leading-relaxed line-clamp-3">
             {snippet.description}
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          {/* Tags */}
+        <CardContent className="space-y-4 flex-1 flex flex-col">
+          {/* Tags - Mobile Optimized */}
           <div className="flex flex-wrap gap-1">
             {snippet.tags.slice(0, 3).map((tag, index) => (
               <Badge 
@@ -159,28 +159,28 @@ export default function SnippetCard({
                 variant="outline" 
                 className={`text-xs ${getTagColor(index)}`}
               >
-                {tag}
+                <span className="truncate max-w-20">{tag}</span>
               </Badge>
             ))}
             {snippet.tags.length > 3 && (
               <Badge variant="outline" className="text-xs bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border-amber-200 dark:from-amber-900/20 dark:to-orange-900/20 dark:text-amber-300 dark:border-amber-800">
-                +{snippet.tags.length - 3} more
+                +{snippet.tags.length - 3}
               </Badge>
             )}
           </div>
 
-          {/* Metadata */}
-          <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-            <div className="flex items-center gap-1">
-              <Code className="w-3 h-3 text-cyan-500" />
-              <span className="text-cyan-700 dark:text-cyan-400 font-medium">{snippet.language}</span>
-              {snippet.framework && <span className="text-violet-600 dark:text-violet-400">• {snippet.framework}</span>}
+          {/* Metadata - Mobile Stack */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-1 min-w-0">
+              <Code className="w-3 h-3 text-cyan-500 flex-shrink-0" />
+              <span className="text-cyan-700 dark:text-cyan-400 font-medium truncate">{snippet.language}</span>
+              {snippet.framework && <span className="text-violet-600 dark:text-violet-400 truncate">• {snippet.framework}</span>}
             </div>
-            <div className="flex items-center gap-1">
-              <User className="w-3 h-3 text-indigo-500" />
+            <div className="flex items-center gap-1 min-w-0">
+              <User className="w-3 h-3 text-indigo-500 flex-shrink-0" />
               <ConditionalLink
                 href={`/profile/${snippet.author}`}
-                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium"
+                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium truncate"
                 onClick={(e: any) => e.stopPropagation()}
               >
                 {snippet.author}
@@ -188,20 +188,23 @@ export default function SnippetCard({
             </div>
           </div>
 
-          {/* Stats */}
+          {/* Stats - Mobile Responsive */}
           <div className="flex justify-between items-center text-sm">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
                 <Star className="w-4 h-4 fill-current" />
-                <span className="font-medium">{snippet.rating}</span>
+                <span className="font-medium text-xs sm:text-sm">{snippet.rating}</span>
               </div>
               <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                 <Download className="w-4 h-4" />
-                <span className="font-medium">{snippet.downloads}</span>
+                <span className="font-medium text-xs sm:text-sm">{snippet.downloads}</span>
               </div>
             </div>
-            <span className="text-gray-500 text-xs">
+            <span className="text-gray-500 text-xs hidden sm:block">
               {new Date(snippet.createdAt).toLocaleDateString()}
+            </span>
+            <span className="text-gray-500 text-xs sm:hidden">
+              {new Date(snippet.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           </div>
 
@@ -268,11 +271,11 @@ export default function SnippetCard({
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
+          {/* Action Buttons - Mobile Stack */}
+          <div className="flex flex-col sm:flex-row gap-2 mt-auto">
             {showPurchaseButton && (
               <Button
-                className={`flex-1 transition-all duration-200 ${
+                className={`flex-1 transition-all duration-200 min-h-10 ${
                   snippet.price === 0
                     ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
                     : "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
@@ -281,24 +284,34 @@ export default function SnippetCard({
                 disabled={snippet.price === 0}
               >
                 <ShoppingCart className="w-4 h-4 mr-2" />
-                {snippet.price === 0
-                  ? "Download Free"
-                  : `Buy ₹${snippet.price}`}
+                <span className="truncate">
+                  {snippet.price === 0
+                    ? "Download Free"
+                    : `Buy ₹${snippet.price}`}
+                </span>
               </Button>
             )}
 
-            <Button variant="outline" asChild className="border-cyan-200 hover:border-cyan-300 text-cyan-700 hover:bg-cyan-50 dark:border-cyan-800 dark:text-cyan-400 dark:hover:bg-cyan-900/10">
-              <ConditionalLink href={`/snippet/${snippet.id}`}>View Details</ConditionalLink>
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                asChild 
+                className="border-cyan-200 hover:border-cyan-300 text-cyan-700 hover:bg-cyan-50 dark:border-cyan-800 dark:text-cyan-400 dark:hover:bg-cyan-900/10 flex-1 min-h-10"
+              >
+                <ConditionalLink href={`/snippet/${snippet.id}`}>
+                  <span className="truncate">View Details</span>
+                </ConditionalLink>
+              </Button>
 
-            <FavoriteButton
-              snippetId={snippet.id}
-              userId={getCurrentUserId() || undefined}
-              size="sm"
-              variant="outline"
-              initialIsFavorited={false}
-              showCount
-            />
+              <FavoriteButton
+                snippetId={snippet.id}
+                userId={getCurrentUserId() || undefined}
+                size="sm"
+                variant="outline"
+                initialIsFavorited={false}
+                showCount
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

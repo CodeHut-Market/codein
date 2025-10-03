@@ -339,7 +339,7 @@ export default function PurchaseModal({
                     userEmail={currentUser.email}
                     onSuccess={handlePaymentSuccess}
                     onError={handlePaymentError}
-                    className="w-full text-white font-semibold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-md"
+                    className="w-full text-white font-semibold bg-action-gradient hover:bg-action-gradient rounded-md"
                     ctaLabel={`Proceed to Pay ₹${snippet.price}`}
                   />
                   <div className="text-xs text-gray-500 text-center">Secure checkout powered by Razorpay</div>

@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Utility classes for text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.line-clamp-4 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
 @layer base {
   /**
    * Tailwind CSS theme
@@ -177,6 +206,52 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Standardized typography scale for consistency */
+  .text-display-xl { @apply text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tight; }
+  .text-display-lg { @apply text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight; }
+  .text-display-md { @apply text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight tracking-tight; }
+  .text-display-sm { @apply text-xl sm:text-2xl lg:text-3xl font-bold leading-tight; }
+  
+  .text-heading-xl { @apply text-2xl sm:text-3xl font-semibold leading-tight tracking-tight; }
+  .text-heading-lg { @apply text-xl sm:text-2xl font-semibold leading-tight; }
+  .text-heading-md { @apply text-lg sm:text-xl font-semibold leading-snug; }
+  .text-heading-sm { @apply text-base sm:text-lg font-semibold leading-snug; }
+  
+  .text-body-xl { @apply text-lg sm:text-xl leading-relaxed; }
+  .text-body-lg { @apply text-base sm:text-lg leading-relaxed; }
+  .text-body-md { @apply text-sm sm:text-base leading-normal; }
+  .text-body-sm { @apply text-xs sm:text-sm leading-normal; }
+  
+  .text-label-lg { @apply text-sm font-medium leading-none; }
+  .text-label-md { @apply text-xs font-medium leading-none; }
+  .text-label-sm { @apply text-xs font-medium leading-none; }
+  
+  .text-caption { @apply text-xs text-muted-foreground leading-normal; }
+
+  /* Standardized spacing utilities for consistency */
+  .spacing-section { @apply py-16 sm:py-20 lg:py-24; }
+  .spacing-section-sm { @apply py-12 sm:py-16 lg:py-20; }
+  .spacing-section-lg { @apply py-20 sm:py-24 lg:py-32; }
+  
+  .spacing-stack-xl { @apply space-y-8 sm:space-y-10 lg:space-y-12; }
+  .spacing-stack-lg { @apply space-y-6 sm:space-y-8 lg:space-y-10; }
+  .spacing-stack-md { @apply space-y-4 sm:space-y-6 lg:space-y-8; }
+  .spacing-stack-sm { @apply space-y-3 sm:space-y-4 lg:space-y-6; }
+  .spacing-stack-xs { @apply space-y-2 sm:space-y-3; }
+  
+  .spacing-inline-lg { @apply space-x-4 sm:space-x-6 lg:space-x-8; }
+  .spacing-inline-md { @apply space-x-3 sm:space-x-4 lg:space-x-6; }
+  .spacing-inline-sm { @apply space-x-2 sm:space-x-3; }
+  .spacing-inline-xs { @apply space-x-1 sm:space-x-2; }
+  
+  .padding-container { @apply px-4 sm:px-6 lg:px-8; }
+  .padding-container-lg { @apply px-6 sm:px-8 lg:px-12; }
+  .padding-container-sm { @apply px-3 sm:px-4 lg:px-6; }
+  
+  .margin-center { @apply mx-auto max-w-7xl; }
+  .margin-center-sm { @apply mx-auto max-w-4xl; }
+  .margin-center-lg { @apply mx-auto max-w-none; }
+
   /* Fix for transparent dropdowns and popovers */
   [data-radix-dropdown-menu-content] {
     background-color: hsl(var(--popover) / 0.95) !important;
@@ -249,6 +324,124 @@
 .bg-gradient-hover {
   background-image: linear-gradient(135deg, rgba(96,165,250,0.08), rgba(99,102,241,0.06));
   transition: background-image 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+}
+
+/* Standardized gradient system for consistency */
+.bg-brand-gradient {
+  background: linear-gradient(135deg, hsl(var(--emerald-vivid)), hsl(var(--cyan-vivid)));
+}
+
+.bg-brand-gradient-hover:hover {
+  background: linear-gradient(135deg, 
+    hsl(var(--emerald-vivid)) 0%, 
+    hsl(var(--cyan-vivid)) 50%,
+    hsl(var(--violet-vivid)) 100%
+  );
+}
+
+.bg-action-gradient {
+  background: linear-gradient(135deg, hsl(var(--emerald-vivid)), hsl(var(--teal-vivid)));
+}
+
+.bg-action-gradient:hover {
+  background: linear-gradient(135deg, 
+    hsl(var(--emerald-vivid)) 20%, 
+    hsl(var(--teal-vivid)) 80%
+  );
+}
+
+.bg-premium-gradient {
+  background: linear-gradient(135deg, hsl(var(--violet-vivid)), hsl(var(--indigo-vivid)));
+}
+
+.bg-premium-gradient:hover {
+  background: linear-gradient(135deg, 
+    hsl(var(--violet-vivid)) 20%, 
+    hsl(var(--indigo-vivid)) 80%
+  );
+}
+
+.bg-warning-gradient {
+  background: linear-gradient(135deg, hsl(var(--amber-vivid)), hsl(var(--orange-vivid)));
+}
+
+.bg-danger-gradient {
+  background: linear-gradient(135deg, hsl(var(--rose-vivid)), hsl(var(--rose-vivid)));
+}
+
+.bg-success-gradient {
+  background: linear-gradient(135deg, hsl(var(--emerald-vivid)), hsl(var(--teal-vivid)));
+}
+
+.bg-info-gradient {
+  background: linear-gradient(135deg, hsl(var(--cyan-vivid)), hsl(var(--indigo-vivid)));
+}
+
+/* Standardized page backgrounds */
+.bg-page-gradient {
+  background: linear-gradient(135deg, 
+    rgb(236 254 255) 0%,  /* cyan-50 */
+    rgb(240 253 250) 25%, /* emerald-50 */
+    rgb(245 243 255) 50%, /* violet-50 */
+    rgb(236 254 255) 100% /* cyan-50 */
+  );
+}
+
+.dark .bg-page-gradient {
+  background: linear-gradient(135deg,
+    rgb(15 23 42) 0%,     /* slate-900 */
+    rgb(30 41 59) 25%,    /* slate-800 */
+    rgb(15 23 42) 50%,    /* slate-900 */
+    rgb(30 41 59) 100%    /* slate-800 */
+  );
+}
+
+/* Text gradients for consistent brand colors */
+.text-brand-gradient {
+  background: linear-gradient(135deg, hsl(var(--emerald-vivid)), hsl(var(--cyan-vivid)), hsl(var(--violet-vivid)));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-primary-gradient {
+  background: linear-gradient(135deg, 
+    rgb(71 85 105) 0%,    /* slate-600 dark */
+    rgb(51 65 85) 50%,    /* slate-700 */
+    rgb(71 85 105) 100%   /* slate-600 */
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .text-primary-gradient {
+  background: linear-gradient(135deg, 
+    rgb(203 213 225) 0%,  /* slate-300 */
+    rgb(226 232 240) 50%, /* slate-200 */
+    rgb(203 213 225) 100% /* slate-300 */
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hover gradient backgrounds for interactive elements */
+.hover-gradient-brand:hover {
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.1) 0%,    /* emerald */
+    rgba(6, 182, 212, 0.08) 50%,   /* cyan */
+    rgba(139, 92, 246, 0.1) 100%   /* violet */
+  );
+  transition: background 0.3s ease;
+}
+
+.hover-gradient-subtle:hover {
+  background: linear-gradient(135deg, 
+    rgba(6, 182, 212, 0.05) 0%,    /* cyan very subtle */
+    rgba(139, 92, 246, 0.05) 100%  /* violet very subtle */
+  );
+  transition: background 0.3s ease;
 }
 
 .hover\:bg-gradient-to-r:hover {

@@ -74,55 +74,78 @@ export default function Index() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-violet-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* Header */}
-      <header className="bg-background/80 backdrop-blur-sm border-b border-border/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-page-gradient">
+      {/* Header - Fixed Mobile Layout */}
+      <header className="bg-background/80 backdrop-blur-sm border-b border-border/50 shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <a href="https://w2sp61d0-8081.inc1.devtunnels.ms/" className="inline-flex items-center">
                 <Logo size="md" />
               </a>
             </div>
-            <div className="flex items-center gap-4">
+            {/* Mobile-optimized navigation */}
+            <div className="flex items-center gap-2 sm:gap-4">
               <ThemeToggle />
-              <NotificationCenter />
-              <Button variant="ghost" asChild className="hover:bg-gradient-to-r hover:from-cyan-50 hover:to-violet-50 dark:hover:from-cyan-900/20 dark:hover:to-violet-900/20">
+              <div className="hidden sm:block">
+                <NotificationCenter />
+              </div>
+              <Button 
+                variant="ghost" 
+                asChild 
+                className="hidden sm:inline-flex hover-gradient-subtle px-3 py-2 text-sm"
+              >
                 <Link to="/login">Sign In</Link>
               </Button>
-              <Button asChild className="bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white shadow-lg">
+              <Button 
+                asChild 
+                className="bg-action-gradient hover:bg-action-gradient text-white shadow-lg px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base"
+              >
                 <Link to="/signup">Sign Up</Link>
               </Button>
+            </div>
+          </div>
+          {/* Mobile-only bottom row */}
+          <div className="sm:hidden mt-2 flex items-center justify-center">
+            <Button 
+              variant="ghost" 
+              asChild 
+              className="flex-1 max-w-32 hover-gradient-subtle text-sm"
+            >
+              <Link to="/login">Sign In</Link>
+            </Button>
+            <div className="mx-2">
+              <NotificationCenter />
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="bg-gradient-to-r from-emerald-600 via-cyan-600 to-violet-600 bg-clip-text text-transparent">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
+      {/* Main Content - Mobile Optimized */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Hero Section - Responsive Typography */}
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="text-brand-gradient">
+            <h1 className="text-display-lg mb-4 sm:mb-6">
               Code Snippets Marketplace
             </h1>
           </div>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 mt-4 max-w-2xl mx-auto">
+          <p className="text-body-xl text-muted-foreground mb-6 sm:mb-8 mt-4 max-w-2xl mx-auto px-4">
             Buy and Sell Quality Code Snippets Instantly
           </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          {/* Action Buttons - Mobile Responsive */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
             <Button
               asChild
-              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 py-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              className="bg-action-gradient hover:bg-action-gradient text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto"
             >
               <Link to="/upload">Upload Your Code</Link>
             </Button>
             <Button
               asChild
               variant="outline"
-              className="border-2 border-violet-200 hover:border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-300 dark:hover:bg-violet-900/20 px-8 py-4 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
+              className="border-2 border-violet-200 hover:border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-300 dark:hover:bg-violet-900/20 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200 w-full sm:w-auto"
             >
               <Link to="/explore">Browse Snippets</Link>
             </Button>
@@ -131,25 +154,25 @@ export default function Index() {
           {/* Background GL */}
           <BackgroundGl />
 
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12">
+          {/* Search Bar - Mobile Optimized */}
+          <div className="max-w-2xl mx-auto mb-8 sm:mb-12 px-4">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-500 w-5 h-5" />
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search code snippets, tools, components..."
-                className="pl-12 pr-4 py-4 w-full rounded-xl border-2 border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 dark:border-gray-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-800/20 text-lg placeholder:text-gray-400 shadow-lg hover:shadow-xl transition-all duration-200"
+                placeholder="Search code snippets, tools..."
+                className="pl-12 pr-4 py-3 sm:py-4 w-full rounded-xl border-2 border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 dark:border-gray-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-800/20 text-base sm:text-lg placeholder:text-gray-400 shadow-lg hover:shadow-xl transition-all duration-200"
               />
             </form>
           </div>
         </div>
 
-        {/* Popular Code Snippets */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent mb-3">
+        {/* Popular Code Snippets - Mobile Grid Fix */}
+        <div className="mb-8 sm:mb-12">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-heading-xl text-primary-gradient mb-3">
               Popular Code Snippets
             </h2>
             <div className="flex items-center justify-center space-x-1">
@@ -159,22 +182,24 @@ export default function Index() {
               <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">Trending Now</span>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Responsive Grid - Fixed for Mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {snippets && snippets.length > 0 ? (
               snippets.map((snippet) => (
-                <SnippetCard
-                  key={snippet.id}
-                  snippet={snippet}
-                  onPurchaseComplete={fetchPopularSnippets}
-                />
+                <div key={snippet.id} className="w-full">
+                  <SnippetCard
+                    snippet={snippet}
+                    onPurchaseComplete={fetchPopularSnippets}
+                  />
+                </div>
               ))
             ) : (
-              <div className="col-span-full text-center py-12">
-                <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-emerald-100 to-cyan-100 dark:from-emerald-900/20 dark:to-cyan-900/20 rounded-full flex items-center justify-center">
-                    <Search className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+              <div className="col-span-full text-center py-8 sm:py-12">
+                <div className="max-w-md mx-auto px-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 bg-brand-gradient rounded-full flex items-center justify-center">
+                    <Search className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 text-lg">
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 text-base sm:text-lg">
                     {loading
                       ? "Loading amazing code snippets..."
                       : "No popular snippets available at the moment."}
@@ -189,36 +214,36 @@ export default function Index() {
         </div>
       </main>
 
-      {/* Component Showcase Section */}
-      <section className="bg-muted/30 py-16">
+      {/* Component Showcase Section - Mobile Optimized */}
+      <section className="bg-muted/30 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground">Enhanced UI Components</h2>
-            <p className="mt-4 text-lg text-muted-foreground">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Enhanced UI Components</h2>
+            <p className="mt-4 text-base sm:text-lg text-muted-foreground px-4">
               Experience our modernized component library with improved accessibility and design
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <div className="bg-background p-6 rounded-lg shadow-xs border">
-              <h3 className="font-semibold mb-3 text-foreground">Enhanced Buttons</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+            <div className="bg-background p-4 sm:p-6 rounded-lg shadow-xs border">
+              <h3 className="font-semibold mb-3 text-foreground text-sm sm:text-base">Enhanced Buttons</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                 Buttons with improved focus states and shadow utilities
               </p>
               <div className="space-y-2">
-                <Button className="w-full">
+                <Button className="w-full text-sm">
                   <Star className="w-4 h-4 mr-2" />
                   Primary Action
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full text-sm">
                   Secondary Action  
                 </Button>
               </div>
             </div>
 
-            <div className="bg-background p-6 rounded-lg shadow-xs border">
-              <h3 className="font-semibold mb-3 text-foreground">Modern Badges</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+            <div className="bg-background p-4 sm:p-6 rounded-lg shadow-xs border">
+              <h3 className="font-semibold mb-3 text-foreground text-sm sm:text-base">Modern Badges</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                 Enhanced badges with better accessibility and styling
               </p>
               <div className="flex flex-wrap gap-2">
@@ -228,16 +253,16 @@ export default function Index() {
               </div>
             </div>
 
-            <div className="bg-background p-6 rounded-lg shadow-xs border">
-              <h3 className="font-semibold mb-3 text-foreground">Improved Inputs</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+            <div className="bg-background p-4 sm:p-6 rounded-lg shadow-xs border md:col-span-2 lg:col-span-1">
+              <h3 className="font-semibold mb-3 text-foreground text-sm sm:text-base">Improved Inputs</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                 Better focus handling and file input support
               </p>
               <div className="space-y-2">
-                <Input placeholder="Search components..." />
+                <Input placeholder="Search components..." className="text-sm" />
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input className="pl-10" placeholder="With icon..." />
+                  <Input className="pl-10 text-sm" placeholder="With icon..." />
                 </div>
               </div>
             </div>
