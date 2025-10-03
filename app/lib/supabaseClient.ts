@@ -54,7 +54,7 @@ export const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY &&
 			flowType: 'implicit', // Use implicit flow for better compatibility
 			storage: typeof window !== 'undefined' ? window.localStorage : undefined,
 			storageKey: 'sb-auth-token', // Custom storage key
-			debug: process.env.NODE_ENV === 'development'
+			debug: false // Disabled to prevent verbose GoTrueClient logs
 		},
 		db: {
 			schema: 'public'
