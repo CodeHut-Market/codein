@@ -30,17 +30,46 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Progress } from "../components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 
+
 export default function UILibraryShowcase() {
   const [activeTab, setActiveTab] = useState('components')
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [progress, setProgress] = useState(0)
+  const [previewComponent, setPreviewComponent] = useState<string | null>(null)
+  const [copied, setCopied] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedComponent, setSelectedComponent] = useState<any>(null)
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setProgress((prev) => (prev >= 100 ? 100 : prev + 1))
-    }, 30)
+      setProgress((prev) => {
+        if (prev >= 100) {
+          return 0 // Reset to 0 when reaching 100%
+        }
+        return prev + 2 // Slightly faster increment
+      })
+    }, 60)
     return () => clearInterval(timer)
   }, [])
+
+  // Copy to clipboard function
+  const copyToClipboard = async (text: string, componentName: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(componentName)
+      setTimeout(() => setCopied(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
+  // Smooth scroll to components section
+  const scrollToComponents = () => {
+    const componentsSection = document.getElementById('components-section')
+    if (componentsSection) {
+      componentsSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   const componentCategories = [
     {
@@ -86,7 +115,23 @@ export default function UILibraryShowcase() {
         'Responsive design',
         'Customizable themes',
         'TypeScript ready'
-      ]
+      ],
+      code: `import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export function DashboardCard() {
+  return (
+    <Card className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+      <CardHeader>
+        <CardTitle>Analytics Overview</CardTitle>
+        <CardDescription>Your performance this month</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">+12,234</div>
+        <p className="text-xs text-muted-foreground">+19% from last month</p>
+      </CardContent>
+    </Card>
+  )
+}`
     },
     {
       name: 'Animated Buttons Suite',
@@ -104,7 +149,25 @@ export default function UILibraryShowcase() {
         'Icon integration',
         'Multiple variants',
         'Accessibility focused'
-      ]
+      ],
+      code: `import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
+
+export function AnimatedButton() {
+  const [loading, setLoading] = useState(false)
+  
+  return (
+    <Button 
+      onClick={() => setLoading(!loading)}
+      disabled={loading}
+      className="relative overflow-hidden group"
+    >
+      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {loading ? "Loading..." : "Click me"}
+      <span className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+    </Button>
+  )
+}`
     },
     {
       name: 'Progress Indicators',
@@ -122,7 +185,28 @@ export default function UILibraryShowcase() {
         'Multiple styles',
         'Real-time updates',
         'Lightweight code'
-      ]
+      ],
+      code: `import { Progress } from "@/components/ui/progress"
+import { useState, useEffect } from "react"
+
+export function ProgressIndicator() {
+  const [progress, setProgress] = useState(13)
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500)
+    return () => clearTimeout(timer)
+  }, [])
+  
+  return (
+    <div className="w-full space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Loading...</span>
+        <span>{progress}%</span>
+      </div>
+      <Progress value={progress} className="w-full" />
+    </div>
+  )
+}`
     },
     {
       name: 'Navigation Components',
@@ -140,7 +224,28 @@ export default function UILibraryShowcase() {
         'Tab navigation',
         'Sidebar layouts',
         'Search integration'
-      ]
+      ],
+      code: `import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+
+export function NavigationBreadcrumb() {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <span>Navigation</span>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  )
+}`
     }
   ]
 
@@ -222,14 +327,20 @@ export default function UILibraryShowcase() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+            <Button 
+              size="lg" 
+              onClick={scrollToComponents}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            >
               <Eye className="w-5 h-5 mr-2" />
               Explore Components
             </Button>
-            <Button variant="outline" size="lg" className="px-8 py-4 rounded-full border-2 hover:bg-slate-50 dark:hover:bg-slate-800">
-              <Github className="w-5 h-5 mr-2" />
-              View on GitHub
-            </Button>
+            <Link href="https://github.com/CodeHut-Market/codein" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="lg" className="px-8 py-4 rounded-full border-2 hover:bg-slate-50 dark:hover:bg-slate-800">
+                <Github className="w-5 h-5 mr-2" />
+                View on GitHub
+              </Button>
+            </Link>
           </div>
 
           {/* Live Demo Progress Bar */}
@@ -271,7 +382,7 @@ export default function UILibraryShowcase() {
           </TabsList>
 
           {/* Featured Components Grid */}
-          <TabsContent value="components" className="space-y-8">
+          <TabsContent value="components" className="space-y-8" id="components-section">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
                 Featured Components
@@ -331,13 +442,29 @@ export default function UILibraryShowcase() {
                       </div>
 
                       <div className="flex gap-2 pt-4">
-                        <Button size="sm" className="flex-1 text-xs">
+                        <Button 
+                          size="sm" 
+                          className="flex-1 text-xs"
+                          onClick={() => {
+                            setSelectedComponent(component)
+                            setIsModalOpen(true)
+                          }}
+                        >
                           <Eye className="w-3 h-3 mr-1" />
                           Preview
                         </Button>
-                        <Button size="sm" variant="outline" className="flex-1 text-xs">
-                          <Copy className="w-3 h-3 mr-1" />
-                          Copy
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1 text-xs"
+                          onClick={() => copyToClipboard(component.code, component.name)}
+                        >
+                          {copied === component.name ? (
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                          ) : (
+                            <Copy className="w-3 h-3 mr-1" />
+                          )}
+                          {copied === component.name ? 'Copied!' : 'Copy'}
                         </Button>
                       </div>
                     </CardContent>
@@ -348,33 +475,107 @@ export default function UILibraryShowcase() {
           </TabsContent>
 
           {/* Other tab contents */}
-          <TabsContent value="layouts" className="text-center py-20">
-            <div className="max-w-md mx-auto">
-              <Layers className="w-16 h-16 mx-auto mb-4 text-slate-400" />
-              <h3 className="text-xl font-semibold mb-2">Layout Components</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Responsive layout components coming soon...
+          <TabsContent value="layouts" className="space-y-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                Layout Components
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Flexible layout components for modern web applications
               </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { name: 'Grid System', desc: 'Responsive grid layouts', icon: '⚡' },
+                { name: 'Flex Containers', desc: 'Flexible box layouts', icon: '📱' },
+                { name: 'Card Layouts', desc: 'Modern card designs', icon: '🎨' },
+                { name: 'Dashboard Layouts', desc: 'Admin dashboard templates', icon: '📊' },
+                { name: 'Landing Pages', desc: 'Marketing page layouts', icon: '🚀' },
+                { name: 'Form Layouts', desc: 'Structured form designs', icon: '📝' }
+              ].map((layout, idx) => (
+                <Card key={idx} className="p-6 hover:shadow-lg transition-all duration-300">
+                  <div className="text-3xl mb-3">{layout.icon}</div>
+                  <h3 className="font-semibold mb-2">{layout.name}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{layout.desc}</p>
+                  <Button size="sm" className="mt-4 w-full" variant="outline">
+                    <Eye className="w-3 h-3 mr-1" />
+                    Preview
+                  </Button>
+                </Card>
+              ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="animations" className="text-center py-20">
-            <div className="max-w-md mx-auto">
-              <Sparkles className="w-16 h-16 mx-auto mb-4 text-slate-400" />
-              <h3 className="text-xl font-semibold mb-2">Animation Library</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Stunning animations and micro-interactions coming soon...
+          <TabsContent value="animations" className="space-y-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                Animation Library
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Smooth animations and micro-interactions to enhance user experience
               </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { name: 'Fade In', type: 'Entrance', demo: 'opacity-0 animate-pulse' },
+                { name: 'Slide Up', type: 'Entrance', demo: 'transform translate-y-2' },
+                { name: 'Bounce', type: 'Attention', demo: 'animate-bounce' },
+                { name: 'Spin', type: 'Loading', demo: 'animate-spin' },
+                { name: 'Scale', type: 'Hover', demo: 'hover:scale-110' },
+                { name: 'Wiggle', type: 'Interactive', demo: 'hover:animate-wiggle' },
+                { name: 'Gradient', type: 'Background', demo: 'bg-gradient-to-r from-pink-500 to-violet-500' },
+                { name: 'Typewriter', type: 'Text', demo: 'animate-pulse' }
+              ].map((anim, idx) => (
+                <Card key={idx} className="p-6 hover:shadow-lg transition-all duration-300">
+                  <div className={`w-12 h-12 bg-blue-500 rounded-lg mb-4 ${anim.demo}`}></div>
+                  <h3 className="font-semibold mb-1">{anim.name}</h3>
+                  <Badge variant="outline" className="text-xs mb-3">{anim.type}</Badge>
+                  <Button size="sm" className="w-full" variant="outline">
+                    <Copy className="w-3 h-3 mr-1" />
+                    Copy Code
+                  </Button>
+                </Card>
+              ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="themes" className="text-center py-20">
-            <div className="max-w-md mx-auto">
-              <Palette className="w-16 h-16 mx-auto mb-4 text-slate-400" />
-              <h3 className="text-xl font-semibold mb-2">Theme System</h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                Customizable themes and design tokens coming soon...
+          <TabsContent value="themes" className="space-y-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                Theme System
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Customizable themes and design tokens for consistent branding
               </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { name: 'Default', colors: ['bg-blue-500', 'bg-slate-200'], desc: 'Clean and modern' },
+                { name: 'Dark Mode', colors: ['bg-slate-900', 'bg-slate-700'], desc: 'Easy on the eyes' },
+                { name: 'Ocean', colors: ['bg-cyan-500', 'bg-teal-400'], desc: 'Fresh and calming' },
+                { name: 'Sunset', colors: ['bg-orange-500', 'bg-pink-500'], desc: 'Warm and vibrant' },
+                { name: 'Forest', colors: ['bg-green-600', 'bg-emerald-400'], desc: 'Natural and organic' },
+                { name: 'Purple', colors: ['bg-purple-600', 'bg-violet-400'], desc: 'Creative and bold' },
+                { name: 'Monochrome', colors: ['bg-gray-900', 'bg-gray-400'], desc: 'Minimal and elegant' },
+                { name: 'Neon', colors: ['bg-pink-500', 'bg-cyan-400'], desc: 'Bright and energetic' }
+              ].map((theme, idx) => (
+                <Card key={idx} className="p-6 hover:shadow-lg transition-all duration-300">
+                  <div className="flex gap-2 mb-4">
+                    {theme.colors.map((color, colorIdx) => (
+                      <div key={colorIdx} className={`w-8 h-8 rounded-full ${color}`}></div>
+                    ))}
+                  </div>
+                  <h3 className="font-semibold mb-2">{theme.name}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{theme.desc}</p>
+                  <Button size="sm" className="w-full" variant="outline">
+                    <Palette className="w-3 h-3 mr-1" />
+                    Apply Theme
+                  </Button>
+                </Card>
+              ))}
             </div>
           </TabsContent>
         </Tabs>
@@ -441,6 +642,15 @@ export default function UILibraryShowcase() {
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
                         : ''
                     }`}
+                    onClick={() => {
+                      if (plan.buttonText === 'Get Started') {
+                        scrollToComponents()
+                      } else if (plan.buttonText === 'Start Free Trial') {
+                        window.open('/signup', '_blank')
+                      } else if (plan.buttonText === 'Contact Sales') {
+                        window.open('/contact', '_blank')
+                      }
+                    }}
                   >
                     {plan.buttonText}
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -464,17 +674,106 @@ export default function UILibraryShowcase() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4"
+              onClick={() => window.open('/signup', '_blank')}
+            >
               <Rocket className="w-5 h-5 mr-2" />
               Start Building Today
             </Button>
-            <Button variant="outline" size="lg" className="px-8 py-4">
-              <Package className="w-5 h-5 mr-2" />
-              Browse Documentation
-            </Button>
+            <Link href="/docs">
+              <Button variant="outline" size="lg" className="px-8 py-4">
+                <Package className="w-5 h-5 mr-2" />
+                Browse Documentation
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
+
+      {/* Simple Modal Implementation */}
+      {isModalOpen && selectedComponent && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-lg max-w-4xl max-h-[90vh] overflow-y-auto w-full relative">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute right-4 top-4 z-10 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              ✕
+            </button>
+            
+            <div className="p-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">{selectedComponent.name}</h2>
+                <p className="text-slate-600 dark:text-slate-400">{selectedComponent.description}</p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="p-6 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                  <h4 className="text-sm font-medium mb-3">Live Preview:</h4>
+                  <div className="flex justify-center">
+                    {selectedComponent.name === 'Interactive Dashboard Cards' && (
+                      <Card className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 w-64">
+                        <CardHeader>
+                          <CardTitle>Analytics Overview</CardTitle>
+                          <CardDescription>Your performance this month</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold">+12,234</div>
+                          <p className="text-xs text-muted-foreground">+19% from last month</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {selectedComponent.name === 'Animated Buttons Suite' && (
+                      <Button className="relative overflow-hidden group">
+                        Click me
+                        <span className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                      </Button>
+                    )}
+                    {selectedComponent.name === 'Progress Indicators' && (
+                      <div className="w-64 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Loading...</span>
+                          <span>66%</span>
+                        </div>
+                        <Progress value={66} className="w-full" />
+                      </div>
+                    )}
+                    {selectedComponent.name === 'Navigation Components' && (
+                      <nav className="text-sm">
+                        <span>Home</span> / <span>Components</span> / <span className="text-slate-500">Navigation</span>
+                      </nav>
+                    )}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-3">Code:</h4>
+                  <div className="relative">
+                    <pre className="bg-slate-900 text-slate-50 p-4 rounded-lg text-xs overflow-x-auto">
+                      <code>{selectedComponent.code}</code>
+                    </pre>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="absolute top-2 right-2"
+                      onClick={() => copyToClipboard(selectedComponent.code, selectedComponent.name)}
+                    >
+                      {copied === selectedComponent.name ? (
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                      ) : (
+                        <Copy className="w-3 h-3 mr-1" />
+                      )}
+                      {copied === selectedComponent.name ? 'Copied!' : 'Copy'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

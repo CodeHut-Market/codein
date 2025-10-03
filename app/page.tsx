@@ -20,8 +20,8 @@ export default function LandingPage(){
         </Link>
       </div>
       <div className="mt-4 text-sm text-foreground/60">
-        <Link href="/pricing" className="hover:text-foreground transition-colors">
-          View pricing plans
+        <Link href="/ui-library" className="hover:text-foreground transition-colors">
+          UI Library
         </Link>{" "}
         •{" "}
         <Link href="/login" className="hover:text-foreground transition-colors">
