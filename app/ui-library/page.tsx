@@ -363,33 +363,99 @@ export function NavigationBreadcrumb() {
       </div>
 
       {/* Component Categories */}
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 dark:from-slate-100 dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-4">
+            Explore Our Library
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            Discover powerful components, layouts, animations, and themes crafted for modern web development
+          </p>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-12 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-2xl p-2">
-            {componentCategories.map((category) => (
-              <TabsTrigger
-                key={category.id}
-                value={category.id}
-                className="flex flex-col items-center gap-2 py-4 px-6 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-lg transition-all duration-200"
-              >
-                <category.icon className="w-6 h-6" />
-                <span className="font-medium">{category.name}</span>
-                <Badge variant="secondary" className="text-xs">
-                  {category.count}
-                </Badge>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="relative mb-16">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 p-2 bg-gradient-to-r from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900/90 dark:via-blue-900/30 dark:to-purple-900/30 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl shadow-2xl">
+              {componentCategories.map((category, index) => (
+                <TabsTrigger
+                  key={category.id}
+                  value={category.id}
+                  className="group relative flex flex-col items-center gap-3 py-6 px-4 md:px-8 rounded-2xl transition-all duration-500 hover:scale-105 data-[state=active]:bg-gradient-to-br data-[state=active]:from-white data-[state=active]:to-blue-50/50 dark:data-[state=active]:from-slate-800 dark:data-[state=active]:to-blue-900/30 data-[state=active]:shadow-2xl data-[state=active]:border data-[state=active]:border-blue-200/50 dark:data-[state=active]:border-blue-700/30"
+                >
+                  {/* Background Glow Effect */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500" />
+                  
+                  {/* Icon with Enhanced Styling */}
+                  <div className="relative z-10 p-3 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 group-hover:from-blue-100 group-hover:to-purple-100 dark:group-hover:from-blue-900/50 dark:group-hover:to-purple-900/50 transition-all duration-300 shadow-lg group-hover:shadow-xl group-hover:scale-110">
+                    <category.icon className="w-6 h-6 md:w-7 md:h-7 text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300" />
+                  </div>
+                  
+                  {/* Category Name */}
+                  <span className="relative z-10 font-semibold text-sm md:text-base text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors duration-300">
+                    {category.name}
+                  </span>
+                  
+                  {/* Enhanced Count Badge */}
+                  <div className="relative z-10 flex items-center justify-center">
+                    <Badge 
+                      variant="secondary" 
+                      className="text-xs font-bold px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 text-blue-700 dark:text-blue-300 border-0 group-hover:from-blue-200 group-hover:to-purple-200 dark:group-hover:from-blue-800/50 dark:group-hover:to-purple-800/50 transition-all duration-300 shadow-md group-hover:shadow-lg"
+                    >
+                      {category.count}
+                    </Badge>
+                  </div>
+
+                  {/* Active State Indicator */}
+                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300 data-[state=active]:w-12" />
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {/* Decorative Elements */}
+            <div className="absolute -top-2 -left-2 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse" />
+            <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-lg animate-pulse" style={{ animationDelay: '1s' }} />
+          </div>
 
           {/* Featured Components Grid */}
-          <TabsContent value="components" className="space-y-8" id="components-section">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                Featured Components
-              </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-300">
-                Hand-picked components that showcase the best of our library
-              </p>
+          <TabsContent value="components" className="space-y-12" id="components-section">
+            <div className="text-center mb-16 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-50 dark:via-blue-900/20 to-transparent h-px top-1/2 transform -translate-y-1/2" />
+              
+              <div className="relative bg-gradient-to-br from-slate-50 via-blue-50/50 to-purple-50/30 dark:from-slate-900 dark:via-blue-900/30 dark:to-purple-900/20 rounded-3xl p-8 mx-auto max-w-3xl border border-white/50 dark:border-slate-700/30 shadow-2xl backdrop-blur-sm">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2" />
+                  <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 text-sm font-medium px-4 py-1">
+                    ✨ Handpicked Selection
+                  </Badge>
+                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse ml-2" />
+                </div>
+                
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-blue-600 to-purple-600 dark:from-slate-100 dark:via-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-6">
+                  Featured Components
+                </h2>
+                
+                <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
+                  Hand-picked components that showcase the best of our library, each crafted with attention to detail and modern design principles
+                </p>
+
+                {/* Stats Row */}
+                <div className="flex justify-center items-center gap-8 mt-8">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">45+</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">Components</div>
+                  </div>
+                  <div className="w-px h-8 bg-slate-300 dark:bg-slate-600" />
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">12+</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">Layouts</div>
+                  </div>
+                  <div className="w-px h-8 bg-slate-300 dark:bg-slate-600" />
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">100%</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">TypeScript</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -475,105 +541,194 @@ export function NavigationBreadcrumb() {
           </TabsContent>
 
           {/* Other tab contents */}
-          <TabsContent value="layouts" className="space-y-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                Layout Components
-              </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-300">
-                Flexible layout components for modern web applications
-              </p>
+          <TabsContent value="layouts" className="space-y-12">
+            <div className="text-center mb-16 relative">
+              <div className="relative bg-gradient-to-br from-slate-50 via-green-50/50 to-teal-50/30 dark:from-slate-900 dark:via-green-900/30 dark:to-teal-900/20 rounded-3xl p-8 mx-auto max-w-3xl border border-white/50 dark:border-slate-700/30 shadow-2xl backdrop-blur-sm">
+                <div className="flex items-center justify-center mb-4">
+                  <Badge className="bg-gradient-to-r from-green-600 to-teal-600 text-white border-0 text-sm font-medium px-4 py-1">
+                    📱 Responsive Design
+                  </Badge>
+                </div>
+                
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-green-600 to-teal-600 dark:from-slate-100 dark:via-green-400 dark:to-teal-400 bg-clip-text text-transparent mb-6">
+                  Layout Components
+                </h2>
+                
+                <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Flexible and responsive layout components designed for modern web applications and perfect user experiences
+                </p>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                { name: 'Grid System', desc: 'Responsive grid layouts', icon: '⚡' },
-                { name: 'Flex Containers', desc: 'Flexible box layouts', icon: '📱' },
-                { name: 'Card Layouts', desc: 'Modern card designs', icon: '🎨' },
-                { name: 'Dashboard Layouts', desc: 'Admin dashboard templates', icon: '📊' },
-                { name: 'Landing Pages', desc: 'Marketing page layouts', icon: '🚀' },
-                { name: 'Form Layouts', desc: 'Structured form designs', icon: '📝' }
+                { name: 'Grid System', desc: 'Responsive grid layouts with auto-fit and flexible columns', icon: '⚡', gradient: 'from-green-500 to-teal-500', stats: '12 variants' },
+                { name: 'Flex Containers', desc: 'Flexible box layouts for perfect alignment', icon: '📱', gradient: 'from-blue-500 to-cyan-500', stats: '8 patterns' },
+                { name: 'Card Layouts', desc: 'Modern card designs with hover effects', icon: '🎨', gradient: 'from-purple-500 to-pink-500', stats: '15 styles' },
+                { name: 'Dashboard Layouts', desc: 'Admin dashboard templates and sidebars', icon: '📊', gradient: 'from-orange-500 to-red-500', stats: '6 templates' },
+                { name: 'Landing Pages', desc: 'Marketing page layouts and sections', icon: '🚀', gradient: 'from-indigo-500 to-blue-500', stats: '10 sections' },
+                { name: 'Form Layouts', desc: 'Structured form designs and validation', icon: '📝', gradient: 'from-emerald-500 to-green-500', stats: '7 forms' }
               ].map((layout, idx) => (
-                <Card key={idx} className="p-6 hover:shadow-lg transition-all duration-300">
-                  <div className="text-3xl mb-3">{layout.icon}</div>
-                  <h3 className="font-semibold mb-2">{layout.name}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{layout.desc}</p>
-                  <Button size="sm" className="mt-4 w-full" variant="outline">
-                    <Eye className="w-3 h-3 mr-1" />
-                    Preview
-                  </Button>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="animations" className="space-y-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                Animation Library
-              </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-300">
-                Smooth animations and micro-interactions to enhance user experience
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { name: 'Fade In', type: 'Entrance', demo: 'opacity-0 animate-pulse' },
-                { name: 'Slide Up', type: 'Entrance', demo: 'transform translate-y-2' },
-                { name: 'Bounce', type: 'Attention', demo: 'animate-bounce' },
-                { name: 'Spin', type: 'Loading', demo: 'animate-spin' },
-                { name: 'Scale', type: 'Hover', demo: 'hover:scale-110' },
-                { name: 'Wiggle', type: 'Interactive', demo: 'hover:animate-wiggle' },
-                { name: 'Gradient', type: 'Background', demo: 'bg-gradient-to-r from-pink-500 to-violet-500' },
-                { name: 'Typewriter', type: 'Text', demo: 'animate-pulse' }
-              ].map((anim, idx) => (
-                <Card key={idx} className="p-6 hover:shadow-lg transition-all duration-300">
-                  <div className={`w-12 h-12 bg-blue-500 rounded-lg mb-4 ${anim.demo}`}></div>
-                  <h3 className="font-semibold mb-1">{anim.name}</h3>
-                  <Badge variant="outline" className="text-xs mb-3">{anim.type}</Badge>
-                  <Button size="sm" className="w-full" variant="outline">
-                    <Copy className="w-3 h-3 mr-1" />
-                    Copy Code
-                  </Button>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="themes" className="space-y-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                Theme System
-              </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-300">
-                Customizable themes and design tokens for consistent branding
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { name: 'Default', colors: ['bg-blue-500', 'bg-slate-200'], desc: 'Clean and modern' },
-                { name: 'Dark Mode', colors: ['bg-slate-900', 'bg-slate-700'], desc: 'Easy on the eyes' },
-                { name: 'Ocean', colors: ['bg-cyan-500', 'bg-teal-400'], desc: 'Fresh and calming' },
-                { name: 'Sunset', colors: ['bg-orange-500', 'bg-pink-500'], desc: 'Warm and vibrant' },
-                { name: 'Forest', colors: ['bg-green-600', 'bg-emerald-400'], desc: 'Natural and organic' },
-                { name: 'Purple', colors: ['bg-purple-600', 'bg-violet-400'], desc: 'Creative and bold' },
-                { name: 'Monochrome', colors: ['bg-gray-900', 'bg-gray-400'], desc: 'Minimal and elegant' },
-                { name: 'Neon', colors: ['bg-pink-500', 'bg-cyan-400'], desc: 'Bright and energetic' }
-              ].map((theme, idx) => (
-                <Card key={idx} className="p-6 hover:shadow-lg transition-all duration-300">
-                  <div className="flex gap-2 mb-4">
-                    {theme.colors.map((color, colorIdx) => (
-                      <div key={colorIdx} className={`w-8 h-8 rounded-full ${color}`}></div>
-                    ))}
+                <Card key={idx} className={`group relative overflow-hidden p-1 bg-gradient-to-br ${layout.gradient} rounded-2xl hover:shadow-2xl transition-all duration-500 hover:scale-105`}>
+                  <div className="bg-white dark:bg-slate-900 rounded-xl p-6 h-full relative">
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-5 dark:opacity-10">
+                      <div className="absolute inset-0 bg-gradient-to-br from-current to-transparent" />
+                    </div>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-4xl">{layout.icon}</div>
+                        <Badge variant="outline" className="text-xs bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
+                          {layout.stats}
+                        </Badge>
+                      </div>
+                      
+                      <h3 className="font-bold text-lg mb-2 text-slate-900 dark:text-white">{layout.name}</h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">{layout.desc}</p>
+                      
+                      <Button size="sm" className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white transition-all duration-300 group-hover:scale-105">
+                        <Eye className="w-3 h-3 mr-2" />
+                        Preview Layout
+                      </Button>
+                    </div>
                   </div>
-                  <h3 className="font-semibold mb-2">{theme.name}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{theme.desc}</p>
-                  <Button size="sm" className="w-full" variant="outline">
-                    <Palette className="w-3 h-3 mr-1" />
-                    Apply Theme
-                  </Button>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="animations" className="space-y-12">
+            <div className="text-center mb-16 relative">
+              <div className="relative bg-gradient-to-br from-slate-50 via-orange-50/50 to-red-50/30 dark:from-slate-900 dark:via-orange-900/30 dark:to-red-900/20 rounded-3xl p-8 mx-auto max-w-3xl border border-white/50 dark:border-slate-700/30 shadow-2xl backdrop-blur-sm">
+                <div className="flex items-center justify-center mb-4">
+                  <Badge className="bg-gradient-to-r from-orange-600 to-red-600 text-white border-0 text-sm font-medium px-4 py-1">
+                    ⚡ Micro-interactions
+                  </Badge>
+                </div>
+                
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-orange-600 to-red-600 dark:from-slate-100 dark:via-orange-400 dark:to-red-400 bg-clip-text text-transparent mb-6">
+                  Animation Library
+                </h2>
+                
+                <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Smooth animations and delightful micro-interactions to enhance user experience and bring your interfaces to life
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { name: 'Fade In', type: 'Entrance', demo: 'opacity-50 animate-pulse', gradient: 'from-blue-400 to-blue-600', duration: '300ms' },
+                { name: 'Slide Up', type: 'Entrance', demo: 'transform translate-y-1 hover:-translate-y-1', gradient: 'from-green-400 to-green-600', duration: '400ms' },
+                { name: 'Bounce', type: 'Attention', demo: 'animate-bounce', gradient: 'from-orange-400 to-orange-600', duration: '600ms' },
+                { name: 'Spin', type: 'Loading', demo: 'animate-spin', gradient: 'from-purple-400 to-purple-600', duration: '1000ms' },
+                { name: 'Scale', type: 'Hover', demo: 'hover:scale-110 transition-transform', gradient: 'from-pink-400 to-pink-600', duration: '200ms' },
+                { name: 'Wiggle', type: 'Interactive', demo: 'hover:animate-pulse', gradient: 'from-indigo-400 to-indigo-600', duration: '250ms' },
+                { name: 'Gradient', type: 'Background', demo: 'bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500', gradient: 'from-gradient-start to-gradient-end', duration: '500ms' },
+                { name: 'Typewriter', type: 'Text', demo: 'animate-pulse', gradient: 'from-teal-400 to-teal-600', duration: '800ms' }
+              ].map((anim, idx) => (
+                <Card key={idx} className="group p-6 hover:shadow-2xl transition-all duration-500 hover:scale-105 bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border-0 shadow-lg">
+                  {/* Demo Animation Area */}
+                  <div className="relative h-20 mb-4 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-xl overflow-hidden flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
+                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${anim.gradient} shadow-lg ${anim.demo}`} />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white">{anim.name}</h3>
+                      <Badge variant="outline" className="text-xs bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 border-0">
+                        {anim.duration}
+                      </Badge>
+                    </div>
+                    
+                    <Badge className={`text-xs w-fit bg-gradient-to-r ${anim.gradient} text-white border-0`}>
+                      {anim.type}
+                    </Badge>
+                    
+                    <Button size="sm" className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white text-xs transition-all duration-300 group-hover:scale-105">
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copy Animation
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="themes" className="space-y-12">
+            <div className="text-center mb-16 relative">
+              <div className="relative bg-gradient-to-br from-slate-50 via-purple-50/50 to-pink-50/30 dark:from-slate-900 dark:via-purple-900/30 dark:to-pink-900/20 rounded-3xl p-8 mx-auto max-w-3xl border border-white/50 dark:border-slate-700/30 shadow-2xl backdrop-blur-sm">
+                <div className="flex items-center justify-center mb-4">
+                  <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 text-sm font-medium px-4 py-1">
+                    🎨 Design Tokens
+                  </Badge>
+                </div>
+                
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-purple-600 to-pink-600 dark:from-slate-100 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-6">
+                  Theme System
+                </h2>
+                
+                <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Customizable themes and design tokens for consistent branding across your entire application ecosystem
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { name: 'Default', colors: ['#3b82f6', '#e2e8f0', '#64748b'], desc: 'Clean and modern design', popularity: '89%', gradient: 'from-blue-500 to-slate-300' },
+                { name: 'Dark Mode', colors: ['#0f172a', '#475569', '#94a3b8'], desc: 'Easy on the eyes', popularity: '95%', gradient: 'from-slate-900 to-slate-600' },
+                { name: 'Ocean', colors: ['#06b6d4', '#14b8a6', '#22d3ee'], desc: 'Fresh and calming vibes', popularity: '78%', gradient: 'from-cyan-500 to-teal-400' },
+                { name: 'Sunset', colors: ['#f97316', '#ec4899', '#f59e0b'], desc: 'Warm and vibrant energy', popularity: '72%', gradient: 'from-orange-500 to-pink-500' },
+                { name: 'Forest', colors: ['#059669', '#10b981', '#34d399'], desc: 'Natural and organic feel', popularity: '65%', gradient: 'from-green-600 to-emerald-400' },
+                { name: 'Purple', colors: ['#7c3aed', '#a855f7', '#c084fc'], desc: 'Creative and bold aesthetic', popularity: '81%', gradient: 'from-purple-600 to-violet-400' },
+                { name: 'Monochrome', colors: ['#111827', '#6b7280', '#d1d5db'], desc: 'Minimal and elegant', popularity: '58%', gradient: 'from-gray-900 to-gray-400' },
+                { name: 'Neon', colors: ['#ec4899', '#06b6d4', '#8b5cf6'], desc: 'Bright and energetic', popularity: '43%', gradient: 'from-pink-500 via-cyan-400 to-purple-500' }
+              ].map((theme, idx) => (
+                <Card key={idx} className="group relative overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  {/* Background Gradient Preview */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
+                  
+                  <div className="relative p-6">
+                    {/* Color Palette */}
+                    <div className="flex justify-center mb-4">
+                      <div className="flex -space-x-2">
+                        {theme.colors.map((color, colorIdx) => (
+                          <div 
+                            key={colorIdx} 
+                            className="w-10 h-10 rounded-full ring-2 ring-white dark:ring-slate-800 shadow-lg transition-transform group-hover:scale-110" 
+                            style={{ backgroundColor: color, animationDelay: `${colorIdx * 100}ms` }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Theme Info */}
+                    <div className="text-center mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{theme.name}</h3>
+                        <Badge variant="outline" className="text-xs bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/30 dark:to-blue-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700">
+                          {theme.popularity} popular
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{theme.desc}</p>
+                    </div>
+
+                    {/* Preview Components */}
+                    <div className={`mb-4 p-3 rounded-lg bg-gradient-to-r ${theme.gradient} opacity-20`}>
+                      <div className="flex justify-between items-center">
+                        <div className="w-12 h-2 bg-white/60 rounded" />
+                        <div className="w-6 h-6 bg-white/40 rounded-full" />
+                      </div>
+                    </div>
+                    
+                    <Button size="sm" className={`w-full bg-gradient-to-r ${theme.gradient} hover:opacity-90 text-white border-0 transition-all duration-300 group-hover:scale-105 shadow-md group-hover:shadow-lg`}>
+                      <Palette className="w-3 h-3 mr-2" />
+                      Apply Theme
+                    </Button>
+                  </div>
                 </Card>
               ))}
             </div>
