@@ -116,7 +116,7 @@ export function MobileNav({ isOpen, onToggle, className }: MobileNavProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             onClick={onToggle}
           />
         )}
@@ -136,7 +136,7 @@ export function MobileNav({ isOpen, onToggle, className }: MobileNavProps) {
               mass: 0.8
             }}
             className={cn(
-              "fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-background/95 backdrop-blur-lg border-r shadow-xl z-50 lg:hidden",
+              "fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-background border-r shadow-xl z-50 lg:hidden",
               "safe-area-left safe-area-top",
               className
             )}

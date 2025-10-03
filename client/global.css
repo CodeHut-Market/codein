@@ -252,20 +252,20 @@
   .margin-center-sm { @apply mx-auto max-w-4xl; }
   .margin-center-lg { @apply mx-auto max-w-none; }
 
-  /* Fix for transparent dropdowns and popovers */
+  /* Fix for transparent dropdowns and popovers - Make fully opaque */
   [data-radix-dropdown-menu-content] {
-    background-color: hsl(var(--popover) / 0.95) !important;
-    backdrop-filter: blur(12px) !important;
+    background-color: hsl(var(--popover)) !important;
+    backdrop-filter: none !important;
   }
 
   [data-radix-popover-content] {
-    background-color: hsl(var(--popover) / 0.95) !important;
-    backdrop-filter: blur(12px) !important;
+    background-color: hsl(var(--popover)) !important;
+    backdrop-filter: none !important;
   }
 
   [data-radix-tooltip-content] {
-    background-color: hsl(var(--popover) / 0.95) !important;
-    backdrop-filter: blur(8px) !important;
+    background-color: hsl(var(--popover)) !important;
+    backdrop-filter: none !important;
   }
 
   /* Ensure proper layering for dropdowns */

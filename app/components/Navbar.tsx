@@ -32,7 +32,7 @@ export function Navbar() {
   );
 
   return (
-    <header className="border-b border-primary/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 shadow-sm">
+    <header className="border-b border-primary/10 bg-background sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
           {/* Brand text (logo removed per request) */}
@@ -86,7 +86,7 @@ export function Navbar() {
         </div>
       </div>
       {open && (
-        <div className="md:hidden border-t bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
+        <div className="md:hidden border-t bg-background">
           <nav className="px-4 py-4 flex flex-col gap-4">
             {navItems.map((item) => {
               const active = pathname === item.href;
