@@ -77,48 +77,82 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Enable Row Level Security for real-time tables
-ALTER TABLE snippets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE snippet_likes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE snippet_comments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE follows ENABLE ROW LEVEL SECURITY;
+-- Enable Row Level Security for real-time tables (only if tables exist)
+DO $$ 
+BEGIN
+  -- Enable RLS on snippets
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'snippets') THEN
+    ALTER TABLE snippets ENABLE ROW LEVEL SECURITY;
+  END IF;
+  
+  -- Enable RLS on snippet_likes
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'snippet_likes') THEN
+    ALTER TABLE snippet_likes ENABLE ROW LEVEL SECURITY;
+  END IF;
+  
+  -- Enable RLS on snippet_comments
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'snippet_comments') THEN
+    ALTER TABLE snippet_comments ENABLE ROW LEVEL SECURITY;
+  END IF;
+  
+  -- Enable RLS on follows
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'follows') THEN
+    ALTER TABLE follows ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
 
--- Policies for real-time subscriptions
--- Allow users to read all public snippets and their own snippets
-CREATE POLICY "Users can view snippets for real-time" ON snippets
-  FOR SELECT USING (
-    is_public = true OR 
-    auth.uid() = user_id OR
-    auth.uid() IN (SELECT follower_id FROM follows WHERE followed_id = user_id)
-  );
+-- Drop existing policies if they exist (to avoid conflicts)
+DROP POLICY IF EXISTS "Users can view snippets for real-time" ON snippets;
+DROP POLICY IF EXISTS "Users can view snippet likes for real-time" ON snippet_likes;
+DROP POLICY IF EXISTS "Users can view snippet comments for real-time" ON snippet_comments;
+DROP POLICY IF EXISTS "Users can view follows for real-time" ON follows;
+DROP POLICY IF EXISTS "Users can manage their own likes" ON snippet_likes;
+DROP POLICY IF EXISTS "Users can manage their own follows" ON follows;
+DROP POLICY IF EXISTS "Users can insert their own comments" ON snippet_comments;
+DROP POLICY IF EXISTS "Users can delete their own comments" ON snippet_comments;
 
--- Allow users to read snippet likes for real-time updates
-CREATE POLICY "Users can view snippet likes for real-time" ON snippet_likes
-  FOR SELECT USING (true);
-
--- Allow users to read snippet comments for real-time updates  
-CREATE POLICY "Users can view snippet comments for real-time" ON snippet_comments
-  FOR SELECT USING (true);
-
--- Allow users to read follows for real-time updates
-CREATE POLICY "Users can view follows for real-time" ON follows
-  FOR SELECT USING (true);
-
--- Allow users to insert/delete their own likes
-CREATE POLICY "Users can manage their own likes" ON snippet_likes
-  FOR ALL USING (auth.uid() = user_id);
-
--- Allow users to insert/delete their own follows
-CREATE POLICY "Users can manage their own follows" ON follows
-  FOR ALL USING (auth.uid() = follower_id);
-
--- Allow users to insert their own comments
-CREATE POLICY "Users can insert their own comments" ON snippet_comments
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- Allow users to delete their own comments
-CREATE POLICY "Users can delete their own comments" ON snippet_comments
-  FOR DELETE USING (auth.uid() = user_id);
+-- Policies for real-time subscriptions (only create if tables exist)
+DO $$ 
+BEGIN
+  -- Policy for viewing snippets
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'snippets') THEN
+    EXECUTE 'CREATE POLICY "Users can view snippets for real-time" ON snippets
+      FOR SELECT USING (
+        visibility = ''public'' OR 
+        author_id::text = auth.uid()::text
+      )';
+  END IF;
+  
+  -- Policy for viewing snippet likes
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'snippet_likes') THEN
+    EXECUTE 'CREATE POLICY "Users can view snippet likes for real-time" ON snippet_likes
+      FOR SELECT USING (true)';
+    
+    EXECUTE 'CREATE POLICY "Users can manage their own likes" ON snippet_likes
+      FOR ALL USING (user_id::text = auth.uid()::text)';
+  END IF;
+  
+  -- Policy for viewing snippet comments
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'snippet_comments') THEN
+    EXECUTE 'CREATE POLICY "Users can view snippet comments for real-time" ON snippet_comments
+      FOR SELECT USING (true)';
+    
+    EXECUTE 'CREATE POLICY "Users can insert their own comments" ON snippet_comments
+      FOR INSERT WITH CHECK (user_id::text = auth.uid()::text)';
+    
+    EXECUTE 'CREATE POLICY "Users can delete their own comments" ON snippet_comments
+      FOR DELETE USING (user_id::text = auth.uid()::text)';
+  END IF;
+  
+  -- Policy for viewing follows
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'follows') THEN
+    EXECUTE 'CREATE POLICY "Users can view follows for real-time" ON follows
+      FOR SELECT USING (true)';
+    
+    EXECUTE 'CREATE POLICY "Users can manage their own follows" ON follows
+      FOR ALL USING (follower_id::text = auth.uid()::text)';
+  END IF;
+END $$;
 
 -- Function to clean up old optimistic updates (can be called via cron)
 CREATE OR REPLACE FUNCTION cleanup_optimistic_updates()
