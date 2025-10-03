@@ -76,47 +76,55 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-page-gradient">
       {/* Header - Fixed Mobile Layout */}
-      <header className="bg-background/80 backdrop-blur-sm border-b border-border/50 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
+      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <a href="https://w2sp61d0-8081.inc1.devtunnels.ms/" className="inline-flex items-center">
+              <a href="/" className="inline-flex items-center">
                 <Logo size="md" />
               </a>
             </div>
-            {/* Mobile-optimized navigation */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            {/* Desktop navigation */}
+            <div className="hidden sm:flex items-center gap-3 md:gap-4">
               <ThemeToggle />
-              <div className="hidden sm:block">
-                <NotificationCenter />
-              </div>
+              <NotificationCenter />
               <Button 
                 variant="ghost" 
                 asChild 
-                className="hidden sm:inline-flex hover-gradient-subtle px-3 py-2 text-sm"
+                className="hover:bg-gradient-to-r hover:from-violet-500/10 hover:to-indigo-500/10 px-3 py-2 text-sm font-medium transition-all duration-200"
               >
                 <Link to="/login">Sign In</Link>
               </Button>
               <Button 
                 asChild 
-                className="bg-action-gradient hover:bg-action-gradient text-white shadow-lg px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base"
+                className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white shadow-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-xl"
               >
                 <Link to="/signup">Sign Up</Link>
               </Button>
             </div>
+
+            {/* Mobile navigation */}
+            <div className="sm:hidden flex items-center gap-2">
+              <ThemeToggle />
+              <NotificationCenter />
+            </div>
           </div>
-          {/* Mobile-only bottom row */}
-          <div className="sm:hidden mt-2 flex items-center justify-center">
+          
+          {/* Mobile-only auth buttons */}
+          <div className="sm:hidden mt-3 flex items-center gap-2">
             <Button 
               variant="ghost" 
               asChild 
-              className="flex-1 max-w-32 hover-gradient-subtle text-sm"
+              className="flex-1 hover:bg-gradient-to-r hover:from-violet-500/10 hover:to-indigo-500/10 text-sm font-medium transition-all duration-200"
             >
               <Link to="/login">Sign In</Link>
             </Button>
-            <div className="mx-2">
-              <NotificationCenter />
-            </div>
+            <Button 
+              asChild 
+              className="flex-1 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white shadow-lg text-sm font-medium transition-all duration-200"
+            >
+              <Link to="/signup">Sign Up</Link>
+            </Button>
           </div>
         </div>
       </header>

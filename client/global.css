@@ -737,3 +737,83 @@
 .ripple-button-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+/* Mobile-First Utility Classes */
+@layer utilities {
+  /* Touch-friendly targets */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improved mobile spacing */
+  .mobile-padding {
+    @apply px-3 sm:px-6;
+  }
+
+  .mobile-text {
+    @apply text-sm sm:text-base;
+  }
+
+  .mobile-heading {
+    @apply text-lg sm:text-xl lg:text-2xl;
+  }
+
+  /* Better mobile grid spacing */
+  .mobile-grid {
+    @apply grid gap-3 sm:gap-4 lg:gap-6;
+  }
+
+  /* Mobile-optimized buttons */
+  .mobile-button {
+    @apply px-4 py-3 text-sm font-medium min-h-11 sm:min-h-10 sm:px-6 sm:py-2 sm:text-base;
+  }
+
+  /* Responsive card padding */
+  .mobile-card {
+    @apply p-4 sm:p-6;
+  }
+
+  /* Mobile-safe text sizes */
+  .mobile-body {
+    @apply text-sm sm:text-base leading-relaxed;
+  }
+
+  .mobile-caption {
+    @apply text-xs sm:text-sm;
+  }
+
+  /* Responsive max-widths for reading comfort */
+  .mobile-content {
+    @apply max-w-full sm:max-w-2xl lg:max-w-4xl xl:max-w-6xl;
+  }
+
+  /* Touch-friendly form elements */
+  .mobile-input {
+    @apply min-h-11 px-3 py-3 text-sm sm:min-h-10 sm:px-4 sm:py-2 sm:text-base;
+  }
+
+  /* Improved mobile margins */
+  .mobile-section {
+    @apply mb-6 sm:mb-8 lg:mb-12;
+  }
+
+  /* Better mobile flex layouts */
+  .mobile-flex {
+    @apply flex flex-col sm:flex-row gap-3 sm:gap-4;
+  }
+
+  /* Mobile navigation safe areas */
+  .mobile-nav {
+    @apply px-3 py-2 sm:px-4 sm:py-3;
+  }
+
+  /* Responsive icon sizes */
+  .mobile-icon {
+    @apply w-5 h-5 sm:w-4 sm:h-4;
+  }
+
+  .mobile-icon-lg {
+    @apply w-6 h-6 sm:w-5 sm:h-5;
+  }
+}

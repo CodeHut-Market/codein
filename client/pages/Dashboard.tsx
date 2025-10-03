@@ -126,54 +126,80 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-indigo-50 to-cyan-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10 backdrop-blur-sm border-b border-indigo-200/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-violet-200/30 dark:border-gray-700/50 shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <a href="https://w2sp61d0-8081.inc1.devtunnels.ms/" className="flex items-center">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <a href="/" className="flex items-center">
                 <Logo size="md" />
               </a>
-              <nav className="hidden md:flex items-center gap-6">
+              <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
                 <Link
                   to="/explore"
-                  className="text-violet-600 hover:text-violet-800 font-medium transition-colors duration-200"
+                  className="text-violet-600 hover:text-violet-800 font-medium transition-colors duration-200 text-sm"
                 >
                   Explore
                 </Link>
                 <Link
                   to="/upload"
-                  className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200"
+                  className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200 text-sm"
                 >
                   Upload
                 </Link>
                 <Link
                   to="/analytics"
-                  className="text-cyan-600 hover:text-cyan-800 font-medium transition-colors duration-200"
+                  className="text-cyan-600 hover:text-cyan-800 font-medium transition-colors duration-200 text-sm"
                 >
                   Analytics
                 </Link>
               </nav>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-violet-200/50">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Mobile navigation buttons */}
+              <div className="lg:hidden flex items-center gap-1">
+                <Button 
+                  asChild 
+                  variant="ghost"
+                  size="sm"
+                  className="p-2"
+                >
+                  <Link to="/explore">
+                    <Search className="w-4 h-4" />
+                  </Link>
+                </Button>
+                <Button 
+                  asChild 
+                  variant="ghost"
+                  size="sm"
+                  className="p-2"
+                >
+                  <Link to="/upload">
+                    <Plus className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </div>
+
+              {/* User profile */}
+              <div className="flex items-center gap-2 sm:gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-2 sm:px-3 py-1 sm:py-2 rounded-full border border-violet-200/50 dark:border-gray-600/50">
                 <img
                   src={user.avatar}
                   alt={user.username}
-                  className="w-8 h-8 rounded-full ring-2 ring-violet-200"
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full ring-2 ring-violet-200 dark:ring-gray-600"
                 />
-                <span className="text-sm font-medium text-violet-900">
+                <span className="text-xs sm:text-sm font-medium text-violet-900 dark:text-violet-300 hidden sm:inline">
                   {user.username}
                 </span>
               </div>
+              
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={handleLogout}
-                className="bg-white/60 backdrop-blur-sm border-rose-300 text-rose-700 hover:bg-rose-50 hover:border-rose-400"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-400 dark:hover:border-rose-600 p-2 sm:px-3 sm:py-2"
               >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
@@ -181,104 +207,114 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Welcome Section */}
-        <div className="mb-8 bg-gradient-to-r from-violet-600/20 via-indigo-600/20 to-cyan-600/20 backdrop-blur-sm rounded-2xl p-8 border border-violet-200/30">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
+        <div className="mb-6 sm:mb-8 bg-gradient-to-r from-violet-600/20 via-indigo-600/20 to-cyan-600/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border border-violet-200/30">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
             Welcome back, {user.username}!
           </h1>
-          <p className="mt-3 text-indigo-700 text-lg">
+          <p className="mt-2 sm:mt-3 text-indigo-700 text-sm sm:text-base lg:text-lg">
             Here's what's happening with your code snippets today.
           </p>
         </div>
 
+        {/* Dashboard Statistics Header */}
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Dashboard Statistics
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Overview of your performance
+          </p>
+        </div>
+
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-emerald-100">
-                Total Snippets
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+          <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-emerald-100">
+                Code Snippets
               </CardTitle>
-              <Code className="h-5 w-5 text-emerald-200" />
+              <Code className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-200" />
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-white">{userSnippets.length}</div>
+            <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-white">{userSnippets.length}</div>
               <p className="text-xs text-emerald-100 mt-1">
-                Published code snippets
+                Published
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-violet-500 to-indigo-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-violet-100">
+          <Card className="bg-gradient-to-br from-violet-500 to-indigo-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-violet-100">
                 Total Downloads
               </CardTitle>
-              <Download className="h-5 w-5 text-violet-200" />
+              <Download className="h-4 w-4 sm:h-5 sm:w-5 text-violet-200" />
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-white">{user.totalDownloads}</div>
+            <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-white">{user.totalDownloads}</div>
               <p className="text-xs text-violet-100 mt-1">
-                All-time downloads
+                All-time
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-amber-100">
+          <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-amber-100">
                 Total Earnings
               </CardTitle>
-              <DollarSign className="h-5 w-5 text-amber-200" />
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-amber-200" />
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-white">${totalEarnings}</div>
+            <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-white">${totalEarnings}</div>
               <p className="text-xs text-amber-100 mt-1">
-                Revenue from sales
+                Revenue
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-rose-500 to-pink-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-rose-100">
+          <Card className="bg-gradient-to-br from-rose-500 to-pink-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-rose-100">
                 Average Rating
               </CardTitle>
-              <Star className="h-5 w-5 text-rose-200 fill-current" />
+              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-rose-200 fill-current" />
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-white">{user.rating}</div>
+            <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-white">{user.rating}</div>
               <p className="text-xs text-rose-100 mt-1">User rating</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Dashboard Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white/70 backdrop-blur-sm border border-violet-200/30 rounded-xl p-1">
+        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-4 bg-white/70 backdrop-blur-sm border border-violet-200/30 rounded-xl p-1">
             <TabsTrigger 
               value="overview"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white rounded-lg font-medium"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
             >
-              Overview
+              📊 Overview
             </TabsTrigger>
             <TabsTrigger 
               value="snippets"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white rounded-lg font-medium"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
             >
-              My Snippets
-            </TabsTrigger>
-            <TabsTrigger 
-              value="purchases"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-medium"
-            >
-              Purchases
+              📝 Snippets
             </TabsTrigger>
             <TabsTrigger 
               value="analytics"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:to-pink-500 data-[state=active]:text-white rounded-lg font-medium"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:to-pink-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
             >
-              Analytics
+              📈 Analytics
+            </TabsTrigger>
+            <TabsTrigger 
+              value="purchases"
+              className="hidden lg:block data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
+            >
+              🛒 Purchases
             </TabsTrigger>
           </TabsList>
 

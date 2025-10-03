@@ -1,12 +1,11 @@
-import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  CreateCodeSnippetRequest
+    CreateCodeSnippetRequest
 } from "@shared/api";
-import { ArrowLeft, FileText, Upload as UploadIcon, X } from "lucide-react";
+import { ArrowLeft, BarChart3, FileText, Search, Upload as UploadIcon, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
@@ -176,45 +175,71 @@ export default function Upload() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-emerald-50 to-amber-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-violet-200/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-violet-200/50 dark:border-gray-700/50 shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Link
                 to="/"
-                className="flex items-center gap-2 text-violet-600 hover:text-violet-800 transition-colors duration-200"
+                className="flex items-center gap-2 text-violet-600 hover:text-violet-800 transition-colors duration-200 font-medium"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Back
+                <span className="hidden sm:inline">Home</span>
               </Link>
-              <a href="https://w2sp61d0-8081.inc1.devtunnels.ms/" className="inline-flex items-center">
-                <Logo size="md" />
-              </a>
+              <div className="h-4 w-px bg-violet-300"></div>
+              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-violet-600 to-emerald-600 bg-clip-text text-transparent">
+                Upload Code
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button 
+                asChild 
+                variant="outline"
+                size="sm"
+                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/20"
+              >
+                <Link to="/explore" className="flex items-center gap-1 sm:gap-2">
+                  <Search className="w-4 h-4" />
+                  <span className="hidden sm:inline">Explore</span>
+                </Link>
+              </Button>
+              <Button 
+                asChild 
+                variant="outline"
+                size="sm"
+                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-900/20"
+              >
+                <Link to="/dashboard" className="flex items-center gap-1 sm:gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 via-emerald-600 to-amber-600 bg-clip-text text-transparent mb-4">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-violet-600 via-emerald-600 to-amber-600 bg-clip-text text-transparent mb-3 sm:mb-4">
             Upload Your Code
           </h1>
-          <p className="text-lg text-gray-700">
+          <p className="text-base sm:text-lg text-gray-700 px-4">
             Share your code snippets with the community and 
             <span className="text-emerald-600 font-semibold"> earn money</span>
           </p>
         </div>
 
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-violet-200/50 p-8 shadow-xl">
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-violet-200/50 p-4 sm:p-6 lg:p-8 shadow-xl">
           {error && (
-            <div className="mb-6 p-4 bg-red-50/80 border border-red-200 rounded-xl backdrop-blur-sm">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50/80 border border-red-200 rounded-xl backdrop-blur-sm">
               <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div>
               <Label
                 htmlFor="title"
@@ -258,50 +283,62 @@ export default function Upload() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <Label
-                  htmlFor="language"
-                  className="text-sm font-semibold text-amber-700"
-                >
-                  Language *
+                <Label className="text-sm font-semibold text-amber-700 mb-3 block">
+                  Primary Programming Language *
                 </Label>
-                <Input
-                  id="language"
-                  type="text"
-                  placeholder="JavaScript"
-                  className="mt-1 border-amber-200 focus:border-amber-500 focus:ring-amber-500 bg-white/80"
-                  value={formData.language}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      language: e.target.value,
-                    }))
-                  }
-                  required
-                />
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
+                  {[
+                    'JavaScript', 'Python', 'TypeScript', 'Java',
+                    'C++', 'C#', 'PHP', 'Ruby', 
+                    'Go', 'Rust', 'Swift', 'Kotlin',
+                    'Dart', 'HTML/CSS', 'SQL', 'Shell/Bash'
+                  ].map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, language: lang }))}
+                      className={`px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg border transition-all duration-200 ${
+                        formData.language === lang
+                          ? 'bg-amber-100 border-amber-400 text-amber-800 shadow-sm'
+                          : 'bg-white/60 border-gray-200 text-gray-700 hover:bg-amber-50 hover:border-amber-300'
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+                {!formData.language && (
+                  <p className="text-xs text-red-600 mt-1">Please select a programming language</p>
+                )}
               </div>
 
               <div>
-                <Label
-                  htmlFor="framework"
-                  className="text-sm font-semibold text-rose-700"
-                >
-                  Framework (Optional)
+                <Label className="text-sm font-semibold text-rose-700 mb-3 block">
+                  Category
                 </Label>
-                <Input
-                  id="framework"
-                  type="text"
-                  placeholder="React"
-                  className="mt-1 border-rose-200 focus:border-rose-500 focus:ring-rose-500 bg-white/80"
+                <select
                   value={formData.framework}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      framework: e.target.value,
-                    }))
-                  }
-                />
+                  onChange={(e) => setFormData(prev => ({ ...prev, framework: e.target.value }))}
+                  className="w-full px-3 py-3 text-sm border border-rose-200 rounded-lg bg-white/80 focus:border-rose-500 focus:ring-rose-500 focus:outline-none"
+                >
+                  <option value="">Select category</option>
+                  <option value="Frontend">Frontend</option>
+                  <option value="Backend">Backend</option>
+                  <option value="Full Stack">Full Stack</option>
+                  <option value="Mobile">Mobile Development</option>
+                  <option value="Data Science">Data Science</option>
+                  <option value="Machine Learning">Machine Learning</option>
+                  <option value="DevOps">DevOps</option>
+                  <option value="Testing">Testing</option>
+                  <option value="API">API Development</option>
+                  <option value="Database">Database</option>
+                  <option value="Security">Security</option>
+                  <option value="Algorithms">Algorithms</option>
+                  <option value="Utilities">Utilities</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
             </div>
 

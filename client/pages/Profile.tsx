@@ -33,10 +33,10 @@ function CodeSnippetCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{snippet.title}</h3>
-        <div className="flex items-center gap-2">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 hover:shadow-md transition-shadow">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-3 sm:gap-0">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">{snippet.title}</h3>
+        <div className="flex items-center justify-between sm:justify-end gap-2">
           <span className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded text-sm font-medium">
             ${snippet.price}
           </span>
@@ -63,20 +63,25 @@ function CodeSnippetCard({
         </div>
       </div>
 
-      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
+      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed line-clamp-3">
         {snippet.description}
       </p>
 
       <div className="flex flex-wrap gap-1 mb-4">
-        {snippet.tags.map((tag) => (
+        {snippet.tags.slice(0, 4).map((tag) => (
           <Badge key={tag} variant="secondary" className="text-xs">
             {tag}
           </Badge>
         ))}
+        {snippet.tags.length > 4 && (
+          <Badge variant="secondary" className="text-xs">
+            +{snippet.tags.length - 4}
+          </Badge>
+        )}
       </div>
 
-      <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span>{snippet.rating}</span>
@@ -86,7 +91,7 @@ function CodeSnippetCard({
             <span>{snippet.downloads}</span>
           </div>
         </div>
-        <span>{new Date(snippet.createdAt).toLocaleDateString()}</span>
+        <span className="text-xs sm:text-sm">{new Date(snippet.createdAt).toLocaleDateString()}</span>
       </div>
     </div>
   );
@@ -264,114 +269,130 @@ export default function Profile() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link
               to="/explore"
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 text-sm sm:text-base"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">CodeHut</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">CodeHut</h1>
           </div>
         </div>
       </header>
 
       {/* Profile Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            {/* Avatar with fallback */}
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-              {user.avatar && !avatarError ? (
-                <img
-                  src={user.avatar}
-                  alt={user.username}
-                  className="w-24 h-24 rounded-full object-cover"
-                  onError={handleAvatarError}
-                />
-              ) : (
-                <span className="text-white text-xl font-bold">
-                  {getInitials(user.username)}
-                </span>
-              )}
-            </div>
-
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                {user.username}
-              </h1>
-              {user.bio && (
-                <p className="mt-2 text-gray-600 dark:text-gray-300 max-w-2xl">{user.bio}</p>
-              )}
-
-              <div className="flex items-center gap-6 mt-4 text-sm text-gray-500 dark:text-gray-400">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Joined {new Date(user.createdAt).toLocaleDateString()}
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+          <div className="flex flex-col gap-4 sm:gap-6">
+            {/* Avatar and basic info */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+              {/* Avatar with fallback */}
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                {user.avatar && !avatarError ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.username}
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover"
+                    onError={handleAvatarError}
+                  />
+                ) : (
+                  <span className="text-white text-lg sm:text-xl font-bold">
+                    {getInitials(user.username)}
                   </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4" />
-                  <span>{user.rating} rating</span>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">
+                  {user.username}
+                </h1>
+                {user.bio && (
+                  <p className="mt-2 text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">{user.bio}</p>
+                )}
+
+                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      Joined {new Date(user.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4" />
+                    <span>{user.rating} rating</span>
+                  </div>
                 </div>
               </div>
+
+              {!isOwner && (
+                <div className="flex flex-row sm:flex-col gap-2 sm:gap-3 w-full sm:w-auto">
+                  <Button variant="outline" className="flex-1 sm:flex-none">Follow</Button>
+                  <Button variant="outline" className="flex-1 sm:flex-none">Message</Button>
+                </div>
+              )}
             </div>
 
-            {!isOwner && (
-              <div className="flex flex-col md:flex-row gap-4">
-                <Button variant="outline">Follow</Button>
-                <Button variant="outline">Message</Button>
+            {/* Stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 text-center border border-blue-100 dark:border-gray-600">
+                <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {snippets.length}
+                </div>
+                <div className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 font-medium">Code Snippets</div>
               </div>
-            )}
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {snippets.length}
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 text-center border border-emerald-100 dark:border-gray-600">
+                <div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                  {user.totalDownloads}
+                </div>
+                <div className="text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 font-medium">Downloads</div>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Code Snippets</div>
-            </div>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {user.totalDownloads}
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 text-center border border-amber-100 dark:border-gray-600">
+                <div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
+                  {user.rating}
+                </div>
+                <div className="text-xs sm:text-sm text-amber-700 dark:text-amber-300 font-medium">Avg Rating</div>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Total Downloads</div>
-            </div>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {user.rating}
+              <div className="bg-gradient-to-br from-violet-50 to-purple-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 text-center border border-violet-100 dark:border-gray-600">
+                <div className="text-xl sm:text-2xl font-bold text-violet-600 dark:text-violet-400">
+                  ${snippets.reduce((sum, s) => sum + s.downloads * s.price, 0)}
+                </div>
+                <div className="text-xs sm:text-sm text-violet-700 dark:text-violet-300 font-medium">Earnings</div>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Average Rating</div>
-            </div>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                ${snippets.reduce((sum, s) => sum + s.downloads * s.price, 0)}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Total Earnings</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="snippets" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto">
-            <TabsTrigger value="snippets">
-              Code Snippets ({snippets.length})
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <Tabs defaultValue="snippets" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 bg-white/70 backdrop-blur-sm border border-gray-200/30 rounded-xl p-1">
+            <TabsTrigger 
+              value="snippets"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
+            >
+              📝 Snippets ({snippets.length})
             </TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsTrigger 
+              value="reviews"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
+            >
+              ⭐ Reviews
+            </TabsTrigger>
+            <TabsTrigger 
+              value="activity"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
+            >
+              📊 Activity
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="snippets">
             {snippets.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {snippets.map((snippet) => (
                   <CodeSnippetCard 
                     key={snippet.id} 
@@ -383,30 +404,35 @@ export default function Profile() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <User className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 text-lg">No code snippets yet.</p>
+              <div className="text-center py-8 sm:py-12">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-gradient-to-br from-blue-400 to-indigo-400 rounded-full flex items-center justify-center mb-4">
+                  <User className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">No code snippets yet</h3>
+                <p className="text-gray-500 text-sm sm:text-base mb-4 px-4">
+                  {isOwner ? "Start sharing your code with the community!" : "This user hasn't shared any snippets yet."}
+                </p>
                 {isOwner && (
-                  <div className="mt-4">
-                    <p className="text-gray-400 dark:text-gray-500 mb-4">
-                      Start sharing your code with the community!
-                    </p>
-                    <Button asChild>
-                      <Link to="/upload">Upload Your First Snippet</Link>
-                    </Button>
-                  </div>
+                  <Button asChild className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600">
+                    <Link to="/upload">
+                      📤 Upload Your First Snippet
+                    </Link>
+                  </Button>
                 )}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="reviews">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full flex items-center justify-center mb-4">
+                  <Star className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Reviews & Feedback
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
                   Reviews from buyers will appear here.
                 </p>
               </div>
@@ -414,12 +440,15 @@ export default function Profile() {
           </TabsContent>
 
           <TabsContent value="activity">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-gradient-to-br from-violet-400 to-purple-400 rounded-full flex items-center justify-center mb-4">
+                  <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Recent Activity
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
                   Recent activity and contributions will appear here.
                 </p>
               </div>
