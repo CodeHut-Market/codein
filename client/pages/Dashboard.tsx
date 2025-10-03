@@ -2,25 +2,25 @@ import Logo from "@/components/Logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeSnippet, User } from "@shared/api";
 import {
-    Code,
-    DollarSign,
-    Download,
-    LogOut,
-    Plus,
-    Settings,
-    ShoppingCart,
-    Star,
-    TrendingUp,
-    Users,
+  Code,
+  DollarSign,
+  Download,
+  LogOut,
+  Plus,
+  Settings,
+  ShoppingCart,
+  Star,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -208,39 +208,85 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Welcome Section */}
-        <div className="mb-6 sm:mb-8 bg-gradient-to-r from-violet-600/20 via-indigo-600/20 to-cyan-600/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border border-violet-200/30">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
-            Welcome back, {user.username}!
-          </h1>
-          <p className="mt-2 sm:mt-3 text-indigo-700 text-sm sm:text-base lg:text-lg">
-            Here's what's happening with your code snippets today.
-          </p>
+        {/* Welcome Section - DRAMATIC NEW DESIGN */}
+        <div className="relative mb-8 bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 rounded-3xl p-8 text-white shadow-2xl overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
+          {/* Animated background effects */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 via-purple-600/30 to-pink-600/30 animate-pulse"></div>
+          <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-300/20 rounded-full blur-3xl animate-bounce"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-green-300/20 rounded-full blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-white/10 rounded-full blur-xl transform -translate-x-1/2 -translate-y-1/2"></div>
+          
+          <div className="relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="text-center lg:text-left">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 drop-shadow-lg">
+                  🚀 Welcome {user.username}!
+                </h1>
+                <p className="text-lg sm:text-xl text-white/90 font-medium">
+                  Ready to conquer the coding world? Let's build something incredible! 💻✨
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 lg:flex-col">
+                <Button 
+                  asChild 
+                  size="lg"
+                  className="bg-white/20 hover:bg-white/30 backdrop-blur-md border-2 border-white/40 text-white shadow-2xl transition-all duration-300 hover:scale-110 font-bold text-lg px-8 py-4"
+                >
+                  <Link to="/upload" className="flex items-center justify-center gap-3">
+                    <Plus className="w-6 h-6" />
+                    Upload Now 🔥
+                  </Link>
+                </Button>
+                <Button 
+                  asChild 
+                  size="lg"
+                  variant="outline"
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 border-none text-black hover:from-yellow-500 hover:to-orange-600 transition-all duration-300 hover:scale-110 font-bold text-lg px-8 py-4 shadow-2xl"
+                >
+                  <Link to="/explore" className="flex items-center justify-center gap-3">
+                    <TrendingUp className="w-6 h-6" />
+                    Explore 🌟
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Dashboard Statistics Header */}
-        <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Dashboard Statistics
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Overview of your performance
-          </p>
+        {/* Dashboard Statistics Header - ULTRA DRAMATIC NEW DESIGN */}
+        <div className="mb-8 text-center relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-purple-500/20 to-blue-500/20 rounded-3xl blur-xl"></div>
+          <div className="relative bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 rounded-2xl p-6 text-white">
+            <h2 className="text-5xl font-black mb-4 drop-shadow-2xl animate-pulse">
+              🚀 DASHBOARD STATISTICS 🚀
+            </h2>
+            <p className="text-2xl font-bold text-white/90">
+              ⚡ YOUR PERFORMANCE OVERVIEW ⚡
+            </p>
+          </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-          <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-emerald-100">
-                Code Snippets
+          <Card className="bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 text-white border-none shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-110 hover:rotate-2 relative overflow-hidden">
+            {/* Animated background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30 animate-pulse"></div>
+            <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-300/30 rounded-full blur-2xl"></div>
+            
+            <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
+              <CardTitle className="text-lg font-black text-green-100 uppercase tracking-wider">
+                💻 CODE SNIPPETS 💻
               </CardTitle>
-              <Code className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-200" />
+              <div className="p-3 bg-white/30 rounded-full animate-bounce">
+                <Code className="h-8 w-8 text-green-200" />
+              </div>
             </CardHeader>
-            <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-              <div className="text-2xl sm:text-3xl font-bold text-white">{userSnippets.length}</div>
-              <p className="text-xs text-emerald-100 mt-1">
-                Published
+            <CardContent className="relative z-10 px-6 pb-6">
+              <div className="text-6xl font-black text-white drop-shadow-2xl mb-2 animate-pulse">
+                {userSnippets.length}
+              </div>
+              <p className="text-green-200 text-lg font-bold">
+                🔥 AMAZING CREATIONS! 🔥
               </p>
             </CardContent>
           </Card>

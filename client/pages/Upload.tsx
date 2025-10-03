@@ -222,14 +222,26 @@ export default function Upload() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-violet-600 via-emerald-600 to-amber-600 bg-clip-text text-transparent mb-3 sm:mb-4">
-            Upload Your Code
-          </h1>
-          <p className="text-base sm:text-lg text-gray-700 px-4">
-            Share your code snippets with the community and 
-            <span className="text-emerald-600 font-semibold"> earn money</span>
-          </p>
+        {/* HUGE DRAMATIC HERO SECTION */}
+        <div className="relative text-center mb-12 bg-gradient-to-r from-red-500 via-purple-600 to-blue-600 rounded-3xl p-12 text-white shadow-2xl overflow-hidden">
+          {/* Animated background effects */}
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 via-pink-500/30 to-green-500/30 animate-pulse"></div>
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full blur-3xl animate-bounce"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-yellow-300/30 rounded-full blur-2xl"></div>
+          
+          <div className="relative z-10">
+            <h1 className="text-6xl sm:text-7xl font-black mb-6 drop-shadow-2xl animate-pulse">
+              🚀 UPLOAD YOUR CODE! 🚀
+            </h1>
+            <p className="text-2xl sm:text-3xl font-bold text-white/90 mb-6">
+              💰 SHARE & EARN BIG! 💰
+            </p>
+            <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 inline-block">
+              <p className="text-xl font-bold">
+                🔥 Join thousands of developers making money! 🔥
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-violet-200/50 p-4 sm:p-6 lg:p-8 shadow-xl">
@@ -285,10 +297,10 @@ export default function Upload() {
 
             <div className="space-y-4 sm:space-y-6">
               <div>
-                <Label className="text-sm font-semibold text-amber-700 mb-3 block">
-                  Primary Programming Language *
+                <Label className="text-2xl font-black text-red-600 mb-6 block uppercase tracking-wider">
+                  🔥 CHOOSE YOUR PROGRAMMING LANGUAGE! 🔥
                 </Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
                   {[
                     'JavaScript', 'Python', 'TypeScript', 'Java',
                     'C++', 'C#', 'PHP', 'Ruby', 
@@ -299,18 +311,18 @@ export default function Upload() {
                       key={lang}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, language: lang }))}
-                      className={`px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg border transition-all duration-200 ${
+                      className={`px-4 py-4 text-lg font-black rounded-xl border-2 transition-all duration-300 transform hover:scale-110 shadow-lg ${
                         formData.language === lang
-                          ? 'bg-amber-100 border-amber-400 text-amber-800 shadow-sm'
-                          : 'bg-white/60 border-gray-200 text-gray-700 hover:bg-amber-50 hover:border-amber-300'
+                          ? 'bg-gradient-to-r from-green-400 to-blue-500 border-green-500 text-white shadow-2xl scale-105 animate-pulse'
+                          : 'bg-gradient-to-r from-white to-gray-100 border-gray-300 text-gray-800 hover:from-yellow-200 hover:to-orange-200 hover:border-orange-400 hover:shadow-xl'
                       }`}
                     >
-                      {lang}
+                      💻 {lang}
                     </button>
                   ))}
                 </div>
                 {!formData.language && (
-                  <p className="text-xs text-red-600 mt-1">Please select a programming language</p>
+                  <p className="text-xl text-red-600 mt-2 font-bold animate-bounce">⚠️ PLEASE SELECT A PROGRAMMING LANGUAGE! ⚠️</p>
                 )}
               </div>
 

@@ -283,54 +283,69 @@ export default function Profile() {
         </div>
       </header>
 
-      {/* Profile Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+      {/* Profile Header - MEGA DRAMATIC NEW DESIGN */}
+      <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Animated background effects */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 via-green-500/30 to-yellow-500/30 animate-pulse"></div>
+        <div className="absolute top-0 right-0 w-60 h-60 bg-white/20 rounded-full blur-3xl animate-bounce"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-yellow-300/30 rounded-full blur-2xl"></div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-8 sm:py-12 text-white">
+          <div className="text-center mb-8">
+            <h1 className="text-6xl sm:text-7xl font-black mb-4 drop-shadow-2xl animate-pulse">
+              🌟 DEVELOPER PROFILE 🌟
+            </h1>
+            <p className="text-2xl font-bold text-white/90">
+              ⚡ CODING SUPERSTAR SHOWCASE ⚡
+            </p>
+          </div>
+          
           <div className="flex flex-col gap-4 sm:gap-6">
             {/* Avatar and basic info */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
               {/* Avatar with fallback */}
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-2xl transform hover:scale-110 transition-all duration-500">
+                <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
                 {user.avatar && !avatarError ? (
                   <img
                     src={user.avatar}
                     alt={user.username}
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover"
+                    className="relative z-10 w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-white/50"
                     onError={handleAvatarError}
                   />
                 ) : (
-                  <span className="text-white text-lg sm:text-xl font-bold">
+                  <span className="relative z-10 text-white text-4xl sm:text-5xl font-black drop-shadow-lg">
                     {getInitials(user.username)}
                   </span>
                 )}
               </div>
 
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">
-                  {user.username}
+                <h1 className="text-4xl sm:text-5xl font-black text-white mb-4 drop-shadow-2xl animate-pulse">
+                  🚀 {user.username} 🚀
                 </h1>
                 {user.bio && (
-                  <p className="mt-2 text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">{user.bio}</p>
+                  <p className="mt-2 text-white/90 text-lg sm:text-xl leading-relaxed bg-white/20 backdrop-blur-md rounded-2xl p-4">{user.bio}</p>
                 )}
 
-                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>
+                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 mt-6 text-lg text-white/90">
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2">
+                    <Calendar className="w-5 h-5" />
+                    <span className="font-bold">
                       Joined {new Date(user.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4" />
-                    <span>{user.rating} rating</span>
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2">
+                    <Star className="w-5 h-5" />
+                    <span className="font-bold">{user.rating} ⭐ RATING!</span>
                   </div>
                 </div>
               </div>
 
               {!isOwner && (
                 <div className="flex flex-row sm:flex-col gap-2 sm:gap-3 w-full sm:w-auto">
-                  <Button variant="outline" className="flex-1 sm:flex-none">Follow</Button>
-                  <Button variant="outline" className="flex-1 sm:flex-none">Message</Button>
+                  <Button variant="outline" className="flex-1 sm:flex-none bg-white/20 border-white/40 text-white hover:bg-white/30 backdrop-blur-md font-bold text-lg py-3">💫 Follow</Button>
+                  <Button variant="outline" className="flex-1 sm:flex-none bg-white/20 border-white/40 text-white hover:bg-white/30 backdrop-blur-md font-bold text-lg py-3">💬 Message</Button>
                 </div>
               )}
             </div>

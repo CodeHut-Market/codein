@@ -131,50 +131,62 @@ export default function Index() {
 
       {/* Main Content - Mobile Optimized */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Hero Section - Responsive Typography */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="text-brand-gradient">
-            <h1 className="text-display-lg mb-4 sm:mb-6">
-              Code Snippets Marketplace
-            </h1>
+        {/* Hero Section - MEGA DRAMATIC NEW DESIGN */}
+        <div className="relative text-center mb-12 bg-gradient-to-r from-red-500 via-purple-600 to-blue-600 rounded-3xl p-16 text-white shadow-2xl overflow-hidden">
+          {/* Animated background effects */}
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 via-pink-500/30 to-green-500/30 animate-pulse"></div>
+          <div className="absolute top-0 right-0 w-60 h-60 bg-white/20 rounded-full blur-3xl animate-bounce"></div>
+          <div className="absolute bottom-0 left-0 w-40 h-40 bg-yellow-300/30 rounded-full blur-2xl"></div>
+          
+          <div className="relative z-10">
+            <div className="text-brand-gradient">
+              <h1 className="text-6xl sm:text-8xl font-black mb-8 drop-shadow-2xl animate-pulse">
+                🚀 CODE MARKETPLACE 🚀
+              </h1>
+            </div>
+            <p className="text-3xl sm:text-4xl font-bold text-white/90 mb-8">
+              💰 BUY & SELL CODE INSTANTLY! 💰
+            </p>
+            <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 inline-block mb-8">
+              <p className="text-2xl font-bold">
+                🔥 JOIN THE REVOLUTION! 🔥
+              </p>
+            </div>
           </div>
-          <p className="text-body-xl text-muted-foreground mb-6 sm:mb-8 mt-4 max-w-2xl mx-auto px-4">
-            Buy and Sell Quality Code Snippets Instantly
-          </p>
+        </div>
 
-          {/* Action Buttons - Mobile Responsive */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
-            <Button
-              asChild
-              className="bg-action-gradient hover:bg-action-gradient text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto"
-            >
-              <Link to="/upload">Upload Your Code</Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="border-2 border-violet-200 hover:border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-300 dark:hover:bg-violet-900/20 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200 w-full sm:w-auto"
-            >
-              <Link to="/explore">Browse Snippets</Link>
-            </Button>
-          </div>
+        {/* Action Buttons - Mobile Responsive */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
+          <Button
+            asChild
+            className="bg-action-gradient hover:bg-action-gradient text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto"
+          >
+            <Link to="/upload">Upload Your Code</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="border-2 border-violet-200 hover:border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-300 dark:hover:bg-violet-900/20 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200 w-full sm:w-auto"
+          >
+            <Link to="/explore">Browse Snippets</Link>
+          </Button>
+        </div>
 
-          {/* Background GL */}
-          <BackgroundGl />
+        {/* Background GL */}
+        <BackgroundGl />
 
-          {/* Search Bar - Mobile Optimized */}
-          <div className="max-w-2xl mx-auto mb-8 sm:mb-12 px-4">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-500 w-5 h-5" />
-              <Input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search code snippets, tools..."
-                className="pl-12 pr-4 py-3 sm:py-4 w-full rounded-xl border-2 border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 dark:border-gray-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-800/20 text-base sm:text-lg placeholder:text-gray-400 shadow-lg hover:shadow-xl transition-all duration-200"
-              />
-            </form>
-          </div>
+        {/* Search Bar - Mobile Optimized */}
+        <div className="max-w-2xl mx-auto mb-8 sm:mb-12 px-4">
+          <form onSubmit={handleSearch} className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-500 w-5 h-5" />
+            <Input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search code snippets, tools..."
+              className="pl-12 pr-4 py-3 sm:py-4 w-full rounded-xl border-2 border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 dark:border-gray-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-800/20 text-base sm:text-lg placeholder:text-gray-400 shadow-lg hover:shadow-xl transition-all duration-200"
+            />
+          </form>
         </div>
 
         {/* Popular Code Snippets - Mobile Grid Fix */}
