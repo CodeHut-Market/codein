@@ -25,6 +25,16 @@ export default function Upload() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [plagiarismStatus, setPlagiarismStatus] = useState<{
+    checking: boolean;
+    result: null | {
+      isPlagiarized: boolean;
+      similarity: number;
+      status: string;
+      message: string;
+      matchedSnippets?: Array<{ title: string; author: string; similarity: number }>;
+    };
+  }>({ checking: false, result: null });
   const [tagInput, setTagInput] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState("");
@@ -119,8 +129,50 @@ export default function Upload() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setPlagiarismStatus({ checking: false, result: null });
 
     try {
+      // STEP 1: COMPULSORY PLAGIARISM CHECK
+      setPlagiarismStatus({ checking: true, result: null });
+      
+      const plagiarismResponse = await authenticatedFetch("/api/snippets/detect-plagiarism", {
+        method: "POST",
+        body: JSON.stringify({
+          code: formData.code,
+          language: formData.language,
+          authorId: user?.id,
+        }),
+      });
+
+      if (!plagiarismResponse.ok) {
+        throw new Error("Plagiarism check failed. Please try again.");
+      }
+
+      const plagiarismData = await plagiarismResponse.json();
+      setPlagiarismStatus({ checking: false, result: plagiarismData });
+      
+      // BLOCK upload if plagiarism detected
+      if (plagiarismData.status === 'BLOCK') {
+        setError(`❌ Upload Blocked: ${plagiarismData.message}`);
+        setLoading(false);
+        return;
+      }
+      
+      // WARN user if similarity is high but not blocking
+      if (plagiarismData.status === 'REVIEW') {
+        const proceed = window.confirm(
+          `⚠️ Warning: ${plagiarismData.message}\n\n` +
+          `Similarity: ${(plagiarismData.similarity * 100).toFixed(1)}%\n\n` +
+          `Do you want to proceed anyway?`
+        );
+        
+        if (!proceed) {
+          setLoading(false);
+          return;
+        }
+      }
+
+      // STEP 2: UPLOAD THE SNIPPET
       const response = await authenticatedFetch("/api/snippets", {
         method: "POST",
         body: JSON.stringify(formData),
@@ -150,6 +202,7 @@ export default function Upload() {
       );
     } finally {
       setLoading(false);
+      setPlagiarismStatus({ checking: false, result: plagiarismStatus.result });
     }
   };
 
@@ -506,14 +559,74 @@ export default function Upload() {
               </div>
             </div>
 
+            {/* Plagiarism Check Status */}
+            {plagiarismStatus.checking && (
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-200 border-t-blue-600"></div>
+                  <p className="text-blue-700 font-medium">🔍 Checking code for plagiarism...</p>
+                </div>
+              </div>
+            )}
+
+            {plagiarismStatus.result && !plagiarismStatus.checking && (
+              <div className={`p-4 rounded-xl border-2 ${
+                plagiarismStatus.result.status === 'PASS' 
+                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300' 
+                  : plagiarismStatus.result.status === 'REVIEW'
+                  ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300'
+                  : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300'
+              }`}>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="text-2xl">
+                      {plagiarismStatus.result.status === 'PASS' ? '✅' : 
+                       plagiarismStatus.result.status === 'REVIEW' ? '⚠️' : '❌'}
+                    </span>
+                    <div className="flex-1">
+                      <p className={`font-bold ${
+                        plagiarismStatus.result.status === 'PASS' ? 'text-green-700' :
+                        plagiarismStatus.result.status === 'REVIEW' ? 'text-yellow-700' :
+                        'text-red-700'
+                      }`}>
+                        {plagiarismStatus.result.message}
+                      </p>
+                      <p className={`text-sm mt-1 ${
+                        plagiarismStatus.result.status === 'PASS' ? 'text-green-600' :
+                        plagiarismStatus.result.status === 'REVIEW' ? 'text-yellow-600' :
+                        'text-red-600'
+                      }`}>
+                        Similarity Score: {(plagiarismStatus.result.similarity * 100).toFixed(1)}%
+                      </p>
+                      
+                      {plagiarismStatus.result.matchedSnippets && plagiarismStatus.result.matchedSnippets.length > 0 && (
+                        <div className="mt-3 space-y-1">
+                          <p className="text-xs font-semibold text-gray-700">Similar snippets found:</p>
+                          {plagiarismStatus.result.matchedSnippets.slice(0, 3).map((match, idx) => (
+                            <div key={idx} className="text-xs text-gray-600 pl-3">
+                              • "{match.title}" by {match.author} ({(match.similarity * 100).toFixed(1)}% similar)
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-4">
               <Button
                 type="submit"
                 className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
-                disabled={loading}
+                disabled={loading || plagiarismStatus.checking}
               >
                 <UploadIcon className="w-4 h-4" />
-                {loading ? "Uploading..." : "Upload Code"}
+                {plagiarismStatus.checking 
+                  ? "Checking Plagiarism..." 
+                  : loading 
+                  ? "Uploading..." 
+                  : "Upload Code"}
               </Button>
               <Button 
                 type="button" 

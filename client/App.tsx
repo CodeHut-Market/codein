@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Explore from "./pages/Explore";
 import Favorites from "./pages/Favorites";
 import Index from "./pages/Index";
+import LoadingDemo from "./pages/LoadingDemo";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
@@ -54,6 +55,7 @@ const AppRoutes = () => (
     <Route path="/profile" element={<ProfileRedirect />} />
     <Route path="/profile/:username" element={<Profile />} />
     <Route path="/checkout" element={<CheckoutPage />} />
+    <Route path="/loading-demo" element={<LoadingDemo />} />
     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
     <Route path="*" element={<NotFound />} />
   </Routes>
