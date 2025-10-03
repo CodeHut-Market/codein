@@ -343,6 +343,34 @@ export const getPopularSnippets: RequestHandler = async (req, res) => {
     const { limit = "10" } = req.query;
     const limitNum = parseInt(limit as string);
 
+    // Try Supabase first if available
+    if (isSupabaseAvailable() && supabaseClient) {
+      try {
+        const { data: snippets, error } = await supabaseClient
+          .from('snippets')
+          .select('*')
+          .order('downloads', { ascending: false })
+          .order('rating', { ascending: false })
+          .limit(limitNum);
+
+        if (error) {
+          console.error('Supabase query error:', error);
+          throw error;
+        }
+
+        const response = {
+          snippets: (snippets || []).map((snippet: SupabaseSnippet) => 
+            supabaseHelpers.mapSupabaseSnippetToAPI(snippet)
+          ),
+        };
+
+        return res.json(response);
+      } catch (supabaseError) {
+        console.error('Supabase error, falling back to PostgreSQL:', supabaseError);
+        // Fall through to PostgreSQL fallback
+      }
+    }
+
     try {
       // Try PostgreSQL database first
       const result = await pool.query(
@@ -395,6 +423,38 @@ export const getPopularSnippets: RequestHandler = async (req, res) => {
 export const getSnippetById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Try Supabase first if available
+    if (isSupabaseAvailable() && supabaseClient) {
+      try {
+        const { data: snippet, error } = await supabaseClient
+          .from('snippets')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // Not found
+            const errorResponse: ErrorResponse = {
+              error: "Not Found",
+              message: "Snippet not found",
+              statusCode: 404,
+            };
+            return res.status(404).json(errorResponse);
+          }
+          console.error('Supabase query error:', error);
+          throw error;
+        }
+
+        if (snippet) {
+          return res.json(supabaseHelpers.mapSupabaseSnippetToAPI(snippet as SupabaseSnippet));
+        }
+      } catch (supabaseError) {
+        console.error('Supabase error, falling back to PostgreSQL:', supabaseError);
+        // Fall through to PostgreSQL fallback
+      }
+    }
 
     try {
       // Try PostgreSQL database first

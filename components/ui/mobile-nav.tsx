@@ -1,27 +1,26 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { 
-  ChevronDown, 
-  ChevronRight, 
-  Home, 
-  Menu, 
-  Search, 
-  User, 
-  X,
-  Code2,
-  BookOpen,
-  Mail,
-  Settings,
-  LogOut,
-  Heart,
-  Star
+import {
+    BookOpen,
+    ChevronRight,
+    Code2,
+    Heart,
+    Home,
+    LogOut,
+    Mail,
+    Menu,
+    Search,
+    Settings,
+    Star,
+    User,
+    X
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 
 interface NavItem {
   title: string;

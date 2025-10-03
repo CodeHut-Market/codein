@@ -1,7 +1,7 @@
 "use client"
 
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { BookOpen, ChevronDown, Code, CreditCard, Heart, Home, LogOut, Menu, Play, Search, Settings, Upload, User, Users, X } from 'lucide-react';
+import { BookOpen, ChevronDown, Code, Heart, Home, LogOut, Menu, Play, Search, Settings, Upload, User, Users, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';

@@ -15,7 +15,7 @@ import UserMenu from "./UserMenu";
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [unread, setUnread] = useState(0);
   useEffect(()=>{
     // fetch notifications to compute unread badge
@@ -104,7 +104,7 @@ export function Navbar() {
                 </Link>
               );
             })}
-            {!user && !loading && (
+            {!user && !isLoading && (
               <div className="flex gap-2 pt-2">
                 <Button asChild className="flex-1 bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 transition-all duration-200" size="sm">
                   <Link href="/signup">Sign Up</Link>
