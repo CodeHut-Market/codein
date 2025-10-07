@@ -251,29 +251,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signInWithProvider = async (provider: 'github' | 'google') => {
     try {
       setIsLoading(true);
-      
-      if (isSupabaseEnabled()) {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback`
-          }
-        });
 
-        if (error) {
-          return { error: { message: error.message } };
-        }
-
-        return { data, error: null };
-      } else {
+      if (!isSupabaseEnabled()) {
         return { error: { message: 'OAuth sign in not available without Supabase' } };
       }
+
+      const redirectTo = `${window.location.origin}/auth/callback`;
+      const queryParams = provider === 'google'
+        ? {
+            access_type: 'offline',
+            prompt: 'consent',
+            scope: 'openid email profile'
+          }
+        : undefined;
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo,
+          ...(queryParams ? { queryParams } : {})
+        }
+      });
+
+      if (error) {
+        return { error: { message: error.message } };
+      }
+
+      if (data?.url) {
+        window.location.assign(data.url);
+      }
+
+      return { data, error: null };
     } catch (error) {
       console.error('OAuth sign in error:', error);
-      return { 
-        error: { 
-          message: error instanceof Error ? error.message : 'An unexpected error occurred during OAuth sign in' 
-        } 
+      return {
+        error: {
+          message: error instanceof Error ? error.message : 'An unexpected error occurred during OAuth sign in'
+        }
       };
     } finally {
       setIsLoading(false);

@@ -87,7 +87,41 @@ https://your-netlify-subdomain.netlify.app/auth/callback
    - Enter your Client ID and Client Secret
    - Save
 
-## 🚀 Step 4: Test Authentication
+## � Step 4: Set Up Google OAuth
+
+1. **Create a Google Cloud OAuth Client:**
+   - Visit the [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Choose **OAuth client ID** → **Web application**
+   - Add the following Authorized redirect URIs:
+     - `http://localhost:3000/auth/callback`
+     - `https://codehutcode.vercel.app/auth/callback`
+     - `https://<your-supabase-project>.supabase.co/auth/v1/callback` (replace with your Supabase URL)
+   - Add the following Authorized JavaScript origins:
+     - `http://localhost:3000`
+     - `https://codehutcode.vercel.app`
+
+2. **Configure Supabase Provider:**
+   - Go to **Supabase Dashboard** → **Authentication** → **Providers** → **Google**
+   - Enable the provider and paste the Client ID and Client Secret
+   - For local CLI usage, the same credentials can be set via environment variables:
+     ```env
+     SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=your-google-client-id-here
+     SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=your-google-client-secret-here
+     ```
+   - Save the provider configuration
+
+3. **Update `.env.local`:**
+   ```env
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=your-google-client-id-here
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=your-google-client-secret-here
+   ```
+   Restart the dev server after updating environment variables.
+
+4. **Verify redirect URLs:**
+   - In Supabase, under **Authentication → URL Configuration**, ensure the site URL and redirect URLs from Step 2 are present
+   - In Google Cloud Console, ensure the same URLs are whitelisted
+
+## �🚀 Step 5: Test Authentication
 
 1. **Start your development server:**
    ```bash
@@ -99,11 +133,11 @@ https://your-netlify-subdomain.netlify.app/auth/callback
    - Try GitHub authentication
    - Try email/password authentication (if users are registered)
 
-## 🏗️ Step 5: Create a Signup Page
+## 🏗️ Step 6: Create a Signup Page
 
 Let me create a proper signup page for your application.
 
-## 🔐 Step 6: Configure Authentication Security
+## 🔐 Step 7: Configure Authentication Security
 
 Based on our security implementation, you should also configure:
 
@@ -117,13 +151,13 @@ Based on our security implementation, you should also configure:
 3. **Rate Limiting**:
    - Configure rate limits for auth endpoints
 
-## 📝 Step 7: Update Email Templates
+## 📝 Step 8: Update Email Templates
 
 1. Go to **Supabase Dashboard** → **Authentication** → **Email Templates**
 2. Customize the confirmation and reset password emails
 3. Make sure the redirect URLs in emails point to your correct domains
 
-## 🌍 Step 8: Production Deployment
+## 🌍 Step 9: Production Deployment
 
 When deploying to production:
 
