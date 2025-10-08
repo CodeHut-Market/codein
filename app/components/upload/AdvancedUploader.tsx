@@ -453,12 +453,12 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
                 <label className="block text-sm font-medium mb-1">
                   Framework
                 </label>
-                <Select value={currentSnippet.framework} onValueChange={(value) => setCurrentSnippet(prev => ({ ...prev, framework: value }))}>
+                <Select value={currentSnippet.framework || "none"} onValueChange={(value) => setCurrentSnippet(prev => ({ ...prev, framework: value === "none" ? "" : value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select framework" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {FRAMEWORKS.map(fw => (
                       <SelectItem key={fw} value={fw}>
                         {fw}
