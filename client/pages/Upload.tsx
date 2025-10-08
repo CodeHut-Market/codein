@@ -5,8 +5,20 @@ import { Textarea } from "@/components/ui/textarea";
 import {
     CreateCodeSnippetRequest
 } from "@shared/api";
-import { ArrowLeft, BarChart3, FileText, Search, Upload as UploadIcon, X } from "lucide-react";
-import { useCallback, useState } from "react";
+import { 
+  ArrowLeft, 
+  BarChart3, 
+  FileText, 
+  Search, 
+  Upload as UploadIcon, 
+  X, 
+  AlertCircle, 
+  CheckCircle, 
+  Loader2,
+  Copy,
+  FileCode
+} from "lucide-react";
+import { useCallback, useState, useRef } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
 
@@ -38,6 +50,31 @@ export default function Upload() {
   const [tagInput, setTagInput] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Supported languages with extensions
+  const supportedLanguages: { [key: string]: { extensions: string[]; label: string } } = {
+    javascript: { extensions: ['.js', '.jsx', '.mjs'], label: 'JavaScript' },
+    typescript: { extensions: ['.ts', '.tsx'], label: 'TypeScript' },
+    python: { extensions: ['.py'], label: 'Python' },
+    java: { extensions: ['.java'], label: 'Java' },
+    'c++': { extensions: ['.cpp', '.cc', '.cxx', '.h', '.hpp'], label: 'C++' },
+    c: { extensions: ['.c', '.h'], label: 'C' },
+    'c#': { extensions: ['.cs'], label: 'C#' },
+    html: { extensions: ['.html', '.htm'], label: 'HTML/CSS' },
+    php: { extensions: ['.php'], label: 'PHP' },
+    ruby: { extensions: ['.rb'], label: 'Ruby' },
+    go: { extensions: ['.go'], label: 'Go' },
+    rust: { extensions: ['.rs'], label: 'Rust' },
+    kotlin: { extensions: ['.kt', '.kts'], label: 'Kotlin' },
+    swift: { extensions: ['.swift'], label: 'Swift' },
+    dart: { extensions: ['.dart'], label: 'Dart' },
+    sql: { extensions: ['.sql'], label: 'SQL' },
+    'shell/bash': { extensions: ['.sh', '.bash'], label: 'Shell/Bash' },
+  };
 
   // Show loading while checking authentication
   if (isLoading) {
@@ -56,6 +93,136 @@ export default function Upload() {
     return <Navigate to="/login" replace />;
   }
 
+  // Detect language from file extension
+  const detectLanguage = (filename: string): string => {
+    const extension = '.' + filename.split('.').pop()?.toLowerCase();
+    for (const [lang, config] of Object.entries(supportedLanguages)) {
+      if (config.extensions.includes(extension)) {
+        return config.label;
+      }
+    }
+    return 'JavaScript'; // Default
+  };
+
+  // Validate code snippet
+  const validateSnippet = (snippet: CreateCodeSnippetRequest): {[key: string]: string} => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!snippet.title || snippet.title.trim().length < 3) {
+      newErrors.title = 'Title must be at least 3 characters';
+    }
+    if (snippet.title && snippet.title.length > 100) {
+      newErrors.title = 'Title must be less than 100 characters';
+    }
+    if (!snippet.code || snippet.code.trim().length < 10) {
+      newErrors.code = 'Code snippet must be at least 10 characters';
+    }
+    if (snippet.code && snippet.code.length > 500000) {
+      newErrors.code = 'Code snippet is too large (max 500KB)';
+    }
+    if (snippet.description && snippet.description.length > 1000) {
+      newErrors.description = 'Description must be less than 1000 characters';
+    }
+    
+    // Basic XSS prevention check for web languages
+    if (['HTML/CSS', 'JavaScript', 'TypeScript'].includes(snippet.language)) {
+      const dangerousPatterns = [
+        /<script[^>]*>[\s\S]*?<\/script>/gi,
+        /javascript:/gi,
+        /on\w+\s*=/gi
+      ];
+      
+      for (const pattern of dangerousPatterns) {
+        if (pattern.test(snippet.code)) {
+          newErrors.code = 'Code contains potentially unsafe patterns. Please review for security issues.';
+          break;
+        }
+      }
+    }
+    
+    return newErrors;
+  };
+
+  // Process uploaded files with enhanced detection
+  const processFiles = async (files: File[]) => {
+    setUploading(true);
+    setValidationErrors({});
+    
+    for (const file of files) {
+      if (file.size > 1024 * 1024 * 5) { // 5MB limit
+        setError(`${file.name} is too large (max 5MB)`);
+        continue;
+      }
+      
+      try {
+        const text = await file.text();
+        const detectedLanguage = detectLanguage(file.name);
+        
+        setFormData(prev => ({
+          ...prev,
+          title: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
+          code: text,
+          language: detectedLanguage
+        }));
+        
+        setUploadedFileName(file.name);
+        
+        // Auto-detect framework based on content
+        let detectedFramework = '';
+        if (text.includes('import React') || text.includes('from \'react\'') || text.includes('from "react"')) {
+          detectedFramework = 'Frontend';
+        } else if (text.includes('import Vue') || text.includes('from \'vue\'')) {
+          detectedFramework = 'Frontend';
+        } else if (text.includes('@angular')) {
+          detectedFramework = 'Frontend';
+        } else if (text.includes('from django') || text.includes('import django')) {
+          detectedFramework = 'Backend';
+        } else if (text.includes('from flask') || text.includes('import flask')) {
+          detectedFramework = 'Backend';
+        } else if (text.includes('express') && text.includes('require')) {
+          detectedFramework = 'Backend';
+        }
+        
+        if (detectedFramework) {
+          setFormData(prev => ({ ...prev, framework: detectedFramework }));
+        }
+        
+        // Extract potential tags
+        const suggestions: string[] = [];
+        if (detectedLanguage === 'JavaScript' || detectedLanguage === 'TypeScript') {
+          const functionMatches = text.match(/(?:function|const|let|var)\s+(\w+)/g);
+          const classMatches = text.match(/class\s+(\w+)/g);
+          
+          if (functionMatches) {
+            functionMatches.forEach(match => {
+              const name = match.split(/\s+/).pop();
+              if (name && name.length > 2 && !['function', 'const', 'let', 'var'].includes(name)) {
+                suggestions.push(name);
+              }
+            });
+          }
+          if (classMatches) {
+            classMatches.forEach(match => {
+              const name = match.split(/\s+/).pop();
+              if (name && name.length > 2) suggestions.push(name);
+            });
+          }
+        }
+        
+        // Add suggested tags
+        const uniqueSuggestions = [...new Set(suggestions.slice(0, 5))];
+        setFormData(prev => ({
+          ...prev,
+          tags: [...prev.tags, ...uniqueSuggestions.filter(s => !prev.tags.includes(s))].slice(0, 10)
+        }));
+        
+      } catch (error) {
+        setError(`Error reading ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+    
+    setUploading(false);
+  };
   // Drag and drop handlers
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -81,43 +248,39 @@ export default function Upload() {
 
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
-      handleFileUpload(files[0]);
+      processFiles(files);
     }
   }, []);
 
+  // Handle file input change
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length > 0) {
+      processFiles(files);
+    }
+  };
+
+  // Handle paste event
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const pastedText = e.clipboardData.getData('text');
+    if (pastedText && pastedText.length > 10) {
+      setFormData(prev => ({
+        ...prev,
+        code: pastedText
+      }));
+      setUploadedFileName('Pasted code');
+    }
+  };
+
+  // Copy code to clipboard
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(formData.code);
+    setSuccessMessage('Code copied to clipboard!');
+    setTimeout(() => setSuccessMessage(''), 2000);
+  };
+
   const handleFileUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      setFormData((prev) => ({ ...prev, code: content }));
-      setUploadedFileName(file.name);
-      
-      // Auto-detect language from file extension
-      const extension = file.name.split('.').pop()?.toLowerCase();
-      const languageMap: { [key: string]: string } = {
-        js: 'JavaScript',
-        ts: 'TypeScript',
-        jsx: 'React',
-        tsx: 'React',
-        py: 'Python',
-        java: 'Java',
-        cpp: 'C++',
-        c: 'C',
-        html: 'HTML',
-        css: 'CSS',
-        php: 'PHP',
-        rb: 'Ruby',
-        go: 'Go',
-        rs: 'Rust',
-        kt: 'Kotlin',
-        swift: 'Swift',
-      };
-      
-      if (extension && languageMap[extension]) {
-        setFormData((prev) => ({ ...prev, language: languageMap[extension] }));
-      }
-    };
-    reader.readAsText(file);
+    processFiles([file]);
   };
 
   const clearUploadedFile = () => {
@@ -127,8 +290,18 @@ export default function Upload() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate snippet first
+    const errors = validateSnippet(formData);
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      setError('Please fix validation errors before submitting');
+      return;
+    }
+    
     setLoading(true);
     setError("");
+    setValidationErrors({});
     setPlagiarismStatus({ checking: false, result: null });
 
     try {
@@ -191,8 +364,26 @@ export default function Upload() {
 
       const data = await response.json();
 
-      // Redirect to explore page or snippet detail page
-      navigate("/explore");
+      // Show success message
+      setSuccessMessage('✅ Snippet uploaded successfully!');
+      
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        code: "",
+        price: 0,
+        tags: [],
+        language: "",
+        framework: "",
+      });
+      setUploadedFileName("");
+      
+      // Redirect after a short delay
+      setTimeout(() => {
+        navigate("/explore");
+      }, 1500);
+      
     } catch (error) {
       console.error("Error uploading snippet:", error);
       setError(
@@ -298,8 +489,17 @@ export default function Upload() {
         </div>
 
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-violet-200/50 p-4 sm:p-6 lg:p-8 shadow-xl">
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50/80 border border-green-200 rounded-xl backdrop-blur-sm flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <p className="text-green-700 font-medium text-sm">{successMessage}</p>
+            </div>
+          )}
+
           {error && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50/80 border border-red-200 rounded-xl backdrop-blur-sm">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50/80 border border-red-200 rounded-xl backdrop-blur-sm flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600" />
               <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
@@ -316,13 +516,21 @@ export default function Upload() {
                 id="title"
                 type="text"
                 placeholder="React Login Form"
-                className="mt-1 border-violet-200 focus:border-violet-500 focus:ring-violet-500 bg-white/80"
+                className={`mt-1 border-violet-200 focus:border-violet-500 focus:ring-violet-500 bg-white/80 ${
+                  validationErrors.title ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
+                }`}
                 value={formData.title}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, title: e.target.value }))
                 }
                 required
               />
+              {validationErrors.title && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.title}
+                </p>
+              )}
             </div>
 
             <div>
@@ -335,7 +543,9 @@ export default function Upload() {
               <Textarea
                 id="description"
                 placeholder="Simple and responsive login component using React and Tailwind."
-                className="mt-1 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 bg-white/80"
+                className={`mt-1 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 bg-white/80 ${
+                  validationErrors.description ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
+                }`}
                 rows={3}
                 value={formData.description}
                 onChange={(e) =>
@@ -346,6 +556,12 @@ export default function Upload() {
                 }
                 required
               />
+              {validationErrors.description && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.description}
+                </p>
+              )}
             </div>
 
             <div className="space-y-4 sm:space-y-6">
@@ -517,13 +733,28 @@ export default function Upload() {
                   <Textarea
                     id="code"
                     placeholder="Paste your code here or drag & drop a file..."
-                    className="min-h-[200px] font-mono text-sm border-teal-200 focus:border-teal-500 focus:ring-teal-500 bg-white/80 resize-y"
+                    className={`min-h-[200px] font-mono text-sm border-teal-200 focus:border-teal-500 focus:ring-teal-500 bg-white/80 resize-y ${
+                      validationErrors.code ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
+                    }`}
                     value={formData.code}
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, code: e.target.value }))
                     }
+                    onPaste={handlePaste}
                     required
                   />
+                  
+                  {/* Copy Button */}
+                  {formData.code && (
+                    <button
+                      type="button"
+                      onClick={copyToClipboard}
+                      className="absolute top-2 right-2 p-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors shadow-md"
+                      title="Copy code"
+                    >
+                      <Copy size={16} />
+                    </button>
+                  )}
                   
                   {/* Drag Overlay */}
                   {isDragging && (
@@ -536,6 +767,13 @@ export default function Upload() {
                     </div>
                   )}
                 </div>
+                
+                {validationErrors.code && (
+                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {validationErrors.code}
+                  </p>
+                )}
 
                 {/* File Upload Button */}
                 <div className="mt-2 flex justify-between items-center">
@@ -543,17 +781,23 @@ export default function Upload() {
                     <FileText className="w-4 h-4" />
                     Choose File
                     <input
+                      ref={fileInputRef}
                       type="file"
                       className="hidden"
-                      accept=".js,.ts,.jsx,.tsx,.py,.java,.cpp,.c,.html,.css,.php,.rb,.go,.rs,.kt,.swift,.txt"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleFileUpload(file);
-                      }}
+                      accept=".js,.ts,.jsx,.tsx,.py,.java,.cpp,.c,.cs,.html,.css,.php,.rb,.go,.rs,.kt,.swift,.txt,.sql,.sh,.bash,.dart,.json,.xml,.md,.yml,.yaml"
+                      onChange={handleFileInput}
+                      multiple
                     />
                   </label>
                   <p className="text-xs text-teal-600">
-                    Or drag & drop a code file anywhere in the text area
+                    {uploading ? (
+                      <span className="flex items-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Processing file...
+                      </span>
+                    ) : (
+                      'Or drag & drop a code file anywhere in the text area'
+                    )}
                   </p>
                 </div>
               </div>
@@ -561,11 +805,9 @@ export default function Upload() {
 
             {/* Plagiarism Check Status */}
             {plagiarismStatus.checking && (
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-200 border-t-blue-600"></div>
-                  <p className="text-blue-700 font-medium">🔍 Checking code for plagiarism...</p>
-                </div>
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl flex items-center gap-3">
+                <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                <p className="text-blue-700 font-medium">🔍 Checking code for plagiarism...</p>
               </div>
             )}
 
@@ -579,10 +821,13 @@ export default function Upload() {
               }`}>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
-                    <span className="text-2xl">
-                      {plagiarismStatus.result.status === 'PASS' ? '✅' : 
-                       plagiarismStatus.result.status === 'REVIEW' ? '⚠️' : '❌'}
-                    </span>
+                    {plagiarismStatus.result.status === 'PASS' ? (
+                      <CheckCircle className="w-6 h-6 text-green-600 mt-1" />
+                    ) : plagiarismStatus.result.status === 'REVIEW' ? (
+                      <AlertCircle className="w-6 h-6 text-yellow-600 mt-1" />
+                    ) : (
+                      <AlertCircle className="w-6 h-6 text-red-600 mt-1" />
+                    )}
                     <div className="flex-1">
                       <p className={`font-bold ${
                         plagiarismStatus.result.status === 'PASS' ? 'text-green-700' :
@@ -612,6 +857,24 @@ export default function Upload() {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Code Preview */}
+            {formData.code && (
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <FileCode className="w-5 h-5" />
+                    Code Preview
+                  </h3>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">
+                    {formData.code.split('\n').length} lines • {formData.language || 'No language'}
+                  </span>
+                </div>
+                <pre className="p-4 bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-700 overflow-x-auto max-h-64 text-sm">
+                  <code>{formData.code}</code>
+                </pre>
               </div>
             )}
 
