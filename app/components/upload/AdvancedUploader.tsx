@@ -1,25 +1,29 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { 
-  Upload, AlertCircle, CheckCircle, X, Copy, FileCode, Loader2, 
-  Heart, MessageCircle, Eye, Share2, User, Code2 
-} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { supabase } from '../../lib/supabaseClient';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    AlertCircle, CheckCircle,
+    Copy,
+    Loader2,
+    Upload,
+    User,
+    X
+} from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../../client/contexts/AuthContext';
-import { 
-  detectLanguage, 
-  detectFramework, 
-  extractTagsFromCode, 
-  validateSnippet 
-} from '../../lib/utils/snippetHelpers';
 import { CodeSnippet } from '../../../shared/api';
+import { supabase } from '../../lib/supabaseClient';
+import {
+    detectFramework,
+    detectLanguage,
+    extractTagsFromCode,
+    validateSnippet
+} from '../../lib/utils/snippetHelpers';
 
 // Supported languages matching database schema
 const SUPPORTED_LANGUAGES = {
