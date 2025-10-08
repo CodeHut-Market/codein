@@ -21,6 +21,7 @@ import {
 import {
     createCodeSnippet,
     deleteCodeSnippet,
+    detectPlagiarismHandler,
     getPopularSnippets,
     getSnippetById,
     getSnippets,
@@ -98,6 +99,7 @@ export function createServer() {
   app.get("/api/snippets/author/:authorId", getSnippetsByAuthor);
   app.get("/api/snippets/:id", getSnippetById);
   app.post("/api/snippets", authenticateToken, createCodeSnippet);
+  app.post("/api/snippets/detect-plagiarism", detectPlagiarismHandler);
   app.put("/api/snippets/:id", authenticateToken, updateCodeSnippet);
   app.delete("/api/snippets/:id", authenticateToken, deleteCodeSnippet);
 
