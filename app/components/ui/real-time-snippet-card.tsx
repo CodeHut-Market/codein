@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { Heart, Eye, Download, MessageCircle, Share2, Bookmark } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
-import { Button } from './button';
-import { Badge } from './badge';
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import { Bookmark, Download, Eye, Heart, MessageCircle, Share2 } from 'lucide-react';
+import Link from 'next/link';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../../../client/contexts/AuthContext';
 import { useRealTime } from '../../contexts/RealTimeContext';
 import { useOptimisticActions } from '../../hooks/useOptimisticActions';
-import { useAuth } from '../../../client/contexts/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
-import Link from 'next/link';
 import { cn } from '../../lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import { Badge } from './badge';
+import { Button } from './button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 
 interface RealTimeSnippetCardProps {
   snippet: {
@@ -76,27 +76,31 @@ export const RealTimeSnippetCard: React.FC<RealTimeSnippetCardProps> = ({
     
     const checkUserInteractions = async () => {
       try {
-        // Check if liked
-        const { data: likeData } = await supabase
+        // Check if liked - silently fail if table doesn't exist
+        const { data: likeData, error: likeError } = await supabase
           .from('snippet_likes')
           .select('id')
           .eq('snippet_id', snippet.id)
           .eq('user_id', user.id)
           .single();
         
-        setIsLiked(!!likeData);
+        if (!likeError) {
+          setIsLiked(!!likeData);
+        }
         
-        // Check if bookmarked (if bookmarks table exists)
-        const { data: bookmarkData } = await supabase
+        // Check if bookmarked (if bookmarks table exists) - silently fail if table doesn't exist
+        const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('user_bookmarks')
           .select('id')
           .eq('snippet_id', snippet.id)
           .eq('user_id', user.id)
           .single();
         
-        setIsBookmarked(!!bookmarkData);
+        if (!bookmarkError) {
+          setIsBookmarked(!!bookmarkData);
+        }
       } catch (error) {
-        // Ignore errors for non-existent interactions
+        // Silently ignore all errors - tables may not exist yet
       }
     };
     

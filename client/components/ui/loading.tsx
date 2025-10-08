@@ -246,9 +246,11 @@ export function WaveLoader({ className, size = "md" }: LoadingProps) {
 export function LoadingOverlay({
   message,
   className,
+  onClick,
 }: {
   message?: string;
   className?: string;
+  onClick?: () => void;
 }) {
   return (
     <div
@@ -257,6 +259,7 @@ export function LoadingOverlay({
         "bg-black/50 backdrop-blur-sm",
         className,
       )}
+      onClick={onClick}
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4">
         <RingLoader size="xl" className="text-blue-600" />

@@ -137,7 +137,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (isSupabaseEnabled()) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
-          console.log('Supabase auth state changed:', event, session);
+          // Removed verbose logging - enable only when debugging auth issues
+          // console.log('Supabase auth state changed:', event, session);
           
           if (event === 'SIGNED_IN' && session) {
             const userData: User = {
