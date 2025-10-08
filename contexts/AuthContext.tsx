@@ -32,6 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Get initial session
     const getInitialSession = async () => {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
@@ -106,18 +110,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithProvider = async (provider: 'google' | 'github') => {
     if (!supabase) return { data: null, error: { message: 'Supabase not initialized' } };
-    
+
     try {
+      const redirectTo = `${window.location.origin}/auth/callback`;
+      const queryParams = provider === 'google'
+        ? {
+            access_type: 'offline',
+            prompt: 'consent',
+            scope: 'openid email profile',
+          }
+        : undefined;
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
+          redirectTo,
+          ...(queryParams ? { queryParams } : {}),
         },
       });
-      
+
+      if (data?.url) {
+        window.location.assign(data.url);
+      }
+
       console.log('OAuth initiated for', provider, { data, error });
       return { data, error };
     } catch (error) {
