@@ -3,22 +3,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-    CreateCodeSnippetRequest
+  CreateCodeSnippetRequest
 } from "@shared/api";
-import { 
-  ArrowLeft, 
-  BarChart3, 
-  FileText, 
-  Search, 
-  Upload as UploadIcon, 
-  X, 
-  AlertCircle, 
-  CheckCircle, 
-  Loader2,
+import {
+  AlertCircle,
+  ArrowLeft,
+  BarChart3,
+  CheckCircle,
   Copy,
-  FileCode
+  FileCode,
+  FileText,
+  Loader2,
+  Search,
+  Upload as UploadIcon,
+  X
 } from "lucide-react";
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth, useAuthenticatedFetch } from "../contexts/AuthContext";
 
