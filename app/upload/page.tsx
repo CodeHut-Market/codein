@@ -19,7 +19,6 @@ import {
     Loader2,
     Plus,
     ShieldAlert,
-// Remove Supabase import - not needed in this starter template
     Upload as UploadIcon,
     UploadCloud,
     X
@@ -28,10 +27,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
+import AdvancedUploader from '../components/upload/AdvancedUploader'
 
 export default function UploadPage() {
   const router = useRouter()
   const { user, isLoading } = useAuth()
+  
+  // Upload mode: 'simple' or 'advanced'
+  const [uploadMode, setUploadMode] = useState<'simple' | 'advanced'>('simple')
   
   // Form state
   const [title, setTitle] = useState('')
@@ -125,12 +128,12 @@ export default function UploadPage() {
       if (user) {
         headers['x-user-data'] = JSON.stringify({
           id: user.id,
-          username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+          username: (user as any).user_metadata?.username || user.email?.split('@')[0] || 'User',
           email: user.email
         });
         console.log('Upload: Adding user data to request:', {
           id: user.id,
-          username: user.user_metadata?.username || user.email?.split('@')[0],
+          username: (user as any).user_metadata?.username || user.email?.split('@')[0],
           email: user.email
         });
       } else {
@@ -339,6 +342,41 @@ export default function UploadPage() {
           Share your code with the community. Help others learn and grow.
         </p>
       </div>
+
+      {/* Upload Mode Toggle */}
+      <div className="flex justify-center mb-6">
+        <div className="inline-flex rounded-lg border border-muted p-1">
+          <Button
+            variant={uploadMode === 'simple' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setUploadMode('simple')}
+          >
+            Simple Upload
+          </Button>
+          <Button
+            variant={uploadMode === 'advanced' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setUploadMode('advanced')}
+          >
+            Advanced Upload
+          </Button>
+        </div>
+      </div>
+
+      {/* Advanced Uploader */}
+      {uploadMode === 'advanced' && (
+        <AdvancedUploader
+          onSuccess={(snippet) => {
+            setUploadMessage('✅ Snippet uploaded successfully! Redirecting...')
+            setTimeout(() => router.push(`/snippet/${snippet.id}`), 1500)
+          }}
+          onCancel={() => setUploadMode('simple')}
+        />
+      )}
+
+      {/* Simple Uploader */}
+      {uploadMode === 'simple' && (
+        <>
 
       {/* Progress Indicator */}
       <Card className="mb-8 border-2 hover:border-emerald-500/20 transition-colors duration-200">
@@ -800,6 +838,8 @@ export default function UploadPage() {
           </Card>
         </div>
       </div>
+        </>
+      )}
     </div>
   )
 }
