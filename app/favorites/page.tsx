@@ -43,16 +43,11 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface FavoriteItem {
-  id: string
+  user_id?: string
+  snippet_id: string
   created_at: string
-  snippet: CodeSnippet & {
-    profiles: {
-      username: string
-      first_name: string
-      last_name: string
-      avatar_url?: string
-    }
-  }
+  snippets?: CodeSnippet
+  snippet?: CodeSnippet
 }
 
 export default function FavoritesPage() {
@@ -194,40 +189,62 @@ class DataValidator:
     setError(null)
     
     try {
-      // Check authentication status using Supabase
-      const { data: { session } } = await supabase.auth.getSession()
+      // Check Supabase authentication first
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
-      if (!session) {
-        // User is not authenticated
+      if (sessionError || !session) {
+        console.log('No active session found')
         setIsAuthenticated(false)
         setShowSignInDialog(true)
         setFavorites([])
         setLoading(false)
         return
       }
-      
-      // User is authenticated
-      setIsAuthenticated(true)
+
+      // User is authenticated - set user ID
       setUserId(session.user.id)
       
-      // Try API to load favorites
+      // Try API with auth token
       try {
         const response = await fetch('/api/favorites', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
           credentials: 'include'
         })
         
         if (response.ok) {
           const data = await response.json()
-          const favoriteSnippets = data.favorites?.map((fav: FavoriteItem) => fav.snippet) || []
+          // Map favorites to snippet format (API returns 'snippets' not 'snippet')
+          const favoriteSnippets = data.favorites?.map((fav: any) => {
+            const snippet = fav.snippets || fav.snippet
+            return {
+              ...snippet,
+              // Ensure all required fields exist
+              author: snippet.author || 'Unknown',
+              authorId: snippet.author_id || snippet.authorId,
+              createdAt: snippet.created_at || snippet.createdAt,
+              updatedAt: snippet.updated_at || snippet.updatedAt,
+              allowComments: snippet.allow_comments ?? snippet.allowComments ?? true,
+            }
+          }).filter(Boolean) || []
           setFavorites(favoriteSnippets)
-        } else {
-          // API failed but user is authenticated - show empty favorites
-          console.warn('Favorites API not available, showing empty list')
+          setIsAuthenticated(true)
+        } else if (response.status === 401) {
+          // Token might be expired
+          console.log('Authentication failed - token may be expired')
+          setIsAuthenticated(false)
+          setShowSignInDialog(true)
           setFavorites([])
+        } else {
+          throw new Error(`API error: ${response.status}`)
         }
       } catch (apiError) {
-        // API error but user is still authenticated
-        console.warn('API error:', apiError)
+        console.error('API error:', apiError)
+        setIsAuthenticated(false)
+        setShowSignInDialog(true)
         setFavorites([])
       }
     } catch (error) {
@@ -242,6 +259,27 @@ class DataValidator:
 
   useEffect(() => {
     loadFavorites()
+
+    // Listen for auth state changes to reload favorites
+    const setupAuthListener = async () => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          console.log('User signed in, reloading favorites')
+          loadFavorites()
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out')
+          setIsAuthenticated(false)
+          setShowSignInDialog(true)
+          setFavorites([])
+        }
+      })
+
+      return () => {
+        subscription.unsubscribe()
+      }
+    }
+
+    setupAuthListener()
   }, [])
 
   // Filter and sort favorites
