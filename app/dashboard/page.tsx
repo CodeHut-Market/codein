@@ -264,16 +264,11 @@ export default function DashboardPage() {
             {/* Enhanced Action Buttons */}
             <div className="flex gap-3">
               <Link href="/upload">
-                <Button className="group flex items-center gap-2 bg-gradient-to-r from-primary via-blue-600 to-emerald-500 hover:from-primary/90 hover:via-blue-600/90 hover:to-emerald-500/90 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 px-6 py-3 font-semibold text-white border-0">
-                  <PlusCircle className="h-5 w-5 transition-transform group-hover:rotate-180 duration-300" />
-                  <span className="hidden sm:inline">Create New Snippet</span>
-                  <span className="sm:hidden">Create</span>
+                <Button className="group flex items-center gap-2.5 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 hover:from-violet-700 hover:via-purple-700 hover:to-fuchsia-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 px-6 py-3 font-semibold text-white border-0">
+                  <Upload className="h-5 w-5 transition-transform group-hover:-translate-y-1 duration-300" />
+                  <span>Upload</span>
                 </Button>
               </Link>
-              
-              <Button variant="outline" className="group border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 px-4 hover:scale-105">
-                <Upload className="h-4 w-4 transition-transform group-hover:-translate-y-1 duration-300" />
-              </Button>
             </div>
           </div>
         </div>
