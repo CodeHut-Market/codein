@@ -126,14 +126,14 @@ export const RealTimePerformanceMonitor: React.FC = () => {
           </Badge>
         </div>
         
-        {/* Latency */}
+        {/* Start Time */}
         <div className="space-y-1">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
               <Timer size={14} />
-              <span>Latency</span>
+              <span>Start Time</span>
             </div>
-            <span>{metrics.connectionLatency}ms</span>
+            <span>{(metrics.connectionLatency / 1000).toFixed(1)}s</span>
           </div>
           <Progress 
             value={Math.min((metrics.connectionLatency / 1000) * 100, 100)} 
