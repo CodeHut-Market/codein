@@ -20,7 +20,12 @@ import {
     Target,
     Trophy,
     ChevronRight,
-    Sparkles
+    Sparkles,
+    Trash2,
+    Edit,
+    Copy,
+    MoreVertical,
+    AlertTriangle
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -33,6 +38,24 @@ import { Button } from "../components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
 import { Progress } from "../components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../client/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../client/components/ui/dropdown-menu"
+import { useToast } from "../../client/hooks/use-toast"
 import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
 import AnalyticsChart from '../components/dashboard/AnalyticsChart'
 import ActivityFeed from '../components/dashboard/ActivityFeed'
@@ -59,6 +82,10 @@ export default function DashboardPage() {
     monthlyGrowth: 0
   })
   const [loadingData, setLoadingData] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [snippetToDelete, setSnippetToDelete] = useState<string | null>(null)
+  const [deletingSnippet, setDeletingSnippet] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     if (isSupabaseEnabled()) {
@@ -121,6 +148,68 @@ export default function DashboardPage() {
       console.error('Dashboard: Error fetching snippets:', error);
     } finally {
       setLoadingData(false);
+    }
+  }
+
+  // Delete snippet handler
+  const handleDeleteSnippet = async (snippetId: string) => {
+    setSnippetToDelete(snippetId)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDeleteSnippet = async () => {
+    if (!snippetToDelete || !user) return
+    
+    setDeletingSnippet(true)
+    
+    try {
+      const { data: { session } } = await supabase!.auth.getSession()
+      
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to delete snippets",
+          variant: "destructive"
+        })
+        return
+      }
+
+      const response = await fetch(`/api/snippets/${snippetToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Failed to delete snippet')
+      }
+
+      // Remove snippet from state
+      setUserSnippets(prev => prev.filter(s => s.id !== snippetToDelete))
+      
+      toast({
+        title: "Snippet Deleted",
+        description: "Your snippet has been successfully deleted",
+      })
+      
+      // Refresh stats
+      await fetchUserSnippets()
+      
+    } catch (error) {
+      console.error('Error deleting snippet:', error)
+      toast({
+        title: "Delete Failed",
+        description: error instanceof Error ? error.message : "Failed to delete snippet. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setDeletingSnippet(false)
+      setDeleteDialogOpen(false)
+      setSnippetToDelete(null)
     }
   }
 
@@ -436,52 +525,103 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {recentSnippets.map((snippet) => (
-                  <Link
+                  <div
                     key={snippet.id}
-                    href={`/snippet/${snippet.id}`}
-                    className="block"
+                    className="flex items-center justify-between p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-primary/50 hover:shadow-lg transition-all duration-300 group bg-white dark:bg-gray-900"
                   >
-                    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer group">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="font-semibold hover:text-primary transition-colors">{snippet.title}</h3>
-                          <Badge variant="secondary">{snippet.language}</Badge>
-                          <Badge variant={snippet.visibility === 'private' ? 'outline' : 'default'} className="text-xs">
-                            {snippet.visibility}
+                    <Link
+                      href={`/snippet/${snippet.id}`}
+                      className="flex-1 min-w-0"
+                    >
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h3 className="font-semibold hover:text-primary transition-colors truncate">{snippet.title}</h3>
+                        <Badge variant="secondary" className="shrink-0">{snippet.language}</Badge>
+                        <Badge variant={snippet.visibility === 'private' ? 'outline' : 'default'} className="text-xs shrink-0">
+                          {snippet.visibility}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <span className="flex items-center">
+                          <Eye className="mr-1 h-3 w-3" />
+                          {snippet.views}
+                        </span>
+                        <span className="flex items-center">
+                          <Heart className="mr-1 h-3 w-3" />
+                          {snippet.likes}
+                        </span>
+                        <span className="hidden sm:inline">{snippet.createdAt}</span>
+                      </div>
+                      <div className="flex gap-1 mt-2 flex-wrap">
+                        {snippet.tags.slice(0, 3).map((tag: string) => (
+                          <Badge key={tag} variant="outline" className="text-xs">
+                            #{tag}
                           </Badge>
-                        </div>
-                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                          <span className="flex items-center">
-                            <Eye className="mr-1 h-3 w-3" />
-                            {snippet.views}
-                          </span>
-                          <span className="flex items-center">
-                            <Heart className="mr-1 h-3 w-3" />
-                            {snippet.likes}
-                          </span>
-                          <span>{snippet.createdAt}</span>
-                        </div>
-                        <div className="flex gap-1 mt-2">
-                          {snippet.tags.map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              #{tag}
-                            </Badge>
-                          ))}
-                        </div>
+                        ))}
+                        {snippet.tags.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{snippet.tags.length - 3}
+                          </Badge>
+                        )}
                       </div>
-                      <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="sm" onClick={(e) => { e.preventDefault(); console.log('Edit snippet:', snippet.id); }}>
-                          Edit
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={(e) => { e.preventDefault(); console.log('Duplicate snippet:', snippet.id); }}>
-                          Duplicate
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={(e) => e.preventDefault()}>
-                          <BarChart3 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    </Link>
+                    
+                    {/* Action Menu */}
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="h-9 w-9 p-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              window.location.href = `/snippet/${snippet.id}/edit`
+                            }}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            <span>Edit Snippet</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              console.log('Duplicate snippet:', snippet.id)
+                            }}
+                          >
+                            <Copy className="mr-2 h-4 w-4" />
+                            <span>Duplicate</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              window.location.href = `/snippet/${snippet.id}#analytics`
+                            }}
+                          >
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            <span>View Analytics</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteSnippet(snippet.id)
+                            }}
+                            className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 focus:bg-red-50 dark:focus:bg-red-950/20"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete Snippet</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  </Link>
+                  </div>
                   ))}
                 </div>
               )}
@@ -562,6 +702,49 @@ export default function DashboardPage() {
           <AchievementsSystem />
         </TabsContent>
       </Tabs>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <AlertDialogTitle className="text-xl">Delete Snippet</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-base pt-2">
+              Are you sure you want to delete this snippet? This action cannot be undone.
+              All analytics data, comments, and ratings associated with this snippet will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel 
+              disabled={deletingSnippet}
+              className="border-2"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteSnippet}
+              disabled={deletingSnippet}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deletingSnippet ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Snippet
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
