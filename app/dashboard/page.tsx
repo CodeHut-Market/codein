@@ -148,7 +148,7 @@ export default function DashboardPage() {
           {/* Enhanced Loading Header */}
           <div className="relative">
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-500/5 via-violet-500/5 to-emerald-500/5 rounded-3xl blur-3xl"></div>
-            <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-6 shadow-xl">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-xl">
               <div className="flex items-center space-x-4">
                 <div className="h-20 w-20 bg-gradient-to-br from-primary/20 to-emerald-500/20 rounded-full animate-pulse"></div>
                 <div className="flex-1 space-y-3">
@@ -160,7 +160,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Enhanced Loading Tabs */}
-          <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-2 shadow-xl">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-2 shadow-xl">
             <div className="grid grid-cols-3 lg:grid-cols-9 gap-2">
               {Array(9).fill(0).map((_, i) => (
                 <div 
@@ -177,7 +177,7 @@ export default function DashboardPage() {
             {Array(4).fill(0).map((_, i) => (
               <div 
                 key={i} 
-                className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-6 shadow-xl loading-pulse"
+                className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-xl loading-pulse"
                 style={{ animationDelay: `${i * 0.2}s` }}
               >
                 <div className="space-y-4">
@@ -223,7 +223,7 @@ export default function DashboardPage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-500/8 via-violet-500/8 to-emerald-500/8 rounded-3xl blur-3xl animate-pulse"></div>
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/3 via-transparent to-emerald-500/3 rounded-2xl"></div>
         
-        <div className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-6 shadow-2xl">
+        <div className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-2xl">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             
             {/* Enhanced User Profile Section */}
@@ -280,7 +280,7 @@ export default function DashboardPage() {
           
           {/* Enhanced Mobile Layout */}
           <div className="mobile-tabs block sm:hidden">
-            <TabsList className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-2 border-white/30 dark:border-gray-700/30 w-full p-1.5 rounded-2xl shadow-xl">
+            <TabsList className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 w-full p-1.5 rounded-2xl shadow-xl">
               <TabsTrigger 
                 value="overview" 
                 className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:bg-purple-500/10 data-[state=active]:scale-105"
@@ -304,7 +304,7 @@ export default function DashboardPage() {
 
           {/* Enhanced Desktop Layout */}
           <div className="desktop-tabs hidden sm:block">
-            <div className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-2 shadow-xl">
+            <div className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-2 shadow-xl">
               <TabsList className="bg-transparent w-full p-0 grid grid-cols-3 lg:grid-cols-9 gap-2 h-auto">
                 <TabsTrigger value="overview" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 data-[state=active]:border-0">
                   <span className="relative z-10 flex items-center gap-2">
