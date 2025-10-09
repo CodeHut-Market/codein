@@ -2,7 +2,20 @@ import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-const supabase = createClient(
+// Create Supabase client that can read cookies
+function createServerSupabaseClient(request: NextRequest) {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        persistSession: false,
+      },
+    }
+  );
+}
+
+const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
@@ -10,52 +23,78 @@ const supabase = createClient(
 // Get user's favorite snippets
 export async function GET(request: NextRequest) {
   try {
+    // Get auth header or cookie
+    const authHeader = request.headers.get('Authorization');
     const cookieStore = cookies();
-    const token = cookieStore.get('sb-access-token');
+    
+    // Try multiple cookie names for Supabase session
+    const possibleTokens = [
+      cookieStore.get('sb-access-token'),
+      cookieStore.get('sb-auth-token'),
+      cookieStore.get('supabase-auth-token')
+    ].filter(Boolean);
+
+    let token = authHeader?.replace('Bearer ', '');
+    
+    // If no auth header, try cookies
+    if (!token && possibleTokens.length > 0) {
+      token = possibleTokens[0]?.value;
+    }
+
+    // If still no token, try to get from Supabase client
+    if (!token) {
+      const supabase = createServerSupabaseClient(request);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (session?.access_token) {
+        token = session.access_token;
+      }
+    }
 
     if (!token) {
       return NextResponse.json(
-        { message: "Authentication required" },
+        { message: "Authentication required", authenticated: false },
         { status: 401 }
       );
     }
 
-    // Get user from token
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token.value);
+    // Get user from token using admin client
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !user) {
       return NextResponse.json(
-        { message: "Invalid authentication" },
+        { message: "Invalid authentication", authenticated: false },
         { status: 401 }
       );
     }
 
     // Get user's favorites with snippet details
-    const { data: favorites, error } = await supabase
+    // Note: favorites table has composite key (user_id, snippet_id), no separate 'id' column
+    const { data: favorites, error } = await supabaseAdmin
       .from('favorites')
       .select(`
-        id,
+        user_id,
+        snippet_id,
         created_at,
-        snippet:snippets (
+        snippets (
           id,
           title,
           description,
           language,
           code,
+          author,
           author_id,
           created_at,
           updated_at,
           downloads,
-          likes,
-          views,
+          rating,
           tags,
-          is_public,
-          profiles!author_id (
-            username,
-            first_name,
-            last_name,
-            avatar_url
-          )
+          price,
+          category,
+          framework,
+          visibility,
+          allow_comments,
+          featured
         )
       `)
       .eq('user_id', user.id)
@@ -69,7 +108,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ favorites: favorites || [] });
+    return NextResponse.json({ 
+      favorites: favorites || [], 
+      authenticated: true 
+    });
 
   } catch (error) {
     console.error('Favorites fetch error:', error);
@@ -83,8 +125,29 @@ export async function GET(request: NextRequest) {
 // Add snippet to favorites
 export async function POST(request: NextRequest) {
   try {
+    // Get auth header or cookie
+    const authHeader = request.headers.get('Authorization');
     const cookieStore = cookies();
-    const token = cookieStore.get('sb-access-token');
+    
+    const possibleTokens = [
+      cookieStore.get('sb-access-token'),
+      cookieStore.get('sb-auth-token'),
+      cookieStore.get('supabase-auth-token')
+    ].filter(Boolean);
+
+    let token = authHeader?.replace('Bearer ', '');
+    
+    if (!token && possibleTokens.length > 0) {
+      token = possibleTokens[0]?.value;
+    }
+
+    if (!token) {
+      const supabase = createServerSupabaseClient(request);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        token = session.access_token;
+      }
+    }
 
     if (!token) {
       return NextResponse.json(
@@ -103,7 +166,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user from token
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token.value);
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !user) {
       return NextResponse.json(
@@ -113,7 +176,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if snippet exists
-    const { data: snippet, error: snippetError } = await supabase
+    const { data: snippet, error: snippetError } = await supabaseAdmin
       .from('snippets')
       .select('id')
       .eq('id', snippetId)
@@ -127,7 +190,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already favorited
-    const { data: existingFavorite, error: checkError } = await supabase
+    const { data: existingFavorite, error: checkError } = await supabaseAdmin
       .from('favorites')
       .select('id')
       .eq('user_id', user.id)
@@ -150,7 +213,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add to favorites
-    const { data: favorite, error: insertError } = await supabase
+    const { data: favorite, error: insertError } = await supabaseAdmin
       .from('favorites')
       .insert({
         user_id: user.id,
@@ -185,8 +248,29 @@ export async function POST(request: NextRequest) {
 // Remove snippet from favorites
 export async function DELETE(request: NextRequest) {
   try {
+    // Get auth header or cookie
+    const authHeader = request.headers.get('Authorization');
     const cookieStore = cookies();
-    const token = cookieStore.get('sb-access-token');
+    
+    const possibleTokens = [
+      cookieStore.get('sb-access-token'),
+      cookieStore.get('sb-auth-token'),
+      cookieStore.get('supabase-auth-token')
+    ].filter(Boolean);
+
+    let token = authHeader?.replace('Bearer ', '');
+    
+    if (!token && possibleTokens.length > 0) {
+      token = possibleTokens[0]?.value;
+    }
+
+    if (!token) {
+      const supabase = createServerSupabaseClient(request);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        token = session.access_token;
+      }
+    }
 
     if (!token) {
       return NextResponse.json(
@@ -206,7 +290,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get user from token
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token.value);
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !user) {
       return NextResponse.json(
@@ -216,7 +300,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Remove from favorites
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseAdmin
       .from('favorites')
       .delete()
       .eq('user_id', user.id)
