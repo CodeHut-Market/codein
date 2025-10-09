@@ -13,7 +13,14 @@ import {
     Upload,
     Users,
     Search,
-    Filter
+    Filter,
+    Zap,
+    Flame,
+    Tag,
+    Target,
+    Trophy,
+    ChevronRight,
+    Sparkles
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -242,21 +249,25 @@ export default function DashboardPage() {
               </div>
               
               <div className="min-w-0 flex-1 space-y-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-700 to-emerald-600 dark:from-white dark:via-blue-300 dark:to-emerald-400 bg-clip-text text-transparent leading-tight">
-                    Welcome back, {getUserDisplayName(user)}!
+                    Welcome back, {getUserDisplayName(user)}
                   </h1>
-                  <div className="hidden sm:block text-2xl animate-bounce">👋</div>
+                  <Sparkles className="hidden sm:block h-6 w-6 text-primary animate-pulse" />
                 </div>
-                <p className="text-sm sm:text-base text-muted-foreground font-medium">
-                  🚀 Ready to build something incredible today?
+                <p className="text-sm sm:text-base text-muted-foreground font-medium flex items-center gap-2">
+                  <ChevronRight className="h-4 w-4" />
+                  Ready to build something incredible today
                 </p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-50 dark:bg-emerald-900/20 rounded-full">
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-full border border-emerald-200 dark:border-emerald-800">
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    Online
+                    <span className="font-medium">Online</span>
                   </span>
-                  <span className="hidden sm:inline">Last activity: Today</span>
+                  <span className="hidden sm:inline flex items-center gap-1">
+                    <Activity className="h-3 w-3" />
+                    Last activity: Today
+                  </span>
                 </div>
               </div>
             </div>
@@ -285,19 +296,28 @@ export default function DashboardPage() {
                 value="overview" 
                 className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:bg-purple-500/10 data-[state=active]:scale-105"
               >
-                <span className="relative z-10">📊 Overview</span>
+                <span className="relative z-10 flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  <span>Overview</span>
+                </span>
               </TabsTrigger>
               <TabsTrigger 
                 value="analytics" 
                 className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:bg-amber-500/10 data-[state=active]:scale-105"
               >
-                <span className="relative z-10">📈 Analytics</span>
+                <span className="relative z-10 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  <span>Analytics</span>
+                </span>
               </TabsTrigger>
               <TabsTrigger 
                 value="snippets" 
                 className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:bg-emerald-500/10 data-[state=active]:scale-105"
               >
-                <span className="relative z-10">💾 Snippets</span>
+                <span className="relative z-10 flex items-center gap-2">
+                  <Code2 className="h-4 w-4" />
+                  <span>Snippets</span>
+                </span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -308,7 +328,7 @@ export default function DashboardPage() {
               <TabsList className="bg-transparent w-full p-0 grid grid-cols-3 lg:grid-cols-9 gap-2 h-auto">
                 <TabsTrigger value="overview" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 data-[state=active]:border-0">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">📊</span>
+                    <BarChart3 className="h-4 w-4" />
                     <span>Overview</span>
                   </span>
                   <div className="absolute inset-0 bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -316,7 +336,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="analytics" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">📈</span>
+                    <TrendingUp className="h-4 w-4" />
                     <span>Analytics</span>
                   </span>
                   <div className="absolute inset-0 bg-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -324,7 +344,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="snippets" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">💾</span>
+                    <Code2 className="h-4 w-4" />
                     <span>Snippets</span>
                   </span>
                   <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -332,7 +352,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="search" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">🔍</span>
+                    <Search className="h-4 w-4" />
                     <span>Search</span>
                   </span>
                   <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -340,7 +360,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="activity" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">⚡</span>
+                    <Zap className="h-4 w-4" />
                     <span>Activity</span>
                   </span>
                   <div className="absolute inset-0 bg-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -348,7 +368,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="trending" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">🔥</span>
+                    <Flame className="h-4 w-4" />
                     <span>Trending</span>
                   </span>
                   <div className="absolute inset-0 bg-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -356,7 +376,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="tags" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">🏷️</span>
+                    <Tag className="h-4 w-4" />
                     <span>Tags</span>
                   </span>
                   <div className="absolute inset-0 bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -364,7 +384,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="progress" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">📊</span>
+                    <Target className="h-4 w-4" />
                     <span>Progress</span>
                   </span>
                   <div className="absolute inset-0 bg-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -372,7 +392,7 @@ export default function DashboardPage() {
 
                 <TabsTrigger value="achievements" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-amber-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 hidden lg:flex">
                   <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-lg">🏆</span>
+                    <Trophy className="h-4 w-4" />
                     <span>Achievements</span>
                   </span>
                   <div className="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
