@@ -283,7 +283,7 @@ export default function DashboardPage() {
             <TabsList className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-2 border-white/30 dark:border-gray-700/30 w-full p-1.5 rounded-2xl shadow-xl">
               <TabsTrigger 
                 value="overview" 
-                className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:bg-primary/10 data-[state=active]:scale-105"
+                className="flex-1 relative overflow-hidden rounded-xl py-3 px-4 text-sm font-semibold transition-all duration-300 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:bg-purple-500/10 data-[state=active]:scale-105"
               >
                 <span className="relative z-10">📊 Overview</span>
               </TabsTrigger>
@@ -306,12 +306,12 @@ export default function DashboardPage() {
           <div className="desktop-tabs hidden sm:block">
             <div className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl p-2 shadow-xl">
               <TabsList className="bg-transparent w-full p-0 grid grid-cols-3 lg:grid-cols-9 gap-2 h-auto">
-                <TabsTrigger value="overview" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 data-[state=active]:border-0">
+                <TabsTrigger value="overview" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0 data-[state=active]:border-0">
                   <span className="relative z-10 flex items-center gap-2">
                     <span className="text-lg">📊</span>
                     <span>Overview</span>
                   </span>
-                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </TabsTrigger>
 
                 <TabsTrigger value="analytics" className="group relative overflow-hidden rounded-xl py-4 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 !text-gray-900 dark:!text-gray-100 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:!text-white data-[state=active]:shadow-lg hover:shadow-md border-0">
