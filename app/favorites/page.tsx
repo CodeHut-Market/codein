@@ -193,7 +193,7 @@ class DataValidator:
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
       if (sessionError || !session) {
-        console.log('No active session found')
+        console.log('No active session found:', sessionError)
         setIsAuthenticated(false)
         setShowSignInDialog(true)
         setFavorites([])
@@ -201,8 +201,11 @@ class DataValidator:
         return
       }
 
-      // User is authenticated - set user ID
+      // User is authenticated - set states immediately
+      console.log('✅ Active session found for user:', session.user.email)
       setUserId(session.user.id)
+      setIsAuthenticated(true)
+      setShowSignInDialog(false) // Hide dialog immediately
       
       // Try API with auth token
       try {
@@ -231,21 +234,30 @@ class DataValidator:
             }
           }).filter(Boolean) || []
           setFavorites(favoriteSnippets)
-          setIsAuthenticated(true)
+          console.log('✅ Loaded', favoriteSnippets.length, 'favorites')
         } else if (response.status === 401) {
-          // Token might be expired
-          console.log('Authentication failed - token may be expired')
-          setIsAuthenticated(false)
-          setShowSignInDialog(true)
-          setFavorites([])
+          // Token might be expired - try to refresh
+          console.log('⚠️ Token expired, attempting refresh...')
+          const { data: { session: newSession }, error: refreshError } = await supabase.auth.refreshSession()
+          
+          if (newSession) {
+            console.log('✅ Session refreshed, retrying...')
+            // Retry with new token
+            loadFavorites()
+          } else {
+            console.log('❌ Session refresh failed:', refreshError)
+            setIsAuthenticated(false)
+            setShowSignInDialog(true)
+            setFavorites([])
+          }
         } else {
           throw new Error(`API error: ${response.status}`)
         }
       } catch (apiError) {
         console.error('API error:', apiError)
-        setIsAuthenticated(false)
-        setShowSignInDialog(true)
-        setFavorites([])
+        // Don't immediately show sign-in dialog if we have a session
+        // The user is authenticated, just couldn't load favorites
+        setError('Failed to load favorites. Please refresh the page.')
       }
     } catch (error) {
       console.error('Error loading favorites:', error)
@@ -261,25 +273,31 @@ class DataValidator:
     loadFavorites()
 
     // Listen for auth state changes to reload favorites
-    const setupAuthListener = async () => {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          console.log('User signed in, reloading favorites')
-          loadFavorites()
-        } else if (event === 'SIGNED_OUT') {
-          console.log('User signed out')
-          setIsAuthenticated(false)
-          setShowSignInDialog(true)
-          setFavorites([])
-        }
-      })
-
-      return () => {
-        subscription.unsubscribe()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔔 Auth state changed:', event, session?.user?.email)
+      
+      if (event === 'SIGNED_IN' && session) {
+        console.log('✅ User signed in, reloading favorites')
+        setIsAuthenticated(true)
+        setShowSignInDialog(false)
+        setUserId(session.user.id)
+        loadFavorites()
+      } else if (event === 'SIGNED_OUT') {
+        console.log('👋 User signed out')
+        setIsAuthenticated(false)
+        setShowSignInDialog(true)
+        setFavorites([])
+        setUserId(null)
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        console.log('🔄 Token refreshed')
+        setIsAuthenticated(true)
+        setShowSignInDialog(false)
       }
-    }
+    })
 
-    setupAuthListener()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   // Filter and sort favorites
