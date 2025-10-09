@@ -15,12 +15,20 @@ create table if not exists public.snippets (
     framework text,
     downloads int default 0 not null,
     created_at timestamptz default now() not null,
-    updated_at timestamptz default now() not null
+    updated_at timestamptz default now() not null,
+    -- Additional columns for advanced features
+    category text,
+    visibility text default 'public' not null,
+    allow_comments boolean default true not null,
+    featured boolean default false not null
 );
 
 -- New canonical indexes
 create index if not exists idx_snippets_created_at on public.snippets(created_at desc);
 create index if not exists idx_snippets_language on public.snippets(language);
+create index if not exists idx_snippets_category on public.snippets(category);
+create index if not exists idx_snippets_visibility on public.snippets(visibility);
+create index if not exists idx_snippets_featured on public.snippets(featured);
 -- Trigram extension (safe if already installed) needed for title gin_trgm_ops
 create extension if not exists pg_trgm;
 create index if not exists idx_snippets_title_trgm on public.snippets using gin (title gin_trgm_ops);
@@ -65,6 +73,12 @@ end $$;
 
 -- Ensure downloads column exists (legacy tables might have lacked it)
 alter table public.snippets add column if not exists downloads int default 0 not null;
+
+-- Add new columns if they don't exist (for existing databases)
+alter table public.snippets add column if not exists category text;
+alter table public.snippets add column if not exists visibility text default 'public' not null;
+alter table public.snippets add column if not exists allow_comments boolean default true not null;
+alter table public.snippets add column if not exists featured boolean default false not null;
 
 -- Replace old createdAt index if it exists (legacy name)
 drop index if exists idx_snippets_createdat; -- old index on createdAt

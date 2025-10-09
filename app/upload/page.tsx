@@ -4,6 +4,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from '@/components/ui/input'
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -17,10 +25,13 @@ import {
     DollarSign,
     FileText,
     Loader2,
+    Lock,
+    LogIn,
     Plus,
     ShieldAlert,
     Upload as UploadIcon,
     UploadCloud,
+    UserPlus,
     X
 } from 'lucide-react'
 import Link from 'next/link'
@@ -36,6 +47,9 @@ export default function UploadPage() {
   // Upload mode: 'simple' or 'advanced'
   const [uploadMode, setUploadMode] = useState<'simple' | 'advanced'>('simple')
   
+  // Sign-in dialog state
+  const [showSignInDialog, setShowSignInDialog] = useState(false)
+  
   // Form state
   const [title, setTitle] = useState('')
   const [code, setCode] = useState('')
@@ -46,7 +60,7 @@ export default function UploadPage() {
   const [uploadMessage, setUploadMessage] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState('')
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState('Frontend')
   const [isPublic, setIsPublic] = useState(true)
   const [allowComments, setAllowComments] = useState(true)
   
@@ -60,6 +74,11 @@ export default function UploadPage() {
   const [plagMessage, setPlagMessage] = useState('')
 
   // Authentication is now handled by AuthContext
+  useEffect(() => {
+    if (!isLoading && !user) {
+      setShowSignInDialog(true)
+    }
+  }, [user, isLoading])
 
   const languages = [
     'typescript', 'javascript', 'python', 'java', 'cpp', 'csharp', 'go', 
@@ -312,21 +331,89 @@ export default function UploadPage() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <Card className="max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle>Authentication Required</CardTitle>
-            <CardDescription>
-              Please sign in to upload code snippets
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/login">
-              <Button className="w-full">Sign In</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        {/* Sign In Dialog */}
+        <Dialog open={showSignInDialog} onOpenChange={setShowSignInDialog}>
+          <DialogContent className="sm:max-w-lg bg-white/100 backdrop-blur-none border-2 border-gray-200 shadow-2xl">
+            <DialogHeader className="bg-white">
+              <DialogTitle className="flex items-center gap-2 text-2xl bg-white">
+                <Lock className="h-6 w-6 text-emerald-500" />
+                Sign in to upload snippets
+              </DialogTitle>
+              <DialogDescription className="pt-3 text-base bg-white">
+                You need to sign in to upload code snippets and share your work with the community.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-4 py-6 bg-white">
+              <div className="flex items-start gap-4 rounded-lg border-2 border-emerald-200 bg-emerald-100 p-4">
+                <div className="rounded-full bg-emerald-500/30 p-3">
+                  <UploadCloud className="h-6 w-6 text-emerald-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-gray-900">Share Your Code</h4>
+                  <p className="text-sm text-gray-700 mt-1">
+                    Upload code snippets and help developers around the world
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 rounded-lg border-2 border-blue-200 bg-blue-100 p-4">
+                <div className="rounded-full bg-blue-500/30 p-3">
+                  <DollarSign className="h-6 w-6 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-gray-900">Earn from Your Work</h4>
+                  <p className="text-sm text-gray-700 mt-1">
+                    Set your own prices or share for free - you decide
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 rounded-lg border-2 border-purple-200 bg-purple-100 p-4">
+                <div className="rounded-full bg-purple-500/30 p-3">
+                  <UserPlus className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-gray-900">Join the Community</h4>
+                  <p className="text-sm text-gray-700 mt-1">
+                    Free account - start uploading in seconds
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="flex-col sm:flex-row gap-3 bg-white">
+              <Button
+                variant="outline"
+                onClick={() => router.push('/explore')}
+                className="w-full sm:w-auto border-2"
+              >
+                Browse Snippets
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowSignInDialog(false);
+                  router.push('/login');
+                }}
+                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white"
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In Now
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Locked state background */}
+        <div className="container mx-auto px-4 py-16 text-center">
+          <div className="max-w-md mx-auto space-y-4">
+            <Lock className="h-16 w-16 mx-auto text-gray-400" />
+            <h2 className="text-2xl font-bold text-gray-900">Authentication Required</h2>
+            <p className="text-gray-600">Please sign in to upload code snippets</p>
+          </div>
+        </div>
+      </>
     )
   }
 

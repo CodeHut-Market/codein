@@ -6,6 +6,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,6 +25,7 @@ import {
   Grid, 
   Heart, 
   List, 
+  LogIn,
   Search, 
   SortAsc, 
   SortDesc, 
@@ -25,8 +34,11 @@ import {
   Trash2,
   TrendingUp,
   Code,
-  Download
+  Download,
+  UserPlus,
+  Lock
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface FavoriteItem {
@@ -56,6 +68,9 @@ export default function FavoritesPage() {
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("all")
+  const [showSignInDialog, setShowSignInDialog] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const router = useRouter()
 
   // Enhanced demo favorites data
   const demoFavorites: CodeSnippet[] = [
@@ -186,16 +201,21 @@ class DataValidator:
           const data = await response.json()
           const favoriteSnippets = data.favorites?.map((fav: FavoriteItem) => fav.snippet) || []
           setFavorites(favoriteSnippets)
+          setIsAuthenticated(true)
+        } else if (response.status === 401) {
+          // User is not authenticated - show dialog
+          setIsAuthenticated(false)
+          setShowSignInDialog(true)
+          setFavorites([])
         } else {
           throw new Error('API not available')
         }
       } catch (apiError) {
-        // Fallback to localStorage for demo
-        const userFavorites = JSON.parse(localStorage.getItem("userFavorites") || "[]")
-        const favoriteSnippets = demoFavorites.filter(snippet => 
-          userFavorites.includes(snippet.id)
-        )
-        setFavorites(favoriteSnippets)
+        // Check if it's an auth error
+        console.warn('API error:', apiError)
+        setIsAuthenticated(false)
+        setShowSignInDialog(true)
+        setFavorites([])
       }
     } catch (error) {
       console.error('Error loading favorites:', error)
@@ -341,7 +361,7 @@ class DataValidator:
     )
   }
 
-  const availableLanguages = Array.from(new Set(favorites.map(f => f.language)))
+  const availableLanguages = Array.from(new Set(favorites.map(f => f.language).filter(Boolean)))
   const availableCategories = Array.from(new Set(favorites.map(f => f.category).filter(Boolean)))
 
   const favoriteStats = {
@@ -356,6 +376,91 @@ class DataValidator:
   }
 
   return (
+    <>
+      {/* Sign In Dialog */}
+      <Dialog open={showSignInDialog} onOpenChange={setShowSignInDialog}>
+        <DialogContent className="sm:max-w-lg bg-white/100 backdrop-blur-none border-2 border-gray-200 shadow-2xl">
+          <DialogHeader className="bg-white">
+            <DialogTitle className="flex items-center gap-2 text-2xl bg-white">
+              <Lock className="h-6 w-6 text-pink-500" />
+              Sign in to view favorites
+            </DialogTitle>
+            <DialogDescription className="pt-3 text-base bg-white">
+              You need to sign in to access your favorites page and manage your saved snippets.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-6 bg-white">
+            <div className="flex items-start gap-4 rounded-lg border-2 border-pink-200 bg-pink-100 p-4">
+              <div className="rounded-full bg-pink-500/30 p-3">
+                <Heart className="h-6 w-6 text-pink-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-gray-900">Save Your Favorites</h4>
+                <p className="text-sm text-gray-700 mt-1">
+                  Keep track of code snippets you love and access them from any device
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 rounded-lg border-2 border-purple-200 bg-purple-100 p-4">
+              <div className="rounded-full bg-purple-500/30 p-3">
+                <Star className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-gray-900">Organize & Search</h4>
+                <p className="text-sm text-gray-700 mt-1">
+                  Filter by language, category, and sort your collection your way
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 rounded-lg border-2 border-blue-200 bg-blue-100 p-4">
+              <div className="rounded-full bg-blue-500/30 p-3">
+                <UserPlus className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-gray-900">Join the Community</h4>
+                <p className="text-sm text-gray-700 mt-1">
+                  Free account - no credit card required, ready in seconds
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-3 bg-white">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/explore')}
+              className="w-full sm:w-auto border-2"
+            >
+              Browse Snippets
+            </Button>
+            <Button
+              onClick={() => {
+                setShowSignInDialog(false);
+                router.push('/login');
+              }}
+              className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign In Now
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Main Content - Only show if authenticated */}
+      {isAuthenticated === false ? (
+        // Empty state while dialog is showing
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Lock className="h-16 w-16 mx-auto text-gray-400" />
+            <h2 className="text-2xl font-bold text-gray-900">Authentication Required</h2>
+            <p className="text-gray-600">Please sign in to view your favorites</p>
+          </div>
+        </div>
+      ) : (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-pink-500 via-purple-600 to-blue-600 text-white">
@@ -623,5 +728,7 @@ class DataValidator:
         </Tabs>
       </div>
     </div>
+      )}
+    </>
   )
 }
