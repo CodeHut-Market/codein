@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useNotifications } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabaseClient";
 import { Heart, Loader2, LogIn, UserPlus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -76,12 +77,32 @@ export default function FavoriteButton({
     setLoading(true);
 
     try {
+      // Check if Supabase is configured
+      if (!supabase) {
+        console.log('⚠️ Supabase not configured, showing sign-in dialog');
+        setShowSignInDialog(true);
+        setLoading(false);
+        return;
+      }
+
+      // Check if user is authenticated first
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.log('❌ No active session, showing sign-in dialog');
+        setShowSignInDialog(true);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('✅ User authenticated:', session.user.email);
+
       // Optimistic update
       const newIsFavorited = !isFavorited;
       setIsFavorited(newIsFavorited);
       setFavoriteCount((prev) => Math.max(0, newIsFavorited ? prev + 1 : prev - 1));
 
-      // Try API first
+      // Try API with auth token
       try {
         let res;
         
@@ -90,7 +111,10 @@ export default function FavoriteButton({
           res = await fetch('/api/favorites', {
             method: "POST",
             credentials: "include",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.access_token}`
+            },
             body: JSON.stringify({ snippetId })
           });
         } else {
@@ -98,6 +122,9 @@ export default function FavoriteButton({
           res = await fetch(`/api/favorites?snippetId=${snippetId}`, {
             method: "DELETE",
             credentials: "include",
+            headers: {
+              "Authorization": `Bearer ${session.access_token}`
+            }
           });
         }
 
@@ -115,63 +142,60 @@ export default function FavoriteButton({
               duration: 2000,
             });
           }
+          
+          // Update localStorage as backup
+          const userFavorites = JSON.parse(localStorage.getItem("userFavorites") || "[]");
+          if (newIsFavorited) {
+            if (!userFavorites.includes(snippetId)) {
+              userFavorites.push(snippetId);
+            }
+          } else {
+            const index = userFavorites.indexOf(snippetId);
+            if (index > -1) {
+              userFavorites.splice(index, 1);
+            }
+          }
+          localStorage.setItem("userFavorites", JSON.stringify(userFavorites));
         } else {
           // Check if it's an auth error
           if (res.status === 401) {
-            // Revert optimistic update
-            setIsFavorited((prev) => !prev);
-            setFavoriteCount((prev) => Math.max(0, newIsFavorited ? prev - 1 : prev + 1));
-            // Show sign in dialog
-            setShowSignInDialog(true);
-            setLoading(false);
-            return;
+            console.log('⚠️ Token expired, attempting refresh...');
+            // Try to refresh the session
+            const { data: { session: newSession }, error: refreshError } = await supabase.auth.refreshSession();
+            
+            if (newSession) {
+              console.log('✅ Session refreshed, retrying...');
+              // Retry the operation
+              setLoading(false);
+              toggleFavorite();
+              return;
+            } else {
+              console.log('❌ Session refresh failed');
+              // Revert optimistic update
+              setIsFavorited((prev) => !prev);
+              setFavoriteCount((prev) => Math.max(0, newIsFavorited ? prev - 1 : prev + 1));
+              // Show sign in dialog
+              setShowSignInDialog(true);
+              setLoading(false);
+              return;
+            }
           }
-          throw new Error("API request failed");
+          throw new Error(`API request failed with status ${res.status}`);
         }
       } catch (apiError) {
-        // Check if it's an auth error
-        if (apiError instanceof Error && apiError.message === "Authentication required") {
-          // Revert optimistic update
-          setIsFavorited((prev) => !prev);
-          setFavoriteCount((prev) => Math.max(0, newIsFavorited ? prev - 1 : prev + 1));
-          // Show sign in dialog
-          setShowSignInDialog(true);
-          setLoading(false);
-          return;
-        }
+        console.error('API error:', apiError);
         
-        // Other errors - fallback to localStorage for demo
-        console.warn("API failed, using localStorage", apiError);
+        // Revert optimistic update
+        setIsFavorited((prev) => !prev);
+        setFavoriteCount((prev) => Math.max(0, newIsFavorited ? prev - 1 : prev + 1));
         
-        const userFavorites = JSON.parse(localStorage.getItem("userFavorites") || "[]");
-        
-        if (newIsFavorited) {
-          if (!userFavorites.includes(snippetId)) {
-            userFavorites.push(snippetId);
-          }
-          showSuccess({
-            title: "Added to Favorites",
-            description: "Snippet saved to your favorites list (local).",
-            duration: 2500,
-          });
-        } else {
-          const index = userFavorites.indexOf(snippetId);
-          if (index > -1) {
-            userFavorites.splice(index, 1);
-          }
-          showInfo({
-            title: "Removed",
-            description: "Snippet removed from favorites.",
-            duration: 2000,
-          });
-        }
-        
-        localStorage.setItem("userFavorites", JSON.stringify(userFavorites));
+        showError({
+          title: "Failed",
+          description: "Could not update favorite. Please try again.",
+        });
       }
     } catch (error) {
-      // Revert optimistic update
-      setIsFavorited((prev) => !prev);
-      setFavoriteCount((prev) => prev); // rely on refresh
+      console.error('Toggle favorite error:', error);
       showError({
         title: "Failed",
         description: "Could not update favorite. Please retry.",
@@ -255,48 +279,48 @@ export default function FavoriteButton({
 
       {/* Sign In Dialog */}
       <Dialog open={showSignInDialog} onOpenChange={setShowSignInDialog}>
-        <DialogContent className="sm:max-w-md bg-white/100 backdrop-blur-none border-2 border-gray-200 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+        <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 backdrop-blur-none border-2 border-gray-200 dark:border-gray-700 shadow-2xl">
+          <DialogHeader className="bg-white dark:bg-gray-900">
+            <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
               <Heart className="h-5 w-5 text-red-500" />
               Sign in to save favorites
             </DialogTitle>
-            <DialogDescription className="pt-2">
+            <DialogDescription className="pt-2 text-gray-600 dark:text-gray-400">
               Create an account or sign in to save your favorite snippets and access them across all your devices.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-3 py-4">
-            <div className="flex items-start gap-3 rounded-lg border p-3">
-              <div className="rounded-full bg-primary/10 p-2">
-                <Heart className="h-4 w-4 text-primary" />
+          <div className="flex flex-col gap-3 py-4 bg-white dark:bg-gray-900">
+            <div className="flex items-start gap-3 rounded-lg border-2 border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-950/30 p-3">
+              <div className="rounded-full bg-pink-500/20 dark:bg-pink-500/30 p-2">
+                <Heart className="h-4 w-4 text-pink-600 dark:text-pink-400" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-medium">Save & Sync</h4>
-                <p className="text-xs text-muted-foreground">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Save & Sync</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
                   Your favorites will be saved and synced across all devices
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 rounded-lg border p-3">
-              <div className="rounded-full bg-primary/10 p-2">
-                <UserPlus className="h-4 w-4 text-primary" />
+            <div className="flex items-start gap-3 rounded-lg border-2 border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/30 p-3">
+              <div className="rounded-full bg-purple-500/20 dark:bg-purple-500/30 p-2">
+                <UserPlus className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-medium">Free Forever</h4>
-                <p className="text-xs text-muted-foreground">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Free Forever</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
                   Create a free account in seconds - no credit card required
                 </p>
               </div>
             </div>
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2">
+          <DialogFooter className="flex-col sm:flex-row gap-2 bg-white dark:bg-gray-900">
             <Button
               variant="outline"
               onClick={() => setShowSignInDialog(false)}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto border-2"
             >
               Maybe Later
             </Button>
@@ -305,7 +329,7 @@ export default function FavoriteButton({
                 setShowSignInDialog(false);
                 router.push('/login');
               }}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
             >
               <LogIn className="mr-2 h-4 w-4" />
               Sign In
