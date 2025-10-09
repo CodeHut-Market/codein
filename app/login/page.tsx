@@ -148,9 +148,8 @@ export default function LoginPage() {
 					<div className="absolute top-1/2 right-1/3 w-16 h-16 rounded-full opacity-45 animate-pulse delay-500" style={{background:"rgba(255,255,255,0.15)",backdropFilter:"blur(20px) saturate(180%)",border:"2px solid rgba(255,255,255,0.3)",boxShadow:"0 8px 32px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.4)"}} />
 				</div>
 				<Card
-					className="max-w-md hover-lift shadow-2xl relative z-10 w-[126%] mx-[0] border-transparent"
+					className="max-w-md hover-lift shadow-2xl relative z-10 w-[126%] mx-[0] border-transparent bg-white/90 dark:bg-gray-900/90"
 					style={{
-						background: "rgba(255, 255, 255, 0.25)",
 						backdropFilter: "blur(40px) saturate(250%)",
 						border: "1px solid rgba(255, 255, 255, 0.4)",
 						boxShadow: "0 32px 80px rgba(0,0,0,0.3),0 16px 64px rgba(255,255,255,0.2), inset 0 3px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(255,255,255,0.3)"
@@ -183,7 +182,7 @@ export default function LoginPage() {
 									value={email} 
 									onChange={(e)=>setEmail(e.target.value)} 
 									required 
-									className="border-white/40 bg-white/10 placeholder:text-card-foreground/50 py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15" 
+									className="border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 placeholder:text-gray-500 dark:placeholder:text-gray-400 py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400" 
 								/>
 							</div>
 							<div className="space-y-2">
@@ -196,11 +195,11 @@ export default function LoginPage() {
 										value={password} 
 										onChange={(e)=>setPassword(e.target.value)} 
 										required 
-										className="border-white/40 bg-white/10 placeholder:text-card-foreground/50 py-3 pr-10 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15" 
+										className="border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 placeholder:text-gray-500 dark:placeholder:text-gray-400 py-3 pr-10 focus:ring-2 focus:ring-blue-400 focus:border-blue-400" 
 									/>
 									<button
 										type="button"
-										className="absolute inset-y-0 right-0 pr-3 flex items-center text-card-foreground/60 hover:text-card-foreground"
+										className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
 										onClick={() => setShowPassword(!showPassword)}
 									>
 										{showPassword ? (
@@ -221,21 +220,21 @@ export default function LoginPage() {
 							</Button>
 						</form>
 						<div className="relative flex justify-center text-xs uppercase">
-							<span className="px-2 font-sans text-card-foreground/60">Or continue with</span>
+							<span className="px-2 font-sans text-gray-600 dark:text-gray-400">Or continue with</span>
 						</div>
 						<div className="space-y-3">
-							<Button variant="outline" onClick={()=>handleSocialLogin('google')} disabled={oauthLoading==='google' || oauthLoading==='processing'} className="w-full glass-effect border-white/30 hover-lift ripple-effect font-sans hover:bg-white/20">
+							<Button variant="outline" onClick={()=>handleSocialLogin('google')} disabled={oauthLoading==='google' || oauthLoading==='processing'} className="w-full bg-white/80 dark:bg-gray-800/80 border-gray-300 dark:border-gray-600 hover-lift ripple-effect font-sans hover:bg-white/90 dark:hover:bg-gray-700/90">
 								{oauthLoading==='google' ? 'Redirecting…' : oauthLoading==='processing' ? 'Completing sign in…' : 'Continue with Google'}
 							</Button>
-							<Button variant="outline" onClick={()=>handleSocialLogin('github')} disabled={oauthLoading==='github' || oauthLoading==='processing'} className="w-full glass-effect border-white/30 hover-lift ripple-effect font-sans hover:bg-white/20">
+							<Button variant="outline" onClick={()=>handleSocialLogin('github')} disabled={oauthLoading==='github' || oauthLoading==='processing'} className="w-full bg-white/80 dark:bg-gray-800/80 border-gray-300 dark:border-gray-600 hover-lift ripple-effect font-sans hover:bg-white/90 dark:hover:bg-gray-700/90">
 								{oauthLoading==='github' ? 'Redirecting…' : oauthLoading==='processing' ? 'Completing sign in…' : 'Continue with GitHub'}
 							</Button>
 						</div>
 						<div className="text-center space-y-2">
-							<Link href="/reset-password" className="text-sm font-sans text-card-foreground/70 hover:text-card-foreground transition-colors">Forgot your password?</Link>
-							<div className="text-sm font-sans text-card-foreground/70">
+							<Link href="/reset-password" className="text-sm font-sans text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">Forgot your password?</Link>
+							<div className="text-sm font-sans text-gray-600 dark:text-gray-400">
 								Don't have an account?{" "}
-								<Link href="/signup" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">
+								<Link href="/signup" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors font-medium">
 									Sign up here
 								</Link>
 							</div>

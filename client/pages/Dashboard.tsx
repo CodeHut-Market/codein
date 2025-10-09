@@ -16,6 +16,7 @@ import {
   Download,
   LogOut,
   Plus,
+  Search,
   Settings,
   ShoppingCart,
   Star,
@@ -126,7 +127,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-indigo-50 to-cyan-50">
       {/* Header */}
-      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-violet-200/30 dark:border-gray-700/50 shadow-sm sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-900 border-b border-violet-200/30 dark:border-gray-700/50 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-4">
@@ -181,7 +182,7 @@ export default function Dashboard() {
               </div>
 
               {/* User profile */}
-              <div className="flex items-center gap-2 sm:gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-2 sm:px-3 py-1 sm:py-2 rounded-full border border-violet-200/50 dark:border-gray-600/50">
+              <div className="flex items-center gap-2 sm:gap-3 bg-white dark:bg-gray-800 px-2 sm:px-3 py-1 sm:py-2 rounded-full border border-violet-200/50 dark:border-gray-600/50">
                 <img
                   src={user.avatar}
                   alt={user.username}
@@ -196,7 +197,7 @@ export default function Dashboard() {
                 variant="outline" 
                 size="sm" 
                 onClick={handleLogout}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-400 dark:hover:border-rose-600 p-2 sm:px-3 sm:py-2"
+                className="bg-white dark:bg-gray-800 border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-400 dark:hover:border-rose-600 p-2 sm:px-3 sm:py-2"
               >
                 <LogOut className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">Logout</span>
@@ -230,7 +231,7 @@ export default function Dashboard() {
                 <Button 
                   asChild 
                   size="lg"
-                  className="bg-white/20 hover:bg-white/30 backdrop-blur-md border-2 border-white/40 text-white shadow-2xl transition-all duration-300 hover:scale-110 font-bold text-lg px-8 py-4"
+                  className="bg-white hover:bg-gray-100 border-2 border-purple-400 text-purple-700 shadow-2xl transition-all duration-300 hover:scale-110 font-bold text-lg px-8 py-4"
                 >
                   <Link to="/upload" className="flex items-center justify-center gap-3">
                     <Plus className="w-6 h-6" />
@@ -277,8 +278,8 @@ export default function Dashboard() {
               <CardTitle className="text-lg font-black text-green-100 uppercase tracking-wider">
                 💻 CODE SNIPPETS 💻
               </CardTitle>
-              <div className="p-3 bg-white/30 rounded-full animate-bounce">
-                <Code className="h-8 w-8 text-green-200" />
+              <div className="p-3 bg-white rounded-full animate-bounce">
+                <Code className="h-8 w-8 text-green-600" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10 px-6 pb-6">
@@ -337,7 +338,7 @@ export default function Dashboard() {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-4 bg-white/70 backdrop-blur-sm border border-violet-200/30 rounded-xl p-1">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-4 bg-white border border-violet-200/30 rounded-xl p-1">
             <TabsTrigger 
               value="overview"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white rounded-lg font-medium text-xs sm:text-sm"
@@ -510,7 +511,7 @@ export default function Dashboard() {
                     {userSnippets.map((snippet) => (
                       <div
                         key={snippet.id}
-                        className="flex items-center justify-between p-5 border border-teal-200/50 rounded-xl bg-gradient-to-r from-white/70 to-teal-50/50 backdrop-blur-sm hover:shadow-md transition-all duration-200"
+                        className="flex items-center justify-between p-5 border border-teal-200/50 rounded-xl bg-gradient-to-r from-white to-teal-50 hover:shadow-md transition-all duration-200"
                       >
                         <div className="flex-1">
                           <h3 className="font-semibold text-teal-900">

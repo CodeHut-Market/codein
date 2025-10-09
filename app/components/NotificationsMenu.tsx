@@ -44,7 +44,7 @@ export default function NotificationsMenu() {
         </span>
       </Button>
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-auto rounded-md border border-white/20 bg-background/80 backdrop-blur-lg shadow-xl supports-[backdrop-filter]:bg-background/60 z-50 p-2 text-sm">
+        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-auto rounded-md border border-gray-300 bg-background shadow-xl z-50 p-2 text-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium">Notifications</span>
             <button onClick={()=> setOpen(false)} className="text-xs text-muted-foreground hover:text-foreground">Close</button>
@@ -54,7 +54,7 @@ export default function NotificationsMenu() {
           )}
           {!loading && items.length === 0 && <div className="py-6 text-center text-muted-foreground">No notifications</div>}
           {!loading && items.map(n => (
-            <div key={n.id} className="rounded-md p-2 hover:bg-accent/50 hover:backdrop-blur-sm flex flex-col gap-0.5 transition-all">
+            <div key={n.id} className="rounded-md p-2 hover:bg-accent flex flex-col gap-0.5 transition-all">
               <span className="font-medium text-foreground text-sm">{n.title}</span>
               <span className="text-xs text-muted-foreground leading-snug">{n.message}</span>
             </div>

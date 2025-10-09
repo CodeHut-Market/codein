@@ -9,12 +9,12 @@
 /* Removed @custom-variant (not supported in Tailwind 3). Using standard .dark class toggling (darkMode:'class'). */
 
 :root {
-  /* Updated color tokens to match liquid glass design brief with pastel gradients and amber accents */
+  /* Updated color tokens - fully opaque backgrounds */
   --background: oklch(0.98 0.02 85); /* #fefce8 - soft cream background */
   --foreground: oklch(0.35 0.02 220); /* #374151 - dark gray text */
-  --card: oklch(1 0 0 / 0.7); /* Semi-transparent white for glass effect */
+  --card: oklch(1 0 0); /* Fully opaque white for cards */
   --card-foreground: oklch(0.35 0.02 220); /* #374151 - dark gray text on cards */
-  --popover: oklch(1 0 0 / 0.9); /* More opaque white for popovers */
+  --popover: oklch(1 0 0); /* Fully opaque white for popovers */
   --popover-foreground: oklch(0.35 0.02 220);
   --primary: oklch(0.65 0.15 45); /* #d97706 - warm amber primary */
   --primary-foreground: oklch(1 0 0); /* White text on primary */
@@ -96,14 +96,12 @@
   }
 }
 
-/* Added custom styles for liquid glass effect and gradient background */
+/* Custom styles - opaque backgrounds */
 @layer utilities {
   .glass-effect {
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(209, 213, 219, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
 
   .gradient-bg {
@@ -121,7 +119,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     pointer-events: none;
   }
 

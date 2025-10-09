@@ -128,8 +128,8 @@ export default function SnippetCard({
 
     return (
     <>
-      <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] hover-gradient-emerald border-l-4 border-l-emerald-400 dark:border-l-emerald-500 h-full flex flex-col">
-        <CardHeader className="pb-3 flex-shrink-0">
+      <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] hover-gradient-emerald border-2 border-gray-200 dark:border-gray-700 h-full flex flex-col overflow-hidden">
+        <CardHeader className="pb-3 flex-shrink-0 border-b border-gray-100 dark:border-gray-800">
           <div className="flex justify-between items-start mb-2 gap-2">
             <CardTitle className="text-lg leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex-1 min-w-0">
               <span className="break-words line-clamp-2">{snippet.title}</span>
@@ -150,21 +150,21 @@ export default function SnippetCard({
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4 flex-1 flex flex-col">
-          {/* Tags - Mobile Optimized */}
-          <div className="flex flex-wrap gap-1">
-            {snippet.tags.slice(0, 3).map((tag, index) => (
+        <CardContent className="space-y-4 flex-1 flex flex-col pt-4">
+          {/* Tags - Contained with horizontal scroll */}
+          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+            {snippet.tags.slice(0, 5).map((tag, index) => (
               <Badge 
                 key={tag} 
                 variant="outline" 
-                className={`text-xs ${getTagColor(index)}`}
+                className={`text-xs whitespace-nowrap flex-shrink-0 ${getTagColor(index)}`}
               >
-                <span className="truncate max-w-20">{tag}</span>
+                {tag}
               </Badge>
             ))}
-            {snippet.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border-amber-200 dark:from-amber-900/20 dark:to-orange-900/20 dark:text-amber-300 dark:border-amber-800">
-                +{snippet.tags.length - 3}
+            {snippet.tags.length > 5 && (
+              <Badge variant="outline" className="text-xs whitespace-nowrap flex-shrink-0 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border-amber-200 dark:from-amber-900/20 dark:to-orange-900/20 dark:text-amber-300 dark:border-amber-800">
+                +{snippet.tags.length - 5}
               </Badge>
             )}
           </div>

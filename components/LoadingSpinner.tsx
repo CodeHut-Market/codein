@@ -210,7 +210,7 @@ export function LoadingOverlay({
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
       <div className="bg-background border border-border rounded-lg p-8 shadow-xl">
         <LoadingSpinner variant={variant} size="xl" message={message} />
       </div>

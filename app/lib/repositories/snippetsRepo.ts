@@ -815,8 +815,8 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
   // OPTIMIZED SUPABASE QUERY - Single query execution
   if(isSupabaseEnabled()){
     try {
-      // Build optimized select query - only fetch needed columns for list view
-      const selectColumns = 'id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at';
+      // Build optimized select query - fetch snippets first, then get authors separately
+      const selectColumns = 'id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at,visibility';
       let q = supabase!.from('snippets').select(selectColumns);
       
       // Batch filter application for better performance
@@ -1094,7 +1094,7 @@ export async function listPopular(limit = 6): Promise<CodeSnippet[]>{
       // Optimized query with specific columns and single order
       const { data, error } = await supabase!
         .from('snippets')
-        .select('id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at')
+        .select('id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at,visibility')
         .order('downloads', { ascending: false })
         .order('created_at', { ascending: false }) // Secondary sort for ties
         .limit(limit * 2); // Fetch more for cache
@@ -1131,6 +1131,14 @@ function handleTableMissing(err: any){
 
 // Map DB row (supports snake_case) to CodeSnippet shape expected by app
 function mapRowToSnippet(row: any): CodeSnippet {
+  // Ensure author is populated - fallback to fetching from profiles if needed
+  let authorName = row.author;
+  
+  // If author is missing or looks like a UUID, try to get username
+  if (!authorName || authorName.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    authorName = 'Anonymous';
+  }
+  
   return {
     id: row.id,
     title: row.title,
@@ -1138,7 +1146,7 @@ function mapRowToSnippet(row: any): CodeSnippet {
     description: row.description || '',
     price: Number(row.price || 0),
     rating: Number(row.rating || 0),
-    author: row.author,
+    author: authorName,
     authorId: row.authorid || row.authorId || row.author_id || 'unknown',
     tags: Array.isArray(row.tags) ? row.tags : [],
     language: row.language,

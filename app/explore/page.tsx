@@ -21,14 +21,23 @@ import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
 
 // Adapter function to convert CodeSnippet to format expected by RealTimeSnippetCard
 const adaptCodeSnippetForRealTime = (snippet: CodeSnippet) => ({
-  ...snippet,
-  viewCount: snippet.views || 0,
-  likeCount: snippet.likes || 0,
-  downloadCount: snippet.downloads || 0,
-  commentCount: snippet.comments?.length || 0,
-  isLiked: false, // This would come from user state
-  isBookmarked: false, // This would come from user state
-  author: snippet.author || { name: 'Anonymous', avatar: null }
+  id: snippet.id,
+  title: snippet.title,
+  description: snippet.description,
+  language: snippet.language,
+  user_id: snippet.authorId,
+  user: {
+    username: snippet.author || 'Anonymous',
+    display_name: snippet.author || 'Anonymous',
+    avatar_url: undefined
+  },
+  views: snippet.views || snippet.downloads || 0,
+  likes: snippet.likes || snippet.rating || 0,
+  downloads: snippet.downloads || 0,
+  created_at: snippet.createdAt,
+  updated_at: snippet.updatedAt,
+  is_public: (snippet.visibility !== 'private'),
+  tags: snippet.tags || []
 })
 
 export default function ExplorePage() {
@@ -276,7 +285,6 @@ export default function ExplorePage() {
               <div key={snippet.id} className="relative">
                 <RealTimeSnippetCard 
                   snippet={adaptCodeSnippetForRealTime(snippet)}
-                  onPurchaseComplete={() => fetchSnippets(1, false)}
                 />
                 <div className="absolute -top-2 -right-2 z-10">
                   <Badge className="bg-yellow-500 text-yellow-50 shadow-lg">
@@ -307,7 +315,6 @@ export default function ExplorePage() {
                 <RealTimeSnippetCard 
                   key={snippet.id} 
                   snippet={adaptCodeSnippetForRealTime(snippet)}
-                  onPurchaseComplete={() => fetchSnippets(1, false)}
                 />
               ))
             ) : (

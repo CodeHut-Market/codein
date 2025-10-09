@@ -73,6 +73,9 @@ export interface SupabaseSnippet {
   downloads: number;
   created_at: string;
   updated_at: string;
+  profiles?: {
+    username: string;
+  } | null;
 }
 
 export interface SupabaseUser {
@@ -102,7 +105,7 @@ export const supabaseHelpers = {
     code: snippet.code,
     price: snippet.price,
     rating: snippet.rating,
-    author: snippet.author,
+    author: snippet.profiles?.username || snippet.author || 'Anonymous',
     authorId: snippet.author_id,
     tags: snippet.tags || [],
     language: snippet.language,
@@ -133,7 +136,12 @@ export const supabaseHelpers = {
   buildSearchQuery: (supabase: SupabaseClient, filters: any) => {
     let query = supabase
       .from('snippets')
-      .select('*');
+      .select(`
+        *,
+        profiles:author_id (
+          username
+        )
+      `);
 
     // Apply filters
     if (filters.language) {

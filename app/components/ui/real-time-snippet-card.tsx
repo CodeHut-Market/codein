@@ -214,14 +214,14 @@ export const RealTimeSnippetCard: React.FC<RealTimeSnippetCardProps> = ({
   return (
     <Card 
       className={cn(
-        "group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer",
+        "group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer border-2 border-gray-200 dark:border-gray-700 overflow-hidden",
         compact && "p-4",
         className
       )}
       onClick={handleView}
     >
       <Link href={`/snippet/${snippet.id}`} className="block">
-        <CardHeader className={cn("space-y-1", compact && "pb-2")}>
+        <CardHeader className={cn("space-y-1 border-b border-gray-100 dark:border-gray-800", compact && "pb-2")}>
           <div className="flex items-start justify-between">
             <div className="space-y-1 flex-1">
               <CardTitle className={cn(
@@ -241,21 +241,26 @@ export const RealTimeSnippetCard: React.FC<RealTimeSnippetCardProps> = ({
             </div>
             
             {!snippet.is_public && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge variant="secondary" className="ml-2 flex-shrink-0">
                 Private
               </Badge>
             )}
           </div>
           
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">
+          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+            <Badge variant="outline" className="text-xs whitespace-nowrap flex-shrink-0">
               {snippet.language}
             </Badge>
-            {snippet.tags?.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
+            {snippet.tags?.slice(0, 5).map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs whitespace-nowrap flex-shrink-0">
                 {tag}
               </Badge>
             ))}
+            {snippet.tags && snippet.tags.length > 5 && (
+              <Badge variant="outline" className="text-xs whitespace-nowrap flex-shrink-0">
+                +{snippet.tags.length - 5}
+              </Badge>
+            )}
           </div>
         </CardHeader>
         

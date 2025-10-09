@@ -348,7 +348,12 @@ export const getPopularSnippets: RequestHandler = async (req, res) => {
       try {
         const { data: snippets, error } = await supabaseClient
           .from('snippets')
-          .select('*')
+          .select(`
+            *,
+            profiles:author_id (
+              username
+            )
+          `)
           .order('downloads', { ascending: false })
           .order('rating', { ascending: false })
           .limit(limitNum);
@@ -429,7 +434,12 @@ export const getSnippetById: RequestHandler = async (req, res) => {
       try {
         const { data: snippet, error } = await supabaseClient
           .from('snippets')
-          .select('*')
+          .select(`
+            *,
+            profiles:author_id (
+              username
+            )
+          `)
           .eq('id', id)
           .single();
 
@@ -1262,7 +1272,7 @@ function mapDbRowToSnippet(row: any) {
     code: row.code,
     price: parseFloat(row.price),
     rating: parseFloat(row.rating) || 0,
-    author: row.author_username || row.author_username,
+    author: row.author_username || row.author || 'Anonymous',
     authorId: row.author_id,
     tags: row.tags || [],
     language: row.language,

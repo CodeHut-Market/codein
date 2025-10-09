@@ -464,10 +464,10 @@ class DataValidator:
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-pink-500 via-purple-600 to-blue-600 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative container mx-auto px-6 py-16">
           <div className="text-center space-y-6 max-w-3xl mx-auto">
-            <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+            <div className="inline-flex items-center px-4 py-2 bg-white rounded-full text-sm font-medium text-purple-600">
               <Sparkles className="w-4 h-4 mr-2" />
               Your curated collection
             </div>
@@ -701,7 +701,7 @@ class DataValidator:
                           <Checkbox
                             checked={selectedItems.includes(snippet.id)}
                             onCheckedChange={() => toggleSelectItem(snippet.id)}
-                            className="bg-white/90 backdrop-blur-sm border-2 shadow-sm"
+                            className="bg-white border-2 shadow-sm"
                           />
                         </div>
                         
@@ -711,7 +711,7 @@ class DataValidator:
                             userId={userId || undefined}
                             initialIsFavorited={true}
                             variant="ghost"
-                            className="bg-white/90 backdrop-blur-sm hover:bg-white text-red-500 border shadow-sm"
+                            className="bg-white hover:bg-white text-red-500 border shadow-sm"
                           />
                         </div>
                         
