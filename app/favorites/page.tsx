@@ -1,5 +1,6 @@
 "use client"
 
+import { createClient } from '@supabase/supabase-js'
 import FavoriteButton from "@/components/FavoriteButton"
 import SnippetCard from "@/components/SnippetCard"
 import { Badge } from "@/components/ui/badge"
@@ -71,6 +72,12 @@ export default function FavoritesPage() {
   const [showSignInDialog, setShowSignInDialog] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const router = useRouter()
+  
+  // Initialize Supabase client
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  )
 
   // Enhanced demo favorites data
   const demoFavorites: CodeSnippet[] = [
@@ -187,11 +194,23 @@ class DataValidator:
     setError(null)
     
     try {
-      // Try to get user ID from auth context or cookie
-      const userToken = localStorage.getItem('userToken') || 'demo-user'
-      setUserId(userToken)
+      // Check authentication status using Supabase
+      const { data: { session } } = await supabase.auth.getSession()
       
-      // Try API first
+      if (!session) {
+        // User is not authenticated
+        setIsAuthenticated(false)
+        setShowSignInDialog(true)
+        setFavorites([])
+        setLoading(false)
+        return
+      }
+      
+      // User is authenticated
+      setIsAuthenticated(true)
+      setUserId(session.user.id)
+      
+      // Try API to load favorites
       try {
         const response = await fetch('/api/favorites', {
           credentials: 'include'
@@ -201,25 +220,21 @@ class DataValidator:
           const data = await response.json()
           const favoriteSnippets = data.favorites?.map((fav: FavoriteItem) => fav.snippet) || []
           setFavorites(favoriteSnippets)
-          setIsAuthenticated(true)
-        } else if (response.status === 401) {
-          // User is not authenticated - show dialog
-          setIsAuthenticated(false)
-          setShowSignInDialog(true)
-          setFavorites([])
         } else {
-          throw new Error('API not available')
+          // API failed but user is authenticated - show empty favorites
+          console.warn('Favorites API not available, showing empty list')
+          setFavorites([])
         }
       } catch (apiError) {
-        // Check if it's an auth error
+        // API error but user is still authenticated
         console.warn('API error:', apiError)
-        setIsAuthenticated(false)
-        setShowSignInDialog(true)
         setFavorites([])
       }
     } catch (error) {
       console.error('Error loading favorites:', error)
       setError('Failed to load favorites. Please try again.')
+      setIsAuthenticated(false)
+      setShowSignInDialog(true)
     } finally {
       setLoading(false)
     }

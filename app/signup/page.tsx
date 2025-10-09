@@ -509,10 +509,10 @@ export default function SignupPage() {
                     <button
                       key={lang}
                       type="button"
-                      className={`selection-button p-3 text-sm rounded-lg border-2 font-medium ${
+                      className={`selection-button p-3 text-sm rounded-lg border-2 font-semibold transition-all duration-200 transform ${
                         formData.primaryLanguage === lang
-                          ? 'selected bg-primary text-primary-foreground border-primary shadow-md'
-                          : 'bg-background hover:bg-primary/10 hover:border-primary/50 border-input hover:shadow-sm'
+                          ? 'selected bg-gradient-to-r from-purple-600 to-violet-600 text-white border-purple-500 shadow-lg shadow-purple-500/50 scale-105'
+                          : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 dark:hover:from-purple-950/50 dark:hover:to-violet-950/50 hover:border-purple-400 border-gray-300 dark:border-gray-700 hover:shadow-md hover:scale-102'
                       }`}
                       onClick={() => updateFormData({ primaryLanguage: lang })}
                     >
@@ -524,25 +524,42 @@ export default function SignupPage() {
 
               <div>
                 <Label>Experience Level *</Label>
-                <div className="space-y-2 mt-2">
+                <div className="space-y-3 mt-2">
                   {experienceLevels.map((level) => (
-                    <div key={level.id} className="flex items-start space-x-3">
-                      <input
-                        type="radio"
-                        id={level.id}
-                        name="experienceLevel"
-                        checked={formData.experienceLevel === level.id}
-                        onChange={(e) => updateFormData({ experienceLevel: e.target.value })}
-                        value={level.id}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor={level.id} className="font-medium">
-                          {level.label}
-                        </Label>
-                        <p className="text-xs text-muted-foreground">{level.desc}</p>
+                    <button
+                      key={level.id}
+                      type="button"
+                      className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 transform ${
+                        formData.experienceLevel === level.id
+                          ? 'bg-gradient-to-r from-purple-600 to-violet-600 text-white border-purple-500 shadow-lg shadow-purple-500/50 scale-[1.02]'
+                          : 'bg-white dark:bg-gray-900 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 dark:hover:from-purple-950/50 dark:hover:to-violet-950/50 hover:border-purple-400 border-gray-300 dark:border-gray-700 hover:shadow-md'
+                      }`}
+                      onClick={() => updateFormData({ experienceLevel: level.id })}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          formData.experienceLevel === level.id
+                            ? 'border-white bg-white'
+                            : 'border-gray-400 dark:border-gray-600'
+                        }`}>
+                          {formData.experienceLevel === level.id && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className={`font-semibold ${
+                            formData.experienceLevel === level.id ? 'text-white' : 'text-gray-900 dark:text-gray-100'
+                          }`}>
+                            {level.label}
+                          </div>
+                          <p className={`text-xs mt-0.5 ${
+                            formData.experienceLevel === level.id ? 'text-purple-100' : 'text-gray-600 dark:text-gray-400'
+                          }`}>
+                            {level.desc}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -554,27 +571,32 @@ export default function SignupPage() {
                     <button
                       key={interest}
                       type="button"
-                      className={`selection-button p-3 text-sm rounded-lg border-2 font-medium text-left ${
+                      className={`selection-button p-3 text-sm rounded-lg border-2 font-semibold text-left transition-all duration-200 transform relative ${
                         formData.interests.includes(interest)
-                          ? 'selected bg-primary text-primary-foreground border-primary shadow-md'
-                          : 'bg-background hover:bg-primary/10 hover:border-primary/50 border-input hover:shadow-sm'
+                          ? 'selected bg-gradient-to-r from-purple-600 to-violet-600 text-white border-purple-500 shadow-lg shadow-purple-500/50 scale-105'
+                          : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 dark:hover:from-purple-950/50 dark:hover:to-violet-950/50 hover:border-purple-400 border-gray-300 dark:border-gray-700 hover:shadow-md hover:scale-102'
                       }`}
                       onClick={() => toggleInterest(interest)}
                     >
-                      {interest}
+                      <span className="pr-6">{interest}</span>
                       {formData.interests.includes(interest) && (
-                        <Check className="w-4 h-4 ml-2 inline-block" />
+                        <Check className="w-4 h-4 absolute top-3 right-2 animate-in zoom-in duration-200" />
                       )}
                     </button>
                   ))}
                 </div>
-                <div className="mt-3 p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Selected interests ({formData.interests.length}):</strong>{" "}
-                    {formData.interests.length > 0 
-                      ? formData.interests.join(', ') 
-                      : 'None selected yet'
-                    }
+                <div className="mt-3 p-4 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 rounded-lg border-2 border-purple-200 dark:border-purple-800">
+                  <p className="text-sm font-medium text-purple-900 dark:text-purple-100">
+                    <strong className="flex items-center gap-2">
+                      <Check className="w-4 h-4" />
+                      Selected interests ({formData.interests.length}):
+                    </strong>
+                    <span className="text-purple-700 dark:text-purple-300 mt-1 block">
+                      {formData.interests.length > 0 
+                        ? formData.interests.join(', ') 
+                        : 'None selected yet - please select at least one'
+                      }
+                    </span>
                   </p>
                 </div>
               </div>
@@ -586,27 +608,32 @@ export default function SignupPage() {
                     <button
                       key={goal}
                       type="button"
-                      className={`selection-button p-4 text-sm rounded-lg border-2 text-left font-medium relative ${
+                      className={`selection-button p-4 text-sm rounded-lg border-2 text-left font-semibold relative transition-all duration-200 transform ${
                         formData.goals.includes(goal)
-                          ? 'selected bg-primary text-primary-foreground border-primary shadow-md'
-                          : 'bg-background hover:bg-primary/10 hover:border-primary/50 border-input hover:shadow-sm'
+                          ? 'selected bg-gradient-to-r from-purple-600 to-violet-600 text-white border-purple-500 shadow-lg shadow-purple-500/50 scale-[1.02]'
+                          : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 dark:hover:from-purple-950/50 dark:hover:to-violet-950/50 hover:border-purple-400 border-gray-300 dark:border-gray-700 hover:shadow-md'
                       }`}
                       onClick={() => toggleGoal(goal)}
                     >
-                      {goal}
+                      <span className="pr-7">{goal}</span>
                       {formData.goals.includes(goal) && (
-                        <Check className="w-4 h-4 absolute top-2 right-2" />
+                        <Check className="w-5 h-5 absolute top-3.5 right-3 animate-in zoom-in duration-200" />
                       )}
                     </button>
                   ))}
                 </div>
-                <div className="mt-3 p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Selected goals ({formData.goals.length}):</strong>{" "}
-                    {formData.goals.length > 0 
-                      ? formData.goals.join(', ') 
-                      : 'None selected yet'
-                    }
+                <div className="mt-3 p-4 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 rounded-lg border-2 border-purple-200 dark:border-purple-800">
+                  <p className="text-sm font-medium text-purple-900 dark:text-purple-100">
+                    <strong className="flex items-center gap-2">
+                      <Check className="w-4 h-4" />
+                      Selected goals ({formData.goals.length}):
+                    </strong>
+                    <span className="text-purple-700 dark:text-purple-300 mt-1 block">
+                      {formData.goals.length > 0 
+                        ? formData.goals.join(', ') 
+                        : 'None selected yet - please select at least one'
+                      }
+                    </span>
                   </p>
                 </div>
               </div>
