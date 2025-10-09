@@ -1,6 +1,5 @@
 "use client"
 
-import { createClient } from '@supabase/supabase-js'
 import FavoriteButton from "@/components/FavoriteButton"
 import SnippetCard from "@/components/SnippetCard"
 import { Badge } from "@/components/ui/badge"
@@ -19,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
+import { supabase } from "@/lib/supabaseClient"
 import { CodeSnippet } from "@shared/api"
 import { AnimatePresence, motion } from "framer-motion"
 import { 
@@ -67,12 +67,6 @@ export default function FavoritesPage() {
   const [showSignInDialog, setShowSignInDialog] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const router = useRouter()
-  
-  // Initialize Supabase client
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  )
 
   // Enhanced demo favorites data
   const demoFavorites: CodeSnippet[] = [
