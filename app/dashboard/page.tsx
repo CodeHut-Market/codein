@@ -47,15 +47,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../../client/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../client/components/ui/dropdown-menu"
-import { useToast } from "../../client/hooks/use-toast"
+} from "@/components/ui/dropdown-menu"
+import { useToast } from "@/hooks/use-toast"
 import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
 import AnalyticsChart from '../components/dashboard/AnalyticsChart'
 import ActivityFeed from '../components/dashboard/ActivityFeed'
