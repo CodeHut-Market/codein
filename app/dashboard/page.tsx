@@ -498,7 +498,7 @@ export default function DashboardPage() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
-          <AnalyticsChart userId={user?.id || ''} />
+          <AnalyticsChart userId={user?.id || ''} snippets={userSnippets} />
         </TabsContent>
         
         <TabsContent value="snippets" className="space-y-4">
