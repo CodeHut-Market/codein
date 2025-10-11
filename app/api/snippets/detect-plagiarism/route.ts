@@ -42,9 +42,11 @@ export async function POST(req: NextRequest) {
     console.log('[Plagiarism] Fetching snippets from Supabase...');
     
     // Fetch existing snippets from Supabase for comparison
+    // Note: We don't join with profiles to avoid foreign key issues
+    // The author info is not critical for plagiarism detection
     let query = supabaseClient
       .from('snippets')
-      .select('id, title, code, user_id, profiles(username)')
+      .select('id, title, code, user_id')
       .order('created_at', { ascending: false })
       .limit(50); // Compare against most recent 50 snippets
     
@@ -71,23 +73,13 @@ export async function POST(req: NextRequest) {
     console.log(`[Plagiarism] Fetched ${snippets?.length || 0} snippets for comparison`);
     
     // Format snippets for AI analysis
-    const existingSnippets = (snippets || []).map(snippet => {
-      let author = 'Anonymous';
-      if (snippet.profiles) {
-        if (Array.isArray(snippet.profiles) && snippet.profiles.length > 0) {
-          author = snippet.profiles[0]?.username || 'Anonymous';
-        } else if (!Array.isArray(snippet.profiles) && (snippet.profiles as any).username) {
-          author = (snippet.profiles as any).username;
-        }
-      }
-      
-      return {
-        id: snippet.id,
-        title: snippet.title,
-        code: snippet.code,
-        author,
-      };
-    });
+    // Use user_id as author since we don't have the profile join
+    const existingSnippets = (snippets || []).map(snippet => ({
+      id: snippet.id,
+      title: snippet.title,
+      code: snippet.code,
+      author: snippet.user_id || 'Anonymous',
+    }));
     
     console.log('[Plagiarism] Running AI-powered plagiarism detection...');
     
