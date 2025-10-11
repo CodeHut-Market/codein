@@ -44,12 +44,42 @@ create table if not exists public.notifications (
 
 create index if not exists idx_notifications_user on public.notifications(userId, createdAt desc);
 
+-- Snippet likes table for tracking user likes
+create table if not exists public.snippet_likes (
+    id uuid primary key default gen_random_uuid(),
+    snippet_id uuid not null references public.snippets(id) on delete cascade,
+    user_id uuid not null,
+    created_at timestamptz default now() not null,
+    unique(snippet_id, user_id)
+);
+
+create index if not exists idx_snippet_likes_snippet on public.snippet_likes(snippet_id);
+create index if not exists idx_snippet_likes_user on public.snippet_likes(user_id);
+
+-- User bookmarks table for saving favorite snippets
+create table if not exists public.user_bookmarks (
+    id uuid primary key default gen_random_uuid(),
+    snippet_id uuid not null references public.snippets(id) on delete cascade,
+    user_id uuid not null,
+    created_at timestamptz default now() not null,
+    unique(snippet_id, user_id)
+);
+
+create index if not exists idx_user_bookmarks_snippet on public.user_bookmarks(snippet_id);
+create index if not exists idx_user_bookmarks_user on public.user_bookmarks(user_id);
+
 Optional: Row Level Security enablement (remove if not using auth yet)
 alter table public.snippets enable row level security;
 alter table public.notifications enable row level security;
+alter table public.snippet_likes enable row level security;
+alter table public.user_bookmarks enable row level security;
 Example permissive policies:
 create policy "public read snippets" on public.snippets for select using (true);
 create policy "public read notifications" on public.notifications for select using (true);
+create policy "public read snippet_likes" on public.snippet_likes for select using (true);
+create policy "users can manage their own likes" on public.snippet_likes for all using (auth.uid() = user_id);
+create policy "public read user_bookmarks" on public.user_bookmarks for select using (true);
+create policy "users can manage their own bookmarks" on public.user_bookmarks for all using (auth.uid() = user_id);
 
 -- To apply: run in Supabase SQL editor or psql client.
 

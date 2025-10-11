@@ -76,31 +76,34 @@ export const RealTimeSnippetCard: React.FC<RealTimeSnippetCardProps> = ({
     
     const checkUserInteractions = async () => {
       try {
-        // Check if liked - silently fail if table doesn't exist
+        // Check if liked - use maybeSingle() to avoid 406 error when no results
         const { data: likeData, error: likeError } = await supabase
           .from('snippet_likes')
           .select('id')
           .eq('snippet_id', snippet.id)
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         
         if (!likeError) {
           setIsLiked(!!likeData);
         }
         
-        // Check if bookmarked (if bookmarks table exists) - silently fail if table doesn't exist
+        // Check if bookmarked - use maybeSingle() to avoid 406 error
+        // Note: user_bookmarks table may not exist yet
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('user_bookmarks')
           .select('id')
           .eq('snippet_id', snippet.id)
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         
-        if (!bookmarkError) {
+        // Only set if no error (table might not exist)
+        if (!bookmarkError || bookmarkError.code !== 'PGRST116') {
           setIsBookmarked(!!bookmarkData);
         }
       } catch (error) {
         // Silently ignore all errors - tables may not exist yet
+        console.debug('User interaction check failed:', error);
       }
     };
     
@@ -164,23 +167,35 @@ export const RealTimeSnippetCard: React.FC<RealTimeSnippetCardProps> = ({
     setIsLoading(true);
     try {
       if (isBookmarked) {
-        await supabase
+        const { error } = await supabase
           .from('user_bookmarks')
           .delete()
           .eq('snippet_id', snippet.id)
           .eq('user_id', user.id);
-        setIsBookmarked(false);
+        
+        if (!error) {
+          setIsBookmarked(false);
+        } else if (error.code === 'PGRST116' || error.code === '42P01') {
+          // Table doesn't exist - ignore error
+          console.debug('Bookmarks table not available');
+        }
       } else {
-        await supabase
+        const { error } = await supabase
           .from('user_bookmarks')
           .insert({
             snippet_id: snippet.id,
             user_id: user.id
           });
-        setIsBookmarked(true);
+        
+        if (!error) {
+          setIsBookmarked(true);
+        } else if (error.code === 'PGRST116' || error.code === '42P01') {
+          // Table doesn't exist - ignore error
+          console.debug('Bookmarks table not available');
+        }
       }
     } catch (error) {
-      console.error('Error toggling bookmark:', error);
+      console.debug('Error toggling bookmark:', error);
     } finally {
       setIsLoading(false);
     }
