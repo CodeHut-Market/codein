@@ -1,9 +1,14 @@
 import {
-    callOpenRouter,
-    createSystemMessage,
-    createUserMessage,
-    MODELS
+  callOpenRouter,
+  createSystemMessage,
+  createUserMessage,
+  MODELS
 } from './openRouterService';
+import { 
+  searchInternetForCode, 
+  analyzeInternetMatches,
+  type InternetCodeMatch 
+} from './tavilySearchService';
 
 export interface PlagiarismMatch {
   snippetId: string;
@@ -11,6 +16,8 @@ export interface PlagiarismMatch {
   author: string;
   similarity: number;
   explanation: string;
+  source?: 'database' | 'internet'; // Track where the match came from
+  url?: string; // For internet matches
 }
 
 export interface PlagiarismResult {
@@ -21,11 +28,14 @@ export interface PlagiarismResult {
   matches: PlagiarismMatch[];
   analysis?: string;
   aiPowered?: boolean; // Indicates if AI was used (true) or fallback method (false)
+  internetSearched?: boolean; // Indicates if internet search was performed
 }
 
 /**
  * Analyze code for plagiarism using AI
- * Compares submitted code against a database of existing snippets
+ * Compares submitted code against:
+ * 1. Database of existing snippets (local)
+ * 2. Internet sources via Tavily search (GitHub, StackOverflow, etc.)
  */
 export async function detectPlagiarismWithAI(
   submittedCode: string,
@@ -40,11 +50,32 @@ export async function detectPlagiarismWithAI(
   try {
     console.log('[AI Plagiarism] Starting detection...');
     console.log('[AI Plagiarism] Code length:', submittedCode?.length);
-    console.log('[AI Plagiarism] Snippets count:', existingSnippets?.length);
+    console.log('[AI Plagiarism] Local snippets count:', existingSnippets?.length);
     console.log('[AI Plagiarism] Language:', language);
     
-    // If no snippets to compare, it's original
-    if (!existingSnippets || existingSnippets.length === 0) {
+    // STEP 1: Search the internet for similar code
+    console.log('[AI Plagiarism] Step 1: Searching internet for similar code...');
+    const internetResults = await searchInternetForCode(submittedCode, language);
+    console.log('[AI Plagiarism] Internet search found:', internetResults.totalResults, 'matches');
+    
+    // STEP 2: Combine local and internet matches
+    const allSnippetsForComparison = [
+      ...existingSnippets,
+      // Add internet matches as pseudo-snippets
+      ...internetResults.matches.map((match, idx) => ({
+        id: `internet-${idx}`,
+        title: match.title,
+        code: match.snippet,
+        author: match.source,
+        _url: match.url, // Store URL for reference
+        _source: 'internet' as const,
+      }))
+    ];
+    
+    console.log('[AI Plagiarism] Total snippets to compare:', allSnippetsForComparison.length);
+    
+    // If no snippets to compare (neither local nor internet), it's original
+    if (allSnippetsForComparison.length === 0) {
       console.log('[AI Plagiarism] No snippets to compare - returning PASS');
       return {
         isPlagiarized: false,
@@ -53,14 +84,15 @@ export async function detectPlagiarismWithAI(
         message: 'No existing snippets found for comparison. Code appears to be original.',
         matches: [],
         aiPowered: false,
+        internetSearched: true,
       };
     }
 
-    // Prepare the comparison data
-    const snippetsForComparison = existingSnippets.slice(0, 10); // Limit to 10 for API token limits
-    console.log('[AI Plagiarism] Comparing against', snippetsForComparison.length, 'snippets');
+    // STEP 3: Prepare the comparison data (limit to avoid token limits)
+    const snippetsForComparison = allSnippetsForComparison.slice(0, 15); // Include both local and internet
+    console.log('[AI Plagiarism] Comparing against', snippetsForComparison.length, 'snippets (local + internet)');
     
-    const systemPrompt = `You are an expert code plagiarism detector. Your job is to analyze code submissions and detect if they are plagiarized from existing code snippets.
+    const systemPrompt = `You are an expert code plagiarism detector. Your job is to analyze code submissions and detect if they are plagiarized from existing code snippets found in databases AND on the internet (GitHub, StackOverflow, etc.).
 
 You should analyze:
 1. Code structure and logic flow
@@ -165,23 +197,39 @@ Analyze and return JSON with your plagiarism detection results.`;
       }
     }
 
-    // Map AI results to our format
-    const matches: PlagiarismMatch[] = (aiResult.matches || []).map((match: any) => ({
-      snippetId: match.snippetId || match.id || 'unknown',
-      title: match.title || 'Unknown',
-      author: snippetsForComparison.find(s => s.id === match.snippetId)?.author || 'Unknown',
-      similarity: Number(match.similarity) || 0,
-      explanation: match.explanation || 'No explanation provided',
-    }));
+    // Map AI results to our format, including source information
+    const matches: PlagiarismMatch[] = (aiResult.matches || []).map((match: any) => {
+      const snippetId = match.snippetId || match.id || 'unknown';
+      const foundSnippet = snippetsForComparison.find(s => s.id === snippetId);
+      
+      // Determine if this is an internet match
+      const isInternetMatch = snippetId.startsWith('internet-');
+      
+      return {
+        snippetId,
+        title: match.title || foundSnippet?.title || 'Unknown',
+        author: foundSnippet?.author || 'Unknown',
+        similarity: Number(match.similarity) || 0,
+        explanation: match.explanation || 'No explanation provided',
+        source: isInternetMatch ? 'internet' as const : 'database' as const,
+        url: isInternetMatch ? (foundSnippet as any)?._url : undefined,
+      };
+    });
 
     const overallSimilarity = Number(aiResult.overallSimilarity) || 0;
     const status = aiResult.status || (overallSimilarity > 0.7 ? 'FAIL' : overallSimilarity > 0.5 ? 'REVIEW' : 'PASS');
 
     let message: string;
+    const internetMatchCount = matches.filter(m => m.source === 'internet').length;
+    
     if (status === 'FAIL') {
-      message = 'High similarity detected. This code appears to be plagiarized.';
+      message = internetMatchCount > 0 
+        ? `High similarity detected. Code appears to be plagiarized (found ${internetMatchCount} matches on the internet).`
+        : 'High similarity detected. This code appears to be plagiarized.';
     } else if (status === 'REVIEW') {
-      message = 'Moderate similarity detected. Manual review recommended.';
+      message = internetMatchCount > 0
+        ? `Moderate similarity detected (${internetMatchCount} internet matches). Manual review recommended.`
+        : 'Moderate similarity detected. Manual review recommended.';
     } else {
       message = 'No significant plagiarism detected. Code appears to be original.';
     }
@@ -194,6 +242,7 @@ Analyze and return JSON with your plagiarism detection results.`;
       matches: matches.slice(0, 5), // Return top 5 matches
       analysis: aiResult.analysis,
       aiPowered: true, // AI was successfully used
+      internetSearched: true, // Internet search was performed
     };
 
   } catch (error: any) {
@@ -213,6 +262,7 @@ Analyze and return JSON with your plagiarism detection results.`;
     return {
       ...fallbackResult,
       aiPowered: false,
+      internetSearched: false, // Fallback doesn't search internet
     };
   }
 }

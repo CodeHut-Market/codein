@@ -52,7 +52,7 @@ export async function callOpenRouter(
   const {
     model = 'anthropic/claude-3.5-sonnet', // Default to Claude 3.5 Sonnet
     temperature = 0.7,
-    maxTokens = 4000,
+    maxTokens = 10000,
     responseFormat = 'text',
   } = options;
 

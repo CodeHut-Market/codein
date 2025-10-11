@@ -81,9 +81,9 @@ export async function POST(req: NextRequest) {
       author: snippet.user_id || 'Anonymous',
     }));
     
-    console.log('[Plagiarism] Running AI-powered plagiarism detection...');
+    console.log('[Plagiarism] Running AI-powered plagiarism detection with internet search...');
     
-    // Run AI-powered plagiarism detection
+    // Run AI-powered plagiarism detection (includes internet search)
     const result = await detectPlagiarismWithAI(
       code,
       existingSnippets,
@@ -93,7 +93,10 @@ export async function POST(req: NextRequest) {
     console.log('[Plagiarism] Detection complete:', {
       status: result.status,
       similarity: result.similarity,
-      aiPowered: result.aiPowered
+      aiPowered: result.aiPowered,
+      internetSearched: result.internetSearched,
+      matchesCount: result.matches.length,
+      internetMatches: result.matches.filter(m => m.source === 'internet').length
     });
     
     return NextResponse.json({
@@ -105,6 +108,7 @@ export async function POST(req: NextRequest) {
       matchedSnippets: result.matches,
       analysis: result.analysis,
       aiPowered: result.aiPowered,
+      internetSearched: result.internetSearched,
     });
     
   } catch (error: any) {
