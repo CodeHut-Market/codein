@@ -38,11 +38,11 @@ create table if not exists public.notifications (
     title text not null,
     message text not null,
     read boolean default false not null,
-    createdAt timestamptz default now() not null,
-    userId text default 'public'
+    created_at timestamptz default now() not null,
+    user_id text default 'public'
 );
 
-create index if not exists idx_notifications_user on public.notifications(userId, createdAt desc);
+create index if not exists idx_notifications_user on public.notifications(user_id, created_at desc);
 
 -- Snippet likes table for tracking user likes
 create table if not exists public.snippet_likes (
@@ -68,17 +68,29 @@ create table if not exists public.user_bookmarks (
 create index if not exists idx_user_bookmarks_snippet on public.user_bookmarks(snippet_id);
 create index if not exists idx_user_bookmarks_user on public.user_bookmarks(user_id);
 
-Optional: Row Level Security enablement (remove if not using auth yet)
+-- Optional: Row Level Security enablement (remove if not using auth yet)
 alter table public.snippets enable row level security;
 alter table public.notifications enable row level security;
 alter table public.snippet_likes enable row level security;
 alter table public.user_bookmarks enable row level security;
-Example permissive policies:
+
+-- Example permissive policies (drop existing first to avoid conflicts):
+drop policy if exists "public read snippets" on public.snippets;
 create policy "public read snippets" on public.snippets for select using (true);
+
+drop policy if exists "public read notifications" on public.notifications;
 create policy "public read notifications" on public.notifications for select using (true);
+
+drop policy if exists "public read snippet_likes" on public.snippet_likes;
 create policy "public read snippet_likes" on public.snippet_likes for select using (true);
+
+drop policy if exists "users can manage their own likes" on public.snippet_likes;
 create policy "users can manage their own likes" on public.snippet_likes for all using (auth.uid() = user_id);
+
+drop policy if exists "public read user_bookmarks" on public.user_bookmarks;
 create policy "public read user_bookmarks" on public.user_bookmarks for select using (true);
+
+drop policy if exists "users can manage their own bookmarks" on public.user_bookmarks;
 create policy "users can manage their own bookmarks" on public.user_bookmarks for all using (auth.uid() = user_id);
 
 -- To apply: run in Supabase SQL editor or psql client.
