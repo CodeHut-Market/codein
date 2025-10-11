@@ -3,11 +3,11 @@
 import { Bookmark, Download, Eye, Heart, MessageCircle, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '../../../client/contexts/AuthContext';
-import { useRealTime } from '../../contexts/RealTimeContext';
-import { useOptimisticActions } from '../../hooks/useOptimisticActions';
-import { supabase } from '../../lib/supabaseClient';
-import { cn } from '../../lib/utils';
+import { useAuth } from '@/client/contexts/AuthContext';
+import { useRealTime } from '@/app/contexts/RealTimeContext';
+import { useOptimisticActions } from '@/app/hooks/useOptimisticActions';
+import { supabase } from '@/lib/supabaseClient';
+import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Badge } from './badge';
 import { Button } from './button';
