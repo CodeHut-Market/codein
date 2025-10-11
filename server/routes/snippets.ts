@@ -22,6 +22,7 @@ import {
     semanticCodeSearch,
     storeCodeEmbedding
 } from "../lib/vectorDatabase";
+import { detectPlagiarismWithAI } from "../services/aiPlagiarismService";
 
 /**
  * GET /api/snippets
@@ -1286,7 +1287,7 @@ function mapDbRowToSnippet(row: any) {
 
 /**
  * POST /api/snippets/detect-plagiarism
- * Check code for plagiarism against existing snippets
+ * Check code for plagiarism using AI-powered analysis
  */
 export const detectPlagiarismHandler: RequestHandler = async (req, res) => {
   try {
@@ -1296,12 +1297,13 @@ export const detectPlagiarismHandler: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: 'Code is required' });
     }
 
-    // Simple plagiarism detection using code similarity
-    // In a production system, you'd use more sophisticated algorithms
-    const codeNormalized = code.trim().toLowerCase().replace(/\s+/g, ' ');
-    const minSimilarityThreshold = 0.8;
-    let matchedSnippets: any[] = [];
-    let maxSimilarity = 0;
+    // Collect existing snippets for comparison
+    const existingSnippets: Array<{
+      id: string;
+      title: string;
+      code: string;
+      author: string;
+    }> = [];
 
     // Try Supabase first
     if (isSupabaseAvailable() && supabaseClient) {
@@ -1315,60 +1317,46 @@ export const detectPlagiarismHandler: RequestHandler = async (req, res) => {
           query = query.neq('user_id', authorId);
         }
 
-        // Filter by language if provided
+        // Filter by language if provided for more relevant comparison
         if (language) {
           query = query.eq('language', language);
         }
 
-        const { data: snippets, error } = await query.limit(100);
+        // Limit to most recent 50 snippets for comparison
+        const { data: snippets, error } = await query
+          .order('created_at', { ascending: false })
+          .limit(50);
 
         if (!error && snippets) {
           for (const snippet of snippets) {
-            const snippetCodeNormalized = snippet.code.trim().toLowerCase().replace(/\s+/g, ' ');
-            const similarity = calculateSimilarity(codeNormalized, snippetCodeNormalized);
-
-            if (similarity > maxSimilarity) {
-              maxSimilarity = similarity;
-            }
-
-            if (similarity >= minSimilarityThreshold) {
-              const profileData = Array.isArray(snippet.profiles) ? snippet.profiles[0] : snippet.profiles;
-              matchedSnippets.push({
-                title: snippet.title,
-                author: profileData?.username || 'Unknown',
-                similarity: similarity,
-              });
-            }
+            const profileData = Array.isArray(snippet.profiles) ? snippet.profiles[0] : snippet.profiles;
+            existingSnippets.push({
+              id: snippet.id.toString(),
+              title: snippet.title,
+              code: snippet.code,
+              author: profileData?.username || 'Unknown',
+            });
           }
         }
       } catch (error) {
-        console.error('Supabase plagiarism check failed:', error);
+        console.error('Supabase query failed:', error);
       }
     }
 
-    // Determine status based on similarity
-    let status: 'PASS' | 'REVIEW' | 'FAIL';
-    let message: string;
-
-    if (maxSimilarity >= 0.9) {
-      status = 'FAIL';
-      message = 'High similarity detected. This code appears to be plagiarized.';
-    } else if (maxSimilarity >= 0.7) {
-      status = 'REVIEW';
-      message = 'Moderate similarity detected. Please review before uploading.';
-    } else {
-      status = 'PASS';
-      message = 'No significant plagiarism detected.';
-    }
+    // Use AI-powered plagiarism detection
+    const result = await detectPlagiarismWithAI(code, existingSnippets, language);
 
     return res.json({
       success: true,
-      isPlagiarized: status !== 'PASS',
-      similarity: maxSimilarity,
-      status,
-      message,
-      matchedSnippets: matchedSnippets.slice(0, 5), // Return top 5 matches
+      isPlagiarized: result.isPlagiarized,
+      similarity: result.similarity,
+      status: result.status,
+      message: result.message,
+      matchedSnippets: result.matches,
+      analysis: result.analysis,
+      aiPowered: true,
     });
+    
   } catch (error: any) {
     console.error('Plagiarism detection error:', error);
     return res.status(500).json({
@@ -1378,13 +1366,3 @@ export const detectPlagiarismHandler: RequestHandler = async (req, res) => {
   }
 };
 
-// Calculate similarity between two strings using Jaccard similarity
-function calculateSimilarity(str1: string, str2: string): number {
-  const words1 = new Set(str1.split(' '));
-  const words2 = new Set(str2.split(' '));
-
-  const intersection = new Set([...words1].filter(x => words2.has(x)));
-  const union = new Set([...words1, ...words2]);
-
-  return intersection.size / union.size;
-}
