@@ -8,11 +8,12 @@
  * - Programming blogs and tutorials
  */
 
-import { tavily } from 'tavily';
+import { TavilySearchResults } from '@langchain/community/tools/tavily_search';
 
-// Initialize Tavily client
-const tavilyClient = tavily({
+// Initialize Tavily search tool
+const tavilySearch = new TavilySearchResults({
   apiKey: process.env.LANGSEARCH_API_KEY || process.env.TAVILY_API_KEY || '',
+  maxResults: 10,
 });
 
 export interface InternetCodeMatch {
@@ -46,27 +47,29 @@ export async function searchInternetForCode(
     const searchQuery = buildCodeSearchQuery(code, language);
     console.log('[Tavily] Search query:', searchQuery);
 
-    // Search using Tavily
-    const response = await tavilyClient.search(searchQuery, {
-      searchDepth: 'advanced', // Use advanced search for better results
-      maxResults: 10,
-      includeAnswer: false,
-      includeRawContent: true,
-      includeDomains: [
-        'github.com',
-        'stackoverflow.com',
-        'gitlab.com',
-        'bitbucket.org',
-        'geeksforgeeks.org',
-        'dev.to',
-        'medium.com',
-      ],
-    });
+    // Search using Tavily LangChain tool
+    const searchResults = await tavilySearch.invoke(searchQuery);
+    
+    console.log('[Tavily] Raw search results:', searchResults);
 
-    console.log('[Tavily] Search completed, results:', response.results?.length || 0);
+    // Parse the results (LangChain returns a string, we need to parse it)
+    let parsedResults: any[] = [];
+    try {
+      // The tool returns JSON string, parse it
+      const resultData = typeof searchResults === 'string' 
+        ? JSON.parse(searchResults) 
+        : searchResults;
+      
+      parsedResults = Array.isArray(resultData) ? resultData : [resultData];
+    } catch (parseError) {
+      console.log('[Tavily] Could not parse results, using raw data');
+      parsedResults = [];
+    }
+
+    console.log('[Tavily] Search completed, results:', parsedResults.length);
 
     // Parse and filter results
-    const matches: InternetCodeMatch[] = (response.results || [])
+    const matches: InternetCodeMatch[] = parsedResults
       .map((result: any) => {
         const url = result.url || '';
         let source = 'web';
@@ -77,14 +80,14 @@ export async function searchInternetForCode(
         else if (url.includes('bitbucket.org')) source = 'bitbucket';
         
         return {
-          url: result.url,
+          url: result.url || '',
           title: result.title || 'Untitled',
-          snippet: result.content || result.snippet || '',
-          score: result.score || 0,
+          snippet: result.content || result.snippet || result.description || '',
+          score: result.score || 0.5, // Default score if not provided
           source,
         };
       })
-      .filter((match) => match.score > 0.3); // Only keep relevant matches
+      .filter((match) => match.url && match.snippet); // Only keep matches with URL and content
 
     console.log('[Tavily] Filtered matches:', matches.length);
 
