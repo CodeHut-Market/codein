@@ -1,8 +1,8 @@
 import {
-  callOpenRouter,
-  createSystemMessage,
-  createUserMessage,
-  MODELS
+    callOpenRouter,
+    createSystemMessage,
+    createUserMessage,
+    MODELS
 } from './openRouterService';
 
 export interface PlagiarismMatch {
@@ -38,19 +38,27 @@ export async function detectPlagiarismWithAI(
   language?: string
 ): Promise<PlagiarismResult> {
   try {
+    console.log('[AI Plagiarism] Starting detection...');
+    console.log('[AI Plagiarism] Code length:', submittedCode?.length);
+    console.log('[AI Plagiarism] Snippets count:', existingSnippets?.length);
+    console.log('[AI Plagiarism] Language:', language);
+    
     // If no snippets to compare, it's original
     if (!existingSnippets || existingSnippets.length === 0) {
+      console.log('[AI Plagiarism] No snippets to compare - returning PASS');
       return {
         isPlagiarized: false,
         similarity: 0,
         status: 'PASS',
         message: 'No existing snippets found for comparison. Code appears to be original.',
         matches: [],
+        aiPowered: false,
       };
     }
 
     // Prepare the comparison data
     const snippetsForComparison = existingSnippets.slice(0, 10); // Limit to 10 for API token limits
+    console.log('[AI Plagiarism] Comparing against', snippetsForComparison.length, 'snippets');
     
     const systemPrompt = `You are an expert code plagiarism detector. Your job is to analyze code submissions and detect if they are plagiarized from existing code snippets.
 
@@ -118,6 +126,7 @@ ${snippet.code}
 Analyze and return JSON with your plagiarism detection results.`;
 
     // Call OpenRouter API
+    console.log('[AI Plagiarism] Calling callOpenRouter...');
     const response = await callOpenRouter(
       [
         createSystemMessage(systemPrompt),
@@ -130,13 +139,17 @@ Analyze and return JSON with your plagiarism detection results.`;
         responseFormat: 'json',
       }
     );
+    console.log('[AI Plagiarism] OpenRouter response received, length:', response?.length);
 
     // Parse the JSON response
     let aiResult;
     try {
+      console.log('[AI Plagiarism] Parsing JSON response...');
       // Try to parse the response as JSON
       aiResult = JSON.parse(response);
+      console.log('[AI Plagiarism] JSON parsed successfully');
     } catch (parseError) {
+      console.log('[AI Plagiarism] JSON parse failed, trying markdown extraction...');
       // If parsing fails, try to extract JSON from markdown code block
       const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/);
       if (jsonMatch) {
@@ -184,11 +197,23 @@ Analyze and return JSON with your plagiarism detection results.`;
     };
 
   } catch (error: any) {
-    console.error('AI Plagiarism Detection Error:', error);
+    console.error('[AI Plagiarism] ERROR occurred:', error);
+    console.error('[AI Plagiarism] Error message:', error?.message);
+    console.error('[AI Plagiarism] Error stack:', error?.stack);
+    console.error('[AI Plagiarism] Error type:', error?.constructor?.name);
     
     // Fallback to basic detection if AI fails
-    console.log('Falling back to basic similarity detection');
-    return detectPlagiarismBasic(submittedCode, existingSnippets);
+    console.log('[AI Plagiarism] Falling back to basic similarity detection');
+    const fallbackResult = detectPlagiarismBasic(submittedCode, existingSnippets);
+    console.log('[AI Plagiarism] Fallback result:', {
+      status: fallbackResult.status,
+      similarity: fallbackResult.similarity
+    });
+    
+    return {
+      ...fallbackResult,
+      aiPowered: false,
+    };
   }
 }
 
