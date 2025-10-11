@@ -20,6 +20,7 @@ export interface PlagiarismResult {
   message: string;
   matches: PlagiarismMatch[];
   analysis?: string;
+  aiPowered?: boolean; // Indicates if AI was used (true) or fallback method (false)
 }
 
 /**
@@ -179,6 +180,7 @@ Analyze and return JSON with your plagiarism detection results.`;
       message,
       matches: matches.slice(0, 5), // Return top 5 matches
       analysis: aiResult.analysis,
+      aiPowered: true, // AI was successfully used
     };
 
   } catch (error: any) {
@@ -246,6 +248,7 @@ function detectPlagiarismBasic(
     status,
     message: message + ' (Note: AI analysis unavailable, using basic detection)',
     matches: matches.slice(0, 5).sort((a, b) => b.similarity - a.similarity),
+    aiPowered: false, // Fallback method was used
   };
 }
 
