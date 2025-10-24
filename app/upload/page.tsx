@@ -334,60 +334,60 @@ export default function UploadPage() {
       <>
         {/* Sign In Dialog */}
         <Dialog open={showSignInDialog} onOpenChange={setShowSignInDialog}>
-          <DialogContent className="sm:max-w-lg border border-border/70 bg-card/90 text-card-foreground shadow-2xl backdrop-blur-xl supports-[backdrop-filter]:bg-card/75">
-            <DialogHeader className="space-y-2">
-              <DialogTitle className="flex items-center gap-2 text-2xl text-foreground">
+          <DialogContent className="sm:max-w-lg border-2 border-slate-200 dark:border-slate-700 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+            <DialogHeader className="space-y-2 bg-white/90 dark:bg-slate-900/90 rounded-lg px-4 py-3">
+              <DialogTitle className="flex items-center gap-2 text-2xl text-slate-900 dark:text-slate-100">
                 <Lock className="h-6 w-6 text-emerald-500" />
                 Sign in to upload snippets
               </DialogTitle>
-              <DialogDescription className="pt-3 text-base text-muted-foreground">
+              <DialogDescription className="pt-3 text-base text-slate-700 dark:text-slate-300">
                 You need to sign in to upload code snippets and share your work with the community.
               </DialogDescription>
             </DialogHeader>
 
             <div className="flex flex-col gap-4 py-6">
-              <div className="flex items-start gap-4 rounded-lg border border-emerald-400/40 bg-emerald-500/15 p-4 dark:border-emerald-400/50 dark:bg-emerald-500/20">
-                <div className="rounded-full bg-emerald-500/25 dark:bg-emerald-400/30 p-3 backdrop-blur-sm">
+              <div className="flex items-start gap-4 rounded-xl border border-emerald-400/50 bg-emerald-100/80 dark:bg-emerald-500/10 dark:border-emerald-400/40 backdrop-blur-sm p-4">
+                <div className="rounded-full bg-emerald-500/30 dark:bg-emerald-500/25 p-3 backdrop-blur-sm">
                   <UploadCloud className="h-6 w-6 text-emerald-500" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-foreground">Share Your Code</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Share Your Code</h4>
+                  <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
                     Upload code snippets and help developers around the world
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-lg border border-blue-400/40 bg-blue-500/15 p-4 dark:border-blue-400/50 dark:bg-blue-500/20">
-                <div className="rounded-full bg-blue-500/25 dark:bg-blue-400/30 p-3 backdrop-blur-sm">
+              <div className="flex items-start gap-4 rounded-xl border border-blue-400/50 bg-blue-100/80 dark:bg-blue-500/10 dark:border-blue-400/40 backdrop-blur-sm p-4">
+                <div className="rounded-full bg-blue-500/25 dark:bg-blue-500/25 p-3 backdrop-blur-sm">
                   <DollarSign className="h-6 w-6 text-blue-500" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-foreground">Earn from Your Work</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Earn from Your Work</h4>
+                  <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
                     Set your own prices or share for free - you decide
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-lg border border-purple-400/40 bg-purple-500/15 p-4 dark:border-purple-400/50 dark:bg-purple-500/20">
-                <div className="rounded-full bg-purple-500/25 dark:bg-purple-400/30 p-3 backdrop-blur-sm">
+              <div className="flex items-start gap-4 rounded-xl border border-purple-400/50 bg-purple-100/80 dark:bg-purple-500/10 dark:border-purple-400/40 backdrop-blur-sm p-4">
+                <div className="rounded-full bg-purple-500/25 dark:bg-purple-500/25 p-3 backdrop-blur-sm">
                   <UserPlus className="h-6 w-6 text-purple-500" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-foreground">Join the Community</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Join the Community</h4>
+                  <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
                     Free account - start uploading in seconds
                   </p>
                 </div>
               </div>
             </div>
 
-            <DialogFooter className="flex-col sm:flex-row gap-3">
+            <DialogFooter className="flex-col sm:flex-row gap-3 bg-white/90 dark:bg-slate-900/90 rounded-lg px-4 py-3">
               <Button
                 variant="outline"
                 onClick={() => router.push('/explore')}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto border-2 border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800"
               >
                 Browse Snippets
               </Button>
@@ -396,7 +396,7 @@ export default function UploadPage() {
                   setShowSignInDialog(false);
                   router.push('/login');
                 }}
-                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-blue-600 text-primary-foreground hover:from-emerald-600 hover:to-blue-700"
+                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-blue-600 text-white hover:from-emerald-600 hover:to-blue-700 shadow-lg"
               >
                 <LogIn className="mr-2 h-4 w-4" />
                 Sign In Now
@@ -439,10 +439,10 @@ export default function UploadPage() {
             size="sm"
             onClick={() => setUploadMode('simple')}
             className={cn(
-              'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2',
+              'rounded-full px-5 py-2 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2',
               uploadMode === 'simple'
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-primary-foreground shadow-lg ring-2 ring-emerald-400/70 dark:ring-emerald-300/60'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 text-white shadow-xl ring-2 ring-emerald-400/70 dark:ring-emerald-300/60'
+                : 'bg-transparent text-muted-foreground/80 hover:text-foreground hover:bg-muted/20 hover:shadow-sm'
             )}
           >
             Simple Upload
@@ -453,10 +453,10 @@ export default function UploadPage() {
             size="sm"
             onClick={() => setUploadMode('advanced')}
             className={cn(
-              'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2',
+              'rounded-full px-5 py-2 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2',
               uploadMode === 'advanced'
-                ? 'bg-gradient-to-r from-primary to-violet-600 text-primary-foreground shadow-lg ring-2 ring-primary/70 dark:ring-primary/60'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 text-white shadow-xl ring-2 ring-emerald-400/70 dark:ring-emerald-300/60'
+                : 'bg-transparent text-muted-foreground/80 hover:text-foreground hover:bg-muted/20 hover:shadow-sm'
             )}
           >
             Advanced Upload
@@ -513,7 +513,12 @@ export default function UploadPage() {
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-muted/50 border border-primary/10">
               <TabsTrigger value="basic" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-emerald-600/80">Basic Info</TabsTrigger>
-              <TabsTrigger value="code" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80">Code & Preview</TabsTrigger>
+              <TabsTrigger
+                value="code"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-sky-500 data-[state=active]:via-sky-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-lg"
+              >
+                Code &amp; Preview
+              </TabsTrigger>
               <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-violet-600/80">Settings</TabsTrigger>
             </TabsList>
             
@@ -647,9 +652,19 @@ export default function UploadPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Tabs defaultValue="editor" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="editor">Editor</TabsTrigger>
-                      <TabsTrigger value="preview">Preview</TabsTrigger>
+                    <TabsList className="grid w-full grid-cols-2 bg-muted/60 border border-emerald-100/40 dark:border-emerald-500/20">
+                      <TabsTrigger
+                        value="editor"
+                        className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:via-emerald-600 data-[state=active]:to-emerald-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-emerald-300"
+                      >
+                        Editor
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="preview"
+                        className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:via-emerald-600 data-[state=active]:to-emerald-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-emerald-300"
+                      >
+                        Preview
+                      </TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="editor">

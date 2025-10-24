@@ -119,14 +119,7 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
     priceInput
   ]);
 
-  // Initialize user and profile
-  useEffect(() => {
-    if (user) {
-      fetchUserProfile();
-    }
-  }, [user]);
-
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     if (!supabase || !user) return;
 
     try {
@@ -142,7 +135,14 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
-  };
+  }, [user]);
+
+  // Initialize user and profile
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user, fetchUserProfile]);
 
   // Handle file drop
   const handleDrop = useCallback((e: React.DragEvent) => {

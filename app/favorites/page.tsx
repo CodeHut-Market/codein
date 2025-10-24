@@ -444,60 +444,60 @@ class DataValidator:
     <>
       {/* Sign In Dialog */}
       <Dialog open={showSignInDialog} onOpenChange={setShowSignInDialog}>
-        <DialogContent className="sm:max-w-lg bg-white/100 backdrop-blur-none border-2 border-gray-200 shadow-2xl">
-          <DialogHeader className="bg-white">
-            <DialogTitle className="flex items-center gap-2 text-2xl bg-white">
+        <DialogContent className="sm:max-w-lg border-2 border-gray-200 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur">
+          <DialogHeader className="bg-white/90 dark:bg-slate-900/90 rounded-lg px-4 py-3">
+            <DialogTitle className="flex items-center gap-2 text-2xl text-slate-900 dark:text-slate-100">
               <Lock className="h-6 w-6 text-pink-500" />
               Sign in to view favorites
             </DialogTitle>
-            <DialogDescription className="pt-3 text-base bg-white">
+            <DialogDescription className="pt-3 text-base text-slate-700 dark:text-slate-300">
               You need to sign in to access your favorites page and manage your saved snippets.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-4 py-6 bg-white">
-            <div className="flex items-start gap-4 rounded-lg border-2 border-pink-200 bg-pink-100 p-4">
-              <div className="rounded-full bg-pink-500/30 p-3">
+          <div className="flex flex-col gap-4 py-6">
+            <div className="flex items-start gap-4 rounded-xl border border-pink-500/40 bg-pink-100/90 dark:bg-pink-500/10 dark:border-pink-400/40 backdrop-blur-sm p-4">
+              <div className="rounded-full bg-pink-500/30 dark:bg-pink-500/20 p-3">
                 <Heart className="h-6 w-6 text-pink-600" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-gray-900">Save Your Favorites</h4>
-                <p className="text-sm text-gray-700 mt-1">
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Save Your Favorites</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
                   Keep track of code snippets you love and access them from any device
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 rounded-lg border-2 border-purple-200 bg-purple-100 p-4">
-              <div className="rounded-full bg-purple-500/30 p-3">
+            <div className="flex items-start gap-4 rounded-xl border border-purple-500/40 bg-purple-100/90 dark:bg-purple-500/10 dark:border-purple-400/40 backdrop-blur-sm p-4">
+              <div className="rounded-full bg-purple-500/30 dark:bg-purple-500/20 p-3">
                 <Star className="h-6 w-6 text-purple-600" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-gray-900">Organize & Search</h4>
-                <p className="text-sm text-gray-700 mt-1">
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Organize & Search</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
                   Filter by language, category, and sort your collection your way
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 rounded-lg border-2 border-blue-200 bg-blue-100 p-4">
-              <div className="rounded-full bg-blue-500/30 p-3">
+            <div className="flex items-start gap-4 rounded-xl border border-blue-500/40 bg-blue-100/90 dark:bg-blue-500/10 dark:border-blue-400/40 backdrop-blur-sm p-4">
+              <div className="rounded-full bg-blue-500/30 dark:bg-blue-500/20 p-3">
                 <UserPlus className="h-6 w-6 text-blue-600" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-gray-900">Join the Community</h4>
-                <p className="text-sm text-gray-700 mt-1">
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Join the Community</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
                   Free account - no credit card required, ready in seconds
                 </p>
               </div>
             </div>
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-3 bg-white">
+          <DialogFooter className="flex-col sm:flex-row gap-3 bg-white/90 dark:bg-slate-900/90 rounded-lg px-4 py-3">
             <Button
               variant="outline"
               onClick={() => router.push('/explore')}
-              className="w-full sm:w-auto border-2"
+              className="w-full sm:w-auto border-2 border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800"
             >
               Browse Snippets
             </Button>
@@ -506,7 +506,7 @@ class DataValidator:
                 setShowSignInDialog(false);
                 router.push('/login');
               }}
-              className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+              className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg"
             >
               <LogIn className="mr-2 h-4 w-4" />
               Sign In Now
