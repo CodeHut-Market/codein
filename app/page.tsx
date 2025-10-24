@@ -1,6 +1,22 @@
+"use client";
 import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 
 export default function LandingPage(){
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    import("@/lib/supabaseClient").then(({ supabase }) => {
+      supabase.auth.getUser().then(({ data }) => {
+        setUser(data?.user);
+      });
+    });
+  }, []);
+
+  if (user) {
+    const LoggedInHome = require("./home-loggedin").default;
+    return <LoggedInHome />;
+  }
+  // ...existing code...
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(80,120,255,0.15),transparent_70%)]" />
@@ -42,9 +58,9 @@ export default function LandingPage(){
 
 function Feature({ title, desc }: { title: string; desc: string }){
   return (
-    <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur hover:border-white/20 transition-colors">
-      <h3 className="font-semibold text-lg mb-2 text-foreground/90">{title}</h3>
-      <p className="text-sm text-foreground/60 leading-relaxed">{desc}</p>
+    <div className="p-6 rounded-xl shadow-xl border-0 bg-gradient-to-br from-purple-100 via-blue-100 to-green-100 dark:from-purple-900 dark:via-blue-900 dark:to-green-900 hover:scale-[1.02] transition-transform duration-300">
+      <h3 className="font-semibold text-lg mb-2 bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 bg-clip-text text-transparent drop-shadow-lg">{title}</h3>
+      <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">{desc}</p>
     </div>
   );
 }

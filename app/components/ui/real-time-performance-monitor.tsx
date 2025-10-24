@@ -86,25 +86,27 @@ export const RealTimePerformanceMonitor: React.FC = () => {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-4 right-4 p-2 bg-muted/50 hover:bg-muted border rounded-full shadow-lg z-50 transition-all"
+        className="fixed bottom-4 right-4 p-2 bg-gradient-to-br from-purple-500 via-blue-400 to-green-400 opacity-90 hover:opacity-100 border-0 rounded-full shadow-2xl z-50 transition-all duration-300 scale-100 hover:scale-105"
         title="Show performance monitor"
+        style={{ boxShadow: '0 4px 24px 0 rgba(80,120,255,0.25)' }}
       >
-        <Activity size={16} />
+        <Activity size={18} className="text-white drop-shadow" />
       </button>
     );
   }
   
   return (
-    <Card className="fixed bottom-4 right-4 w-80 shadow-xl z-50 border-2">
+  <Card className="fixed bottom-4 right-4 w-80 shadow-2xl z-50 border-0 rounded-2xl bg-gradient-to-br from-purple-500 via-blue-400 to-green-400 opacity-95 text-white backdrop-blur-xl transition-all duration-500">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Activity size={16} className="text-primary" />
-            <CardTitle className="text-sm">Real-Time Performance</CardTitle>
+            <Activity size={18} className="text-white drop-shadow" />
+            <CardTitle className="text-base font-bold tracking-wide bg-gradient-to-r from-white via-blue-200 to-green-200 bg-clip-text text-transparent">Real-Time Performance</CardTitle>
           </div>
           <button
             onClick={() => setIsVisible(false)}
-            className="text-muted-foreground hover:text-foreground text-xs"
+            className="text-white/70 hover:text-white text-lg font-bold px-2 py-1 rounded-full transition-colors"
+            style={{ background: 'rgba(0,0,0,0.08)' }}
           >
             ✕
           </button>
@@ -115,37 +117,31 @@ export const RealTimePerformanceMonitor: React.FC = () => {
         {/* Connection Status */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Wifi size={14} />
-            <span className="text-sm">Connection</span>
+            <Wifi size={16} className="text-white" />
+            <span className="text-sm font-semibold">Connection</span>
           </div>
-          <Badge 
-            variant={quality === 'excellent' || quality === 'good' ? 'default' : 'destructive'}
-            className={`text-xs ${getQualityColor(quality)}`}
-          >
-            {connectionState.status === 'connected' ? quality : connectionState.status}
-          </Badge>
+          <span className={`px-2 py-1 rounded-lg text-xs font-bold ${getQualityColor(quality)} bg-white/20 shadow`}>{connectionState.status === 'connected' ? quality : connectionState.status}</span>
         </div>
         
         {/* Start Time */}
         <div className="space-y-1">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
-              <Timer size={14} />
-              <span>Start Time</span>
+              <Timer size={16} className="text-white" />
+              <span className="font-semibold">Start Time</span>
             </div>
-            <span>{(metrics.connectionLatency / 1000).toFixed(1)}s</span>
+            <span className="font-mono">{(metrics.connectionLatency / 1000).toFixed(1)}s</span>
           </div>
           <Progress 
             value={Math.min((metrics.connectionLatency / 1000) * 100, 100)} 
-            className="h-1"
-          />
+            className="h-1 bg-white/30" />
         </div>
         
         {/* Active Subscriptions */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
-            <Database size={14} />
-            <span>Subscriptions</span>
+            <Database size={16} className="text-white" />
+            <span className="font-semibold">Subscriptions</span>
           </div>
           <span>{metrics.subscriptionCount}</span>
         </div>
@@ -153,8 +149,8 @@ export const RealTimePerformanceMonitor: React.FC = () => {
         {/* Update Frequency */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
-            <Zap size={14} />
-            <span>Updates/sec</span>
+            <Zap size={16} className="text-white" />
+            <span className="font-semibold">Updates/sec</span>
           </div>
           <span>{(metrics.updateFrequency / 60).toFixed(1)}</span>
         </div>
@@ -163,24 +159,23 @@ export const RealTimePerformanceMonitor: React.FC = () => {
         {metrics.memoryUsage > 0 && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
-              <span>Memory</span>
-              <span>{metrics.memoryUsage}MB</span>
+              <span className="font-semibold">Memory</span>
+              <span className="font-mono">{metrics.memoryUsage}MB</span>
             </div>
             <Progress 
               value={Math.min((metrics.memoryUsage / 100) * 100, 100)} 
-              className="h-1"
-            />
+              className="h-1 bg-white/30" />
           </div>
         )}
         
         {/* Last Update */}
         <div className="text-xs text-muted-foreground text-center pt-2 border-t">
-          Last update: {metrics.lastUpdateTime.toLocaleTimeString()}
+          <span className="text-white/80">Last update: {metrics.lastUpdateTime.toLocaleTimeString()}</span>
         </div>
         
         {/* Reconnection Info */}
         {connectionState.reconnectAttempts > 0 && (
-          <div className="text-xs text-yellow-600 text-center">
+          <div className="text-xs text-yellow-200 text-center font-semibold">
             Reconnection attempts: {connectionState.reconnectAttempts}
           </div>
         )}

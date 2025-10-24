@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../client/components/ui/dropdown-menu';
-import RippleThemeToggle from './RippleThemeToggle';
+import ThemeSwitcher from '../app/components/ThemeSwitcher';
 
 interface NavigationProps {
   className?: string
@@ -121,8 +121,8 @@ export default function Navigation({ className }: NavigationProps) {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
-            {/* Ripple Theme Toggle */}
-            <RippleThemeToggle size="md" />
+            {/* Theme Switcher Dropdown */}
+            <ThemeSwitcher />
 
             {/* User Menu or Sign In */}
             {isLoading ? (
