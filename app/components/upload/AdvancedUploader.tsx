@@ -3,18 +3,24 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { cn } from '../../lib/utils';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
-    AlertCircle, CheckCircle,
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle,
     Copy,
+  DollarSign,
     Loader2,
+  ShieldAlert,
     Upload,
     User,
     X
 } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '../../../client/contexts/AuthContext';
 import { CodeSnippet } from '../../../shared/api';
 import { supabase } from '../../lib/supabaseClient';
@@ -57,6 +63,13 @@ const FRAMEWORKS = [
   'Rails', 'ASP.NET', 'None'
 ];
 
+type ProfileRecord = {
+  username?: string | null;
+  avatar_url?: string | null;
+};
+
+type SnippetVisibility = 'public' | 'private' | 'unlisted';
+
 interface AdvancedUploaderProps {
   onSuccess?: (snippet: CodeSnippet) => void;
   onCancel?: () => void;
@@ -73,16 +86,38 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
     language: 'text',
     tags: [] as string[],
     framework: '',
-    visibility: 'public' as 'public' | 'private' | 'unlisted',
+    visibility: 'public' as SnippetVisibility,
     price: 0
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [tagInput, setTagInput] = useState('');
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [recentSnippets, setRecentSnippets] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<ProfileRecord | null>(null);
+  const [priceInput, setPriceInput] = useState('0');
+  const [plagStatus, setPlagStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+  const [similarity, setSimilarity] = useState<number | null>(null);
+  const [plagMessage, setPlagMessage] = useState('');
+
+  const completionProgress = useMemo(() => {
+    const checks = [
+      currentSnippet.title.trim().length > 0,
+      currentSnippet.code.trim().length > 0,
+      currentSnippet.message.trim().length > 0,
+      !!currentSnippet.language,
+      currentSnippet.tags.length > 0,
+      priceInput.trim().length > 0
+    ];
+
+    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  }, [
+    currentSnippet.code,
+    currentSnippet.language,
+    currentSnippet.message,
+    currentSnippet.tags.length,
+    currentSnippet.title,
+    priceInput
+  ]);
 
   // Initialize user and profile
   useEffect(() => {
@@ -203,6 +238,20 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
     }));
   };
 
+  const handlePriceChange = (value: string) => {
+    const sanitized = value.replace(/[^0-9.]/g, '');
+    const parts = sanitized.split('.');
+    const normalized = parts.length > 1 ? `${parts[0]}.${parts.slice(1).join('').slice(0, 2)}` : parts[0];
+
+    setPriceInput(normalized);
+
+    const numeric = parseFloat(normalized);
+    setCurrentSnippet(prev => ({
+      ...prev,
+      price: Number.isFinite(numeric) ? Math.min(1000, Math.max(0, Number(numeric.toFixed(2)))) : 0
+    }));
+  };
+
   // Submit snippet
   const handleSubmit = async () => {
     if (!user) {
@@ -226,9 +275,10 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
       };
 
       if (user) {
+        const fallbackUsername = user.username || user.email?.split('@')[0] || 'User';
         headers['x-user-data'] = JSON.stringify({
           id: user.id,
-          username: (user as any).user_metadata?.username || user.email?.split('@')[0] || 'User',
+          username: fallbackUsername,
           email: user.email
         });
       }
@@ -267,6 +317,10 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
         visibility: 'public',
         price: 0
       });
+      setPriceInput('0');
+      setSimilarity(null);
+      setPlagMessage('');
+      setPlagStatus('idle');
       
       setSuccessMessage('Snippet uploaded successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -279,6 +333,42 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
       setErrors({ submit: `Failed to upload snippet: ${(error as Error).message}` });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handlePlagiarismCheck = async () => {
+    if (!currentSnippet.code.trim()) {
+      return;
+    }
+
+    setPlagStatus('loading');
+    setPlagMessage('');
+
+    try {
+      const res = await fetch('/api/snippets/detect-plagiarism', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: currentSnippet.code })
+      });
+
+      if (!res.ok) {
+        throw new Error('Detection failed');
+      }
+
+      const data = await res.json();
+      const score = typeof data.similarity === 'number' ? data.similarity : null;
+      setSimilarity(score);
+      setPlagStatus('done');
+      if (score !== null) {
+        setPlagMessage(`Similarity score: ${(score * 100).toFixed(1)}%`);
+      } else {
+        setPlagMessage('Originality check completed. No similarity score available.');
+      }
+    } catch (error) {
+      setPlagStatus('error');
+      setPlagMessage((error as Error).message || 'Detection failed');
+    } finally {
+      setTimeout(() => setPlagStatus('idle'), 5000);
     }
   };
 
@@ -308,7 +398,8 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
           <CardContent className="p-4 flex items-center">
             <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mr-4">
               {userProfile.avatar_url ? (
-                <img src={userProfile.avatar_url} alt={userProfile.username} className="rounded-full" />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={userProfile.avatar_url} alt={userProfile.username ?? 'User avatar'} className="rounded-full" />
               ) : (
                 <User className="text-muted-foreground" size={24} />
               )}
@@ -340,6 +431,31 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
           </CardContent>
         </Card>
       )}
+
+      <Card className="border border-border/70 bg-card/80 backdrop-blur-sm">
+        <CardHeader className="bg-muted/50">
+          <CardTitle className="flex items-center gap-2 text-foreground">
+            <CheckCircle className="h-5 w-5 text-emerald-500" />
+            Advanced Upload Progress
+          </CardTitle>
+          <CardDescription>
+            Your form is {completionProgress}% complete
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between text-sm font-medium text-muted-foreground">
+            <span>Form Completion</span>
+            <span className="text-emerald-500">{completionProgress}%</span>
+          </div>
+          <Progress
+            value={completionProgress}
+            className="h-2 rounded-full [&>div]:rounded-full [&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:via-primary [&>div]:to-violet-500"
+          />
+          <p className="text-xs text-muted-foreground">
+            Fill in all recommended fields to help your snippet stand out.
+          </p>
+        </CardContent>
+      </Card>
       
       {/* Upload Section */}
       <Card>
@@ -508,6 +624,28 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
                 </Button>
               </div>
             </div>
+
+            {/* Pricing */}
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="advanced-price">
+                Selling Price (USD)
+              </label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="advanced-price"
+                  type="text"
+                  inputMode="decimal"
+                  value={priceInput}
+                  onChange={(e) => handlePriceChange(e.target.value)}
+                  placeholder="0.00"
+                  className="pl-8"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Set to 0 to share for free. Maximum price is $1000.
+              </p>
+            </div>
             
             {/* Visibility */}
             <div>
@@ -520,7 +658,7 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
                     type="radio"
                     value="public"
                     checked={currentSnippet.visibility === 'public'}
-                    onChange={(e) => setCurrentSnippet(prev => ({ ...prev, visibility: e.target.value as any }))}
+                    onChange={(e) => setCurrentSnippet(prev => ({ ...prev, visibility: e.target.value as SnippetVisibility }))}
                     className="mr-2"
                   />
                   Public
@@ -530,7 +668,7 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
                     type="radio"
                     value="private"
                     checked={currentSnippet.visibility === 'private'}
-                    onChange={(e) => setCurrentSnippet(prev => ({ ...prev, visibility: e.target.value as any }))}
+                    onChange={(e) => setCurrentSnippet(prev => ({ ...prev, visibility: e.target.value as SnippetVisibility }))}
                     className="mr-2"
                   />
                   Private
@@ -540,7 +678,7 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
                     type="radio"
                     value="unlisted"
                     checked={currentSnippet.visibility === 'unlisted'}
-                    onChange={(e) => setCurrentSnippet(prev => ({ ...prev, visibility: e.target.value as any }))}
+                    onChange={(e) => setCurrentSnippet(prev => ({ ...prev, visibility: e.target.value as SnippetVisibility }))}
                     className="mr-2"
                   />
                   Unlisted
@@ -569,6 +707,64 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
               </div>
               {errors.code && (
                 <p className="text-red-500 text-sm mt-1">{errors.code}</p>
+              )}
+              <div className="flex flex-col gap-3 pt-4 mt-4 border-t border-border/60 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h4 className="text-sm font-medium text-foreground">Code Originality Check</h4>
+                  <p className="text-xs text-muted-foreground">Verify your snippet before publishing.</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePlagiarismCheck}
+                  disabled={plagStatus === 'loading' || !currentSnippet.code.trim()}
+                  className="inline-flex items-center gap-2"
+                >
+                  {plagStatus === 'loading' ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ShieldAlert className="h-4 w-4" />
+                  )}
+                  {plagStatus === 'loading' ? 'Checking…' : 'Check Originality'}
+                </Button>
+              </div>
+              {plagMessage && (
+                <p className="text-xs text-muted-foreground mt-2">{plagMessage}</p>
+              )}
+              {similarity !== null && (
+                <Card
+                  className={cn(
+                    'mt-3 border shadow-sm',
+                    similarity > 0.8
+                      ? 'border-red-200 bg-red-50 dark:bg-red-950'
+                      : similarity > 0.5
+                        ? 'border-yellow-200 bg-yellow-50 dark:bg-yellow-950'
+                        : 'border-green-200 bg-green-50 dark:bg-green-950'
+                  )}
+                >
+                  <CardContent className="p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      {similarity > 0.8 ? (
+                        <AlertTriangle className="h-4 w-4 text-red-600" />
+                      ) : similarity > 0.5 ? (
+                        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4 text-emerald-600" />
+                      )}
+                      <span className="text-sm font-medium">
+                        Similarity: {(similarity * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <Progress value={similarity * 100} className="h-2" />
+                    <p className="text-xs text-muted-foreground">
+                      {similarity > 0.8
+                        ? 'High similarity detected. Please revise your content.'
+                        : similarity > 0.5
+                          ? 'Moderate similarity detected. Consider adding more originality.'
+                          : 'Low similarity detected. Great job!'}
+                    </p>
+                  </CardContent>
+                </Card>
               )}
             </div>
             

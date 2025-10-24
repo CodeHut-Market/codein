@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { X } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface GuestSnippetModalProps {
@@ -12,6 +11,19 @@ interface GuestSnippetModalProps {
 export const GuestSnippetModal: React.FC<GuestSnippetModalProps> = ({ open, onClose }) => {
   const router = useRouter();
   const [loading, setLoading] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open, onClose]);
   if (!open) return null;
   const handleNavigate = async (path: string) => {
     setLoading(path);
@@ -19,8 +31,21 @@ export const GuestSnippetModal: React.FC<GuestSnippetModalProps> = ({ open, onCl
     // Modal will unmount after navigation
   };
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-indigo-100 via-sky-100 to-cyan-100 dark:from-indigo-900 dark:via-sky-900 dark:to-cyan-900 rounded-2xl shadow-2xl p-8 w-full max-w-md relative border-2 border-indigo-300 dark:border-indigo-700">
+    <div
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      onClick={(event) => {
+        event.stopPropagation();
+        onClose();
+      }}
+      role="presentation"
+    >
+      <div
+        className="bg-gradient-to-br from-indigo-100 via-sky-100 to-cyan-100 dark:from-indigo-900 dark:via-sky-900 dark:to-cyan-900 rounded-2xl shadow-2xl p-8 w-full max-w-md relative border-2 border-indigo-300 dark:border-indigo-700"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="guest-snippet-modal-title"
+      >
         <button
           className="absolute top-4 right-4 text-gray-700 dark:text-cyan-200 hover:text-indigo-600 dark:hover:text-cyan-300 transition-colors"
           onClick={() => { onClose(); }}
@@ -28,7 +53,7 @@ export const GuestSnippetModal: React.FC<GuestSnippetModalProps> = ({ open, onCl
         >
           <X size={24} />
         </button>
-  <h2 className="text-2xl font-bold text-indigo-700 dark:text-cyan-200 mb-2">Sign in required</h2>
+  <h2 id="guest-snippet-modal-title" className="text-2xl font-bold text-indigo-700 dark:text-cyan-200 mb-2">Sign in required</h2>
   <p className="text-base text-gray-900 dark:text-gray-100 mb-6">You should log in to view snippet details and access all features.</p>
         <div className="flex flex-col gap-3">
           <button

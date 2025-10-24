@@ -34,10 +34,9 @@ import {
     UserPlus,
     X
 } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { isSupabaseEnabled, supabase } from '../lib/supabaseClient'
+import { cn } from '../lib/utils'
 import AdvancedUploader from '../components/upload/AdvancedUploader'
 
 export default function UploadPage() {
@@ -145,16 +144,17 @@ export default function UploadPage() {
 
       // Add user data to request headers if user is authenticated
       if (user) {
+        const fallbackUsername = user.username || user.email?.split('@')[0] || 'User'
         headers['x-user-data'] = JSON.stringify({
           id: user.id,
-          username: (user as any).user_metadata?.username || user.email?.split('@')[0] || 'User',
+          username: fallbackUsername,
           email: user.email
-        });
+        })
         console.log('Upload: Adding user data to request:', {
           id: user.id,
-          username: (user as any).user_metadata?.username || user.email?.split('@')[0],
+          username: fallbackUsername,
           email: user.email
-        });
+        })
       } else {
         console.log('Upload: No authenticated user found');
       }
@@ -189,7 +189,7 @@ export default function UploadPage() {
       setDescription('')
       setPrice('0')
       setTags([])
-      setCategory('')
+    setCategory('Frontend')
       
       // Redirect to detail page or dashboard
       if (data.snippet?.id) {
@@ -248,18 +248,7 @@ export default function UploadPage() {
     e.stopPropagation()
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-
-    const files = Array.from(e.dataTransfer.files)
-    if (files.length > 0) {
-      handleFileUpload(files[0])
-    }
-  }, [])
-
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = useCallback((file: File) => {
     const reader = new FileReader()
     reader.onload = (e) => {
       const content = e.target?.result as string
@@ -299,7 +288,18 @@ export default function UploadPage() {
       }
     }
     reader.readAsText(file)
-  }
+  }, [title])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length > 0) {
+      handleFileUpload(files[0])
+    }
+  }, [handleFileUpload])
 
   const clearUploadedFile = () => {
     setCode("")
@@ -334,60 +334,60 @@ export default function UploadPage() {
       <>
         {/* Sign In Dialog */}
         <Dialog open={showSignInDialog} onOpenChange={setShowSignInDialog}>
-          <DialogContent className="sm:max-w-lg bg-white/100 backdrop-blur-none border-2 border-gray-200 shadow-2xl">
-            <DialogHeader className="bg-white">
-              <DialogTitle className="flex items-center gap-2 text-2xl bg-white">
+          <DialogContent className="sm:max-w-lg border border-border/70 bg-card/90 text-card-foreground shadow-2xl backdrop-blur-xl supports-[backdrop-filter]:bg-card/75">
+            <DialogHeader className="space-y-2">
+              <DialogTitle className="flex items-center gap-2 text-2xl text-foreground">
                 <Lock className="h-6 w-6 text-emerald-500" />
                 Sign in to upload snippets
               </DialogTitle>
-              <DialogDescription className="pt-3 text-base bg-white">
+              <DialogDescription className="pt-3 text-base text-muted-foreground">
                 You need to sign in to upload code snippets and share your work with the community.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex flex-col gap-4 py-6 bg-white">
-              <div className="flex items-start gap-4 rounded-lg border-2 border-emerald-200 bg-emerald-100 p-4">
-                <div className="rounded-full bg-emerald-500/30 p-3">
-                  <UploadCloud className="h-6 w-6 text-emerald-600" />
+            <div className="flex flex-col gap-4 py-6">
+              <div className="flex items-start gap-4 rounded-lg border border-emerald-400/40 bg-emerald-500/15 p-4 dark:border-emerald-400/50 dark:bg-emerald-500/20">
+                <div className="rounded-full bg-emerald-500/25 dark:bg-emerald-400/30 p-3 backdrop-blur-sm">
+                  <UploadCloud className="h-6 w-6 text-emerald-500" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-gray-900">Share Your Code</h4>
-                  <p className="text-sm text-gray-700 mt-1">
+                  <h4 className="text-sm font-semibold text-foreground">Share Your Code</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Upload code snippets and help developers around the world
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-lg border-2 border-blue-200 bg-blue-100 p-4">
-                <div className="rounded-full bg-blue-500/30 p-3">
-                  <DollarSign className="h-6 w-6 text-blue-600" />
+              <div className="flex items-start gap-4 rounded-lg border border-blue-400/40 bg-blue-500/15 p-4 dark:border-blue-400/50 dark:bg-blue-500/20">
+                <div className="rounded-full bg-blue-500/25 dark:bg-blue-400/30 p-3 backdrop-blur-sm">
+                  <DollarSign className="h-6 w-6 text-blue-500" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-gray-900">Earn from Your Work</h4>
-                  <p className="text-sm text-gray-700 mt-1">
+                  <h4 className="text-sm font-semibold text-foreground">Earn from Your Work</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Set your own prices or share for free - you decide
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-lg border-2 border-purple-200 bg-purple-100 p-4">
-                <div className="rounded-full bg-purple-500/30 p-3">
-                  <UserPlus className="h-6 w-6 text-purple-600" />
+              <div className="flex items-start gap-4 rounded-lg border border-purple-400/40 bg-purple-500/15 p-4 dark:border-purple-400/50 dark:bg-purple-500/20">
+                <div className="rounded-full bg-purple-500/25 dark:bg-purple-400/30 p-3 backdrop-blur-sm">
+                  <UserPlus className="h-6 w-6 text-purple-500" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-gray-900">Join the Community</h4>
-                  <p className="text-sm text-gray-700 mt-1">
+                  <h4 className="text-sm font-semibold text-foreground">Join the Community</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Free account - start uploading in seconds
                   </p>
                 </div>
               </div>
             </div>
 
-            <DialogFooter className="flex-col sm:flex-row gap-3 bg-white">
+            <DialogFooter className="flex-col sm:flex-row gap-3">
               <Button
                 variant="outline"
                 onClick={() => router.push('/explore')}
-                className="w-full sm:w-auto border-2"
+                className="w-full sm:w-auto"
               >
                 Browse Snippets
               </Button>
@@ -396,7 +396,7 @@ export default function UploadPage() {
                   setShowSignInDialog(false);
                   router.push('/login');
                 }}
-                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white"
+                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-blue-600 text-primary-foreground hover:from-emerald-600 hover:to-blue-700"
               >
                 <LogIn className="mr-2 h-4 w-4" />
                 Sign In Now
@@ -408,9 +408,9 @@ export default function UploadPage() {
         {/* Locked state background */}
         <div className="container mx-auto px-4 py-16 text-center">
           <div className="max-w-md mx-auto space-y-4">
-            <Lock className="h-16 w-16 mx-auto text-gray-400" />
-            <h2 className="text-2xl font-bold text-gray-900">Authentication Required</h2>
-            <p className="text-gray-600">Please sign in to upload code snippets</p>
+            <Lock className="h-16 w-16 mx-auto text-muted-foreground" />
+            <h2 className="text-2xl font-bold text-foreground">Authentication Required</h2>
+            <p className="text-muted-foreground">Please sign in to upload code snippets</p>
           </div>
         </div>
       </>
@@ -432,18 +432,32 @@ export default function UploadPage() {
 
       {/* Upload Mode Toggle */}
       <div className="flex justify-center mb-6">
-        <div className="inline-flex rounded-lg border border-muted p-1">
+        <div className="inline-flex rounded-full border border-border bg-background/80 shadow-sm p-1">
           <Button
-            variant={uploadMode === 'simple' ? 'default' : 'ghost'}
+            aria-pressed={uploadMode === 'simple'}
+            variant="ghost"
             size="sm"
             onClick={() => setUploadMode('simple')}
+            className={cn(
+              'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2',
+              uploadMode === 'simple'
+                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-primary-foreground shadow-lg ring-2 ring-emerald-400/70 dark:ring-emerald-300/60'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
           >
             Simple Upload
           </Button>
           <Button
-            variant={uploadMode === 'advanced' ? 'default' : 'ghost'}
+            aria-pressed={uploadMode === 'advanced'}
+            variant="ghost"
             size="sm"
             onClick={() => setUploadMode('advanced')}
+            className={cn(
+              'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2',
+              uploadMode === 'advanced'
+                ? 'bg-gradient-to-r from-primary to-violet-600 text-primary-foreground shadow-lg ring-2 ring-primary/70 dark:ring-primary/60'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
           >
             Advanced Upload
           </Button>
@@ -466,22 +480,28 @@ export default function UploadPage() {
         <>
 
       {/* Progress Indicator */}
-      <Card className="mb-8 border-2 hover:border-emerald-500/20 transition-colors duration-200">
-        <CardHeader className="bg-gradient-to-r from-emerald-500/5 via-primary/5 to-violet-500/5">
-          <CardTitle className="text-lg flex items-center text-primary">
-            <CheckCircle className="mr-2 h-5 w-5 text-emerald-600" />
+      <Card className="mb-8 border border-border/70 bg-card/80 backdrop-blur-sm shadow-sm">
+        <CardHeader className="bg-muted/50">
+          <CardTitle className="text-lg flex items-center text-foreground">
+            <CheckCircle className="mr-2 h-5 w-5 text-emerald-500" />
             Upload Progress
           </CardTitle>
+          <CardDescription>
+            Your form is {Math.round(getFormProgress())}% complete
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm font-medium text-muted-foreground">
               <span>Form Completion</span>
-              <span className="text-emerald-600 font-medium">{Math.round(getFormProgress())}%</span>
+              <span className="text-emerald-500">{Math.round(getFormProgress())}%</span>
             </div>
-            <Progress value={getFormProgress()} className="[&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:to-primary" />
+            <Progress
+              value={getFormProgress()}
+              className="h-2 rounded-full [&>div]:rounded-full [&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:via-primary [&>div]:to-violet-500"
+            />
             <p className="text-xs text-muted-foreground">
-              Complete all fields for the best visibility
+              Complete all required fields to unlock maximum visibility.
             </p>
           </div>
         </CardContent>
@@ -734,7 +754,7 @@ export default function UploadPage() {
                     <div className="space-y-1">
                       <h4 className="text-sm font-medium">Code Originality Check</h4>
                       <p className="text-xs text-muted-foreground">
-                        Verify your code's uniqueness
+                        Verify your code&rsquo;s uniqueness
                       </p>
                     </div>
                     <Button 
@@ -751,6 +771,10 @@ export default function UploadPage() {
                       {plagStatus === 'loading' ? 'Checking...' : 'Check Originality'}
                     </Button>
                   </div>
+
+                  {plagMessage && (
+                    <p className="mt-2 text-xs text-muted-foreground">{plagMessage}</p>
+                  )}
 
                   {similarity !== null && (
                     <Card className={`mt-4 ${similarity > 0.8 ? 'border-red-200 bg-red-50 dark:bg-red-950' : similarity > 0.5 ? 'border-yellow-200 bg-yellow-50 dark:bg-yellow-950' : 'border-green-200 bg-green-50 dark:bg-green-950'}`}>
