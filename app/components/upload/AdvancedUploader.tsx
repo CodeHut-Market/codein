@@ -30,8 +30,13 @@ import {
     extractTagsFromCode,
     validateSnippet
 } from '../../lib/utils/snippetHelpers';
-
-const SIMILARITY_THRESHOLD = 0.4;
+import {
+  SIMILARITY_THRESHOLD,
+  formatPrice,
+  formatPriceCap,
+  getPriceCapForSimilarity,
+  normalizePriceInput,
+} from '../../lib/pricing';
 
 // Supported languages matching database schema
 const SUPPORTED_LANGUAGES = {
@@ -97,9 +102,32 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
   const [tagInput, setTagInput] = useState('');
   const [userProfile, setUserProfile] = useState<ProfileRecord | null>(null);
   const [priceInput, setPriceInput] = useState('0');
+  const [priceNotice, setPriceNotice] = useState<string | null>(null);
   const [plagStatus, setPlagStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [similarity, setSimilarity] = useState<number | null>(null);
   const [plagMessage, setPlagMessage] = useState('');
+
+  const maxPrice = useMemo(() => getPriceCapForSimilarity(similarity), [similarity]);
+
+  useEffect(() => {
+    let adjusted = false;
+    let normalizedDisplay = '';
+    setCurrentSnippet(prev => {
+      const normalized = normalizePriceInput(prev.price, maxPrice);
+      if (normalized !== prev.price) {
+        adjusted = true;
+        normalizedDisplay = formatPrice(normalized);
+        setPriceInput(normalizedDisplay);
+        return { ...prev, price: normalized };
+      }
+      return prev;
+    });
+    if (adjusted) {
+      setPriceNotice(`Price adjusted to $${normalizedDisplay} (max $${formatPriceCap(maxPrice)}) based on originality score.`);
+    } else {
+      setPriceNotice(null);
+    }
+  }, [maxPrice]);
 
   const completionProgress = useMemo(() => {
     const checks = [
@@ -240,18 +268,30 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
     }));
   };
 
-  const handlePriceChange = (value: string) => {
-    const sanitized = value.replace(/[^0-9.]/g, '');
-    const parts = sanitized.split('.');
-    const normalized = parts.length > 1 ? `${parts[0]}.${parts.slice(1).join('').slice(0, 2)}` : parts[0];
+  const handlePriceInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = event.target.value;
 
-    setPriceInput(normalized);
+    if (rawValue.trim() === '') {
+      setPriceInput('0');
+      setCurrentSnippet(prev => ({ ...prev, price: 0 }));
+      setPriceNotice(null);
+      return;
+    }
 
-    const numeric = parseFloat(normalized);
-    setCurrentSnippet(prev => ({
-      ...prev,
-      price: Number.isFinite(numeric) ? Math.min(1000, Math.max(0, Number(numeric.toFixed(2)))) : 0
-    }));
+    const numericValue = parseFloat(rawValue);
+    if (!Number.isFinite(numericValue)) {
+      return;
+    }
+
+    const normalizedValue = normalizePriceInput(numericValue, maxPrice);
+    if (normalizedValue !== numericValue) {
+      setPriceNotice(`Price capped at $${formatPriceCap(maxPrice)} based on originality score.`);
+    } else {
+      setPriceNotice(null);
+    }
+
+    setPriceInput(formatPrice(normalizedValue));
+    setCurrentSnippet(prev => ({ ...prev, price: normalizedValue }));
   };
 
   // Submit snippet
@@ -325,6 +365,21 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
         }
       }
 
+      const allowedMaxPrice = getPriceCapForSimilarity(detectedSimilarity ?? similarity);
+      const normalizedPrice = normalizePriceInput(currentSnippet.price, allowedMaxPrice);
+
+      if (currentSnippet.price !== normalizedPrice) {
+        setCurrentSnippet(prev => ({ ...prev, price: normalizedPrice }));
+        setPriceInput(formatPrice(normalizedPrice));
+        setPriceNotice(`Price capped at $${formatPriceCap(allowedMaxPrice)} based on originality score.`);
+        setErrors({
+          submit: `Price must be at or below $${formatPriceCap(allowedMaxPrice)} for the current originality score.`
+        });
+        return;
+      }
+
+      setPriceNotice(null);
+
       // Prepare headers with user information
       const headers: Record<string, string> = {
         'Content-Type': 'application/json'
@@ -347,7 +402,7 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
           code: currentSnippet.code,
           description: currentSnippet.message.trim() || '',
           language: currentSnippet.language,
-          price: currentSnippet.price,
+          price: normalizedPrice,
           tags: currentSnippet.tags,
           framework: currentSnippet.framework || undefined,
           visibility: currentSnippet.visibility,
@@ -374,6 +429,7 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
         price: 0
       });
       setPriceInput('0');
+      setPriceNotice(null);
       setSimilarity(null);
       setPlagMessage('');
       setPlagStatus('idle');
@@ -693,14 +749,19 @@ export default function AdvancedUploader({ onSuccess, onCancel }: AdvancedUpload
                   type="text"
                   inputMode="decimal"
                   value={priceInput}
-                  onChange={(e) => handlePriceChange(e.target.value)}
+                  onChange={handlePriceInputChange}
                   placeholder="0.00"
                   className="pl-8"
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Set to 0 to share for free. Maximum price is $1000.
+                {similarity !== null
+                  ? `Originality score ${(similarity * 100).toFixed(1)}% limits pricing to $0 – $${formatPriceCap(maxPrice)}.`
+                  : `You can currently price between $0 and $${formatPriceCap(maxPrice)}. Run an originality check for precise limits.`}
               </p>
+              {priceNotice && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">{priceNotice}</p>
+              )}
             </div>
             
             {/* Visibility */}

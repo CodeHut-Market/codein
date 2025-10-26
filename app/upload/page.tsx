@@ -35,11 +35,18 @@ import {
     X
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { ChangeEvent } from 'react'
 import { cn } from '../lib/utils'
 import AdvancedUploader from '../components/upload/AdvancedUploader'
 
-const SIMILARITY_THRESHOLD = 0.4
+import {
+  SIMILARITY_THRESHOLD,
+  formatPrice,
+  formatPriceCap,
+  getPriceCapForSimilarity,
+  normalizePriceInput,
+} from '../lib/pricing'
 
 export default function UploadPage() {
   const router = useRouter()
@@ -57,6 +64,7 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false)
   const [language, setLanguage] = useState('typescript')
   const [price, setPrice] = useState('0')
+  const [priceNotice, setPriceNotice] = useState<string | null>(null)
   const [description, setDescription] = useState('')
   const [uploadMessage, setUploadMessage] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>([])
@@ -73,6 +81,49 @@ export default function UploadPage() {
   const [plagStatus, setPlagStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [similarity, setSimilarity] = useState<number | null>(null)
   const [plagMessage, setPlagMessage] = useState('')
+
+  const maxPrice = useMemo(() => getPriceCapForSimilarity(similarity), [similarity])
+
+  useEffect(() => {
+    let notice: string | null = null
+    setPrice(prev => {
+      const numericPrice = parseFloat(prev || '0')
+      if (!Number.isFinite(numericPrice)) {
+        notice = 'Invalid price detected. Reset to $0.'
+        return '0'
+      }
+      const normalizedPrice = normalizePriceInput(numericPrice, maxPrice)
+      if (normalizedPrice !== numericPrice) {
+        const normalizedDisplay = formatPrice(normalizedPrice)
+        notice = `Price adjusted to $${normalizedDisplay} (max $${formatPriceCap(maxPrice)}) based on originality score.`
+        return normalizedDisplay
+      }
+      return prev
+    })
+    setPriceNotice(notice)
+  }, [maxPrice])
+
+  const handlePriceChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const rawValue = event.target.value
+    if (rawValue.trim() === '') {
+      setPrice('0')
+      setPriceNotice(null)
+      return
+    }
+
+    const numericValue = parseFloat(rawValue)
+    if (!Number.isFinite(numericValue)) {
+      return
+    }
+
+    const normalizedValue = normalizePriceInput(numericValue, maxPrice)
+    if (normalizedValue !== numericValue) {
+      setPriceNotice(`Price capped at $${formatPriceCap(maxPrice)} based on originality score.`)
+    } else {
+      setPriceNotice(null)
+    }
+    setPrice(formatPrice(normalizedValue))
+  }
 
   // Authentication is now handled by AuthContext
   useEffect(() => {
@@ -118,9 +169,17 @@ export default function UploadPage() {
     
     if (tags.length > 10) errors.push('Maximum 10 tags allowed')
     
-    const priceNum = parseFloat(price)
-    if (isNaN(priceNum) || priceNum < 0) errors.push('Price must be a valid non-negative number')
-    if (priceNum > 1000) errors.push('Price cannot exceed $1000')
+    const priceNum = parseFloat(price || '0')
+    if (!Number.isFinite(priceNum) || priceNum < 0) {
+      errors.push('Price must be a valid non-negative number')
+    } else {
+      const maxAllowedPrice = getPriceCapForSimilarity(similarity)
+      if (priceNum > maxAllowedPrice) {
+        errors.push(
+          `Price cannot exceed $${formatPriceCap(maxAllowedPrice)} for the current originality score`,
+        )
+      }
+    }
     
     if (!user) errors.push('You must be logged in to upload snippets')
     
@@ -195,6 +254,22 @@ export default function UploadPage() {
         }
       }
 
+      const allowedMaxPrice = getPriceCapForSimilarity(detectedSimilarity ?? similarity)
+      const currentPrice = parseFloat(price || '0')
+      const normalizedPrice = normalizePriceInput(currentPrice, allowedMaxPrice)
+
+      if (currentPrice !== normalizedPrice) {
+        setPrice(formatPrice(normalizedPrice))
+        setPriceNotice(`Price capped at $${formatPriceCap(allowedMaxPrice)} based on originality score.`)
+        setUploadMessage(
+          `❌ Price must be at or below $${formatPriceCap(allowedMaxPrice)} for the current originality score.`,
+        )
+        setTimeout(() => setUploadMessage(null), 6000)
+        return
+      }
+
+      setPriceNotice(null)
+
       // Prepare headers with user information
       const headers: Record<string, string> = {
         'Content-Type': 'application/json'
@@ -225,7 +300,7 @@ export default function UploadPage() {
           code,
           description: description.trim(),
           language,
-          price: parseFloat(price) || 0,
+          price: normalizedPrice,
           tags,
           category,
           visibility: isPublic ? 'public' : 'private',
@@ -246,8 +321,12 @@ export default function UploadPage() {
       setCode('')
       setDescription('')
       setPrice('0')
+      setPriceNotice(null)
       setTags([])
-    setCategory('Frontend')
+      setCategory('Frontend')
+  setSimilarity(null)
+  setPlagMessage('')
+  setPlagStatus('idle')
       
       // Redirect to detail page or dashboard
       if (data.snippet?.id) {
@@ -902,12 +981,17 @@ export default function UploadPage() {
                       min="0" 
                       step="0.50" 
                       value={price} 
-                      onChange={e => setPrice(e.target.value)}
+                      onChange={handlePriceChange}
                       placeholder="0.00"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Set to 0 for free snippets
+                      {similarity !== null
+                        ? `Originality score ${(similarity * 100).toFixed(1)}% limits pricing to $0 – $${formatPriceCap(maxPrice)}`
+                        : `You can currently price between $0 and $${formatPriceCap(maxPrice)}. Run an originality check for a tailored limit.`}
                     </p>
+                    {priceNotice && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400">{priceNotice}</p>
+                    )}
                   </div>
 
                   <div className="space-y-4">
