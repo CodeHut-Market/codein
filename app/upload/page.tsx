@@ -39,6 +39,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { cn } from '../lib/utils'
 import AdvancedUploader from '../components/upload/AdvancedUploader'
 
+const SIMILARITY_THRESHOLD = 0.4
+
 export default function UploadPage() {
   const router = useRouter()
   const { user, isLoading } = useAuth()
@@ -137,6 +139,62 @@ export default function UploadPage() {
     setUploading(true)
     setUploadMessage(null)
     try {
+      let detectedSimilarity: number | null = null
+      if (code.trim()) {
+        try {
+          setPlagStatus('loading')
+          setPlagMessage('')
+
+          const plagiarismResponse = await fetch('/api/snippets/detect-plagiarism', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code })
+          })
+
+          if (!plagiarismResponse.ok) {
+            throw new Error('Originality check failed')
+          }
+
+          const plagiarismData = await plagiarismResponse.json()
+          detectedSimilarity =
+            typeof plagiarismData.similarity === 'number'
+              ? plagiarismData.similarity
+              : null
+
+          if (detectedSimilarity !== null) {
+            setSimilarity(detectedSimilarity)
+            setPlagStatus('done')
+            setPlagMessage(
+              `Similarity score: ${(detectedSimilarity * 100).toFixed(1)}%`,
+            )
+          } else {
+            setPlagStatus('done')
+            setPlagMessage('Originality check completed.')
+          }
+
+          setTimeout(() => setPlagStatus('idle'), 5000)
+
+          if (
+            detectedSimilarity !== null &&
+            detectedSimilarity > SIMILARITY_THRESHOLD
+          ) {
+            setUploadMessage(
+              `❌ Upload blocked. Your code matches existing content by ${(detectedSimilarity * 100).toFixed(1)}%. Please revise and try again.`,
+            )
+            return
+          }
+        } catch (error) {
+          setPlagStatus('error')
+          setPlagMessage(
+            error instanceof Error
+              ? error.message
+              : 'Originality check failed',
+          )
+          setTimeout(() => setPlagStatus('idle'), 5000)
+          throw new Error('Originality check failed. Please try again.')
+        }
+      }
+
       // Prepare headers with user information
       const headers: Record<string, string> = {
         'Content-Type': 'application/json'
