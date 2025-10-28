@@ -1,80 +1,48 @@
 "use client"
 
-import {
-  BookOpen,
-  Code,
-  DollarSign,
-  ExternalLink,
-  FileText,
-  Github,
-  Heart,
-  HelpCircle,
-  Linkedin,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Phone,
-  Shield,
-  Twitter,
-  Upload,
-  Users
-} from 'lucide-react';
+import { Code, Github, Linkedin, Mail, MapPin, MessageCircle, Phone, Twitter } from 'lucide-react';
 import Link from 'next/link';
 
 const currentYear = new Date().getFullYear();
 
-const footerSections = {
-  product: {
-    title: 'Product',
-    links: [
-      { name: 'Explore Code', href: '/explore', icon: Code },
-      { name: 'Upload Code', href: '/upload', icon: Upload },
-      { name: 'Favorites', href: '/favorites', icon: Heart },
-      { name: 'Pricing', href: '/pricing', icon: DollarSign },
-      { name: 'API Access', href: '/api-docs', icon: ExternalLink },
-    ]
-  },
-  resources: {
+const footerSections = [
+  {
     title: 'Resources',
     links: [
-      { name: 'Documentation', href: '/docs', icon: BookOpen },
-      { name: 'Tutorials', href: '/tutorials', icon: BookOpen },
-      { name: 'Blog', href: '/blog', icon: FileText },
-      { name: 'Help Center', href: '/help', icon: HelpCircle },
-      { name: 'Status Page', href: '/status', icon: ExternalLink },
-    ]
+      { name: 'Documentation', href: '/docs' },
+      { name: 'Tutorial', href: '/tutorials' },
+      { name: 'Blogs', href: '/blog' },
+      { name: 'API Access', href: '/api-docs' },
+    ],
   },
-  community: {
-    title: 'Community',
-    links: [
-      { name: 'Community Hub', href: '/community', icon: Users },
-      { name: 'Discord', href: 'https://discord.gg/BqkC2YjD', icon: MessageCircle, external: true },
-      { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github, external: true },
-      { name: 'Contributors', href: '/contributors', icon: Users },
-    ]
-  },
-  company: {
-    title: 'Company',
-    links: [
-      { name: 'About Us', href: '/about', icon: Users },
-      { name: 'Careers', href: '/careers', icon: Users },
-      { name: 'Contact', href: '/contact', icon: Mail },
-      { name: 'Press Kit', href: '/press', icon: FileText },
-      { name: 'Partners', href: '/partners', icon: Users },
-      { name: 'CodeHut UI Library', href: '/ui-library', icon: Code, highlight: true },
-    ]
-  },
-  legal: {
+  {
     title: 'Legal',
     links: [
-      { name: 'Privacy Policy', href: '/privacy', icon: Shield },
-      { name: 'Terms of Service', href: '/terms', icon: FileText },
-      { name: 'Cookie Policy', href: '/cookies', icon: FileText },
-      { name: 'DMCA', href: '/dmca', icon: Shield },
-      { name: 'Licenses', href: '/licenses', icon: FileText },
-    ]
-  }
-};
+      { name: 'Privacy Policy', href: '/privacy' },
+      { name: 'DMCA', href: '/dmca' },
+      { name: 'Terms of Service', href: '/terms' },
+      { name: 'Cookie Policy', href: '/cookies' },
+    ],
+  },
+  {
+    title: 'Community',
+    links: [
+      { name: 'Hub', href: '/community' },
+      { name: 'Contributors', href: '/contributors' },
+      { name: 'UI Library', href: '/ui-library' },
+      { name: 'Help Center', href: '/help' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { name: 'About us', href: '/about' },
+      { name: 'Contact', href: '/contact' },
+      { name: 'Partners', href: '/partners' },
+      { name: 'Licenses', href: '/licenses' },
+    ],
+  },
+];
 
 const socialLinks = [
   { name: 'GitHub', href: 'https://github.com/CodeHut-Market', icon: Github },
@@ -90,9 +58,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
             {/* Brand Section */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-1">
               <Link href="/" className="flex items-center space-x-2 mb-4">
                 <Code className="h-8 w-8 text-primary" />
                 <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
@@ -124,33 +92,16 @@ export default function Footer() {
             </div>
 
             {/* Footer Links */}
-            {Object.entries(footerSections).map(([key, section]) => (
-              <div key={key}>
-                <h3 className="font-semibold text-foreground mb-4">{section.title}</h3>
-                <ul className="space-y-3">
+            {footerSections.map((section) => (
+              <div key={section.title}>
+                <h3 className="font-semibold text-foreground mb-4 uppercase tracking-wide text-sm">
+                  {section.title}
+                </h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
                   {section.links.map((link) => (
                     <li key={link.name}>
-                      <Link
-                        href={link.href}
-                        className={`text-sm transition-colors flex items-center space-x-2 group ${
-                          link.highlight 
-                            ? 'text-primary font-semibold hover:text-primary/80' 
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                        {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                      >
-                        <link.icon className={`h-3 w-3 transition-colors ${
-                          link.highlight 
-                            ? 'text-primary group-hover:text-primary/80' 
-                            : 'group-hover:text-primary'
-                        }`} />
-                        <span>{link.name}</span>
-                        {link.external && <ExternalLink className="h-3 w-3 opacity-50" />}
-                        {link.highlight && (
-                          <span className="ml-1 px-1.5 py-0.5 text-xs bg-primary/10 text-primary rounded-full">
-                            New
-                          </span>
-                        )}
+                      <Link href={link.href} className="hover:text-foreground transition-colors">
+                        {link.name}
                       </Link>
                     </li>
                   ))}
