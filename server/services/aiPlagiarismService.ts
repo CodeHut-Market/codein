@@ -4,10 +4,8 @@ import {
   createUserMessage,
   MODELS
 } from './openRouterService';
-import { 
-  searchInternetForCode, 
-  analyzeInternetMatches,
-  type InternetCodeMatch 
+import {
+  searchInternetForCode
 } from './tavilySearchService';
 
 export interface PlagiarismMatch {

@@ -40,15 +40,15 @@ export function SiteFooter() {
     }
   }
   return (
-    <footer className="bg-gradient-to-b from-background to-muted/20 border-t border-primary/10 mt-24" role="contentinfo" aria-label="Site footer">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="bg-gradient-to-b from-background to-muted/20 border-t border-primary/10 mt-12" role="contentinfo" aria-label="Site footer">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
-              <Code2 className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">Marketplace</span>
+            <div className="flex items-center space-x-2 mb-3">
+              <Code2 className="h-6 w-6 text-primary" />
+              <span className="text-lg font-bold bg-gradient-to-r from-primary via-violet-600 to-emerald-600 bg-clip-text text-transparent">Marketplace</span>
             </div>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               Buy, sell, and discover quality code snippets, templates, and components.
             </p>
             <div className="flex space-x-4">
@@ -64,8 +64,8 @@ export function SiteFooter() {
             </div>
           </div>
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Marketplace</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="font-semibold text-foreground mb-3">Marketplace</h3>
+            <ul className="space-y-2 text-sm">
               <li><Link href="/explore" className="text-muted-foreground hover:text-accent transition-colors">Browse Code</Link></li>
               <li><Link href="/upload" className="text-muted-foreground hover:text-accent transition-colors">Sell Code</Link></li>
               <li><Link href="/pricing" className="text-muted-foreground hover:text-accent transition-colors">Pricing</Link></li>
@@ -73,8 +73,8 @@ export function SiteFooter() {
             </ul>
           </div>
             <div>
-              <h3 className="font-semibold text-foreground mb-4">Support</h3>
-              <ul className="space-y-3 text-sm">
+              <h3 className="font-semibold text-foreground mb-3">Support</h3>
+              <ul className="space-y-2 text-sm">
                 <li><Link href="/help" className="text-muted-foreground hover:text-accent transition-colors">Help Center</Link></li>
                 <li><Link href="/docs" className="text-muted-foreground hover:text-accent transition-colors">Documentation</Link></li>
                 <li><Link href="/contact" className="text-muted-foreground hover:text-accent transition-colors">Contact</Link></li>
@@ -82,8 +82,8 @@ export function SiteFooter() {
               </ul>
             </div>
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Stay Updated</h3>
-            <p className="text-sm text-muted-foreground mb-4">Get the latest snippets & marketplace updates.</p>
+            <h3 className="font-semibold text-foreground mb-3">Stay Updated</h3>
+            <p className="text-sm text-muted-foreground mb-3">Get the latest snippets & marketplace updates.</p>
             <form onSubmit={handleSubscribe} className="flex flex-col space-y-2" aria-label="Newsletter subscription form">
               <Input
                 type="email"
@@ -106,7 +106,7 @@ export function SiteFooter() {
             </form>
           </div>
         </div>
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row gap-4 md:gap-0 items-center justify-between">
+        <div className="mt-8 pt-6 border-t border-border flex flex-col md:flex-row gap-4 md:gap-0 items-center justify-between">
           <div className="flex flex-wrap gap-6 text-sm">
             <Link href="/terms" className="text-muted-foreground hover:text-accent transition-colors">Terms</Link>
             <Link href="/privacy" className="text-muted-foreground hover:text-accent transition-colors">Privacy</Link>
