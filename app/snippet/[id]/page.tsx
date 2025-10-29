@@ -2,24 +2,24 @@
 
 import { CodeSnippet } from '@shared/api';
 import {
-  ArrowLeft,
-  Calendar,
-  CheckCircle2,
-  Code2,
-  Copy,
-  Download,
-  ExternalLink,
-  Eye,
-  Lock,
-  ShoppingCart,
-  Share2,
-  Sparkles,
-  Star,
-  User
+    ArrowLeft,
+    Calendar,
+    CheckCircle2,
+    Code2,
+    Copy,
+    Download,
+    ExternalLink,
+    Eye,
+    Lock,
+    Share2,
+    ShoppingCart,
+    Sparkles,
+    Star,
+    User
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import FavoriteButton from '../../../client/components/FavoriteButton';
 import SnippetCard from '../../../client/components/SnippetCard';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../client/components/ui/avatar';
@@ -44,6 +44,22 @@ export default function SnippetDetailPage({ params }: SnippetDetailPageProps) {
   const searchParams = useSearchParams();
   const purchaseSectionRef = useRef<HTMLDivElement | null>(null);
   const purchaseIntent = searchParams?.get('purchase') === '1';
+
+  // compute paid state and code preview before any early returns so hooks
+  // (useMemo) are called in the same order on every render.
+  const priceValue = snippet?.price ?? 0;
+  const isPaidSnippet = priceValue > 0;
+  const codePreview = useMemo(() => {
+    if (!snippet?.code) return '';
+    if (!isPaidSnippet) return snippet.code;
+    const lines = snippet.code.split('\n');
+    const previewLines = lines.slice(0, 8);
+    let preview = previewLines.join('\n');
+    if (lines.length > previewLines.length) {
+      preview += '\n\n// Purchase to unlock the full source code';
+    }
+    return preview;
+  }, [snippet?.code, isPaidSnippet]);
 
   // Demo snippet as fallback
   const demoSnippet: CodeSnippet = {
@@ -304,8 +320,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   if (!snippet) return null;
 
-  const priceValue = snippet.price ?? 0;
-  const isPaidSnippet = priceValue > 0;
+
   const priceLabel = priceValue <= 0
     ? 'Free'
     : priceValue % 1 === 0
@@ -317,17 +332,6 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   const ratingLabel = (snippet.rating ?? 0) > 0
     ? `${(snippet.rating ?? 0).toFixed(1)}/5`
     : 'New';
-  const codePreview = useMemo(() => {
-    if (!snippet?.code) return '';
-    if (!isPaidSnippet) return snippet.code;
-    const lines = snippet.code.split('\n');
-    const previewLines = lines.slice(0, 8);
-    let preview = previewLines.join('\n');
-    if (lines.length > previewLines.length) {
-      preview += '\n\n// Purchase to unlock the full source code';
-    }
-    return preview;
-  }, [snippet?.code, isPaidSnippet]);
 
   const handleBuyNow = () => {
     router.push(`/snippet/${snippet.id}?purchase=1#purchase`);

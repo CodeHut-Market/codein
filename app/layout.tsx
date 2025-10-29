@@ -7,6 +7,7 @@ import Navigation from "../components/Navigation"
 import "./globals.css"
 import Providers from "./providers"
 import { RealTimePerformanceMonitor } from "./components/ui/real-time-performance-monitor"
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,6 +41,10 @@ export default function RootLayout({
           <Footer />
           <RealTimePerformanceMonitor />
         </Providers>
+        <Script
+          id="razorpay-checkout-js"
+          src="https://checkout.razorpay.com/v1/checkout.js"
+        />
       </body>
     </html>
   )
