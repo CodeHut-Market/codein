@@ -655,6 +655,13 @@ export interface CreateSnippetInput {
   author: string;
 }
 
+export interface DeleteSnippetResult {
+  success: boolean;
+  message?: string;
+  reason?: 'not_found' | 'forbidden' | 'error';
+  snippet?: CodeSnippet;
+}
+
 export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnippet>{
   const now = new Date().toISOString();
   const snippet: CodeSnippet = {
@@ -1020,6 +1027,182 @@ function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
     results = results.slice(0, opts.limit);
   }
   return results;
+}
+
+export async function deleteSnippetForUser(snippetId: string, userId: string): Promise<DeleteSnippetResult> {
+  try {
+    let snippet: CodeSnippet | null = null;
+    let supabaseRow: any = null;
+
+    if (isSupabaseAdminEnabled()) {
+      try {
+        const { data, error } = await supabaseAdmin!
+          .from('snippets')
+          .select('*')
+          .eq('id', snippetId)
+          .maybeSingle();
+
+        if (error) {
+          console.error('deleteSnippetForUser - Supabase admin fetch error:', error);
+          return {
+            success: false,
+            reason: 'error',
+            message: 'Failed to verify snippet ownership'
+          };
+        }
+
+        if (data) {
+          supabaseRow = data;
+          snippet = mapRowToSnippet(data);
+        }
+      } catch (err) {
+        console.error('deleteSnippetForUser - Supabase admin fetch exception:', err);
+        return {
+          success: false,
+          reason: 'error',
+          message: err instanceof Error ? err.message : 'Failed to verify snippet'
+        };
+      }
+    }
+
+    if (!snippet) {
+      snippet = await getSnippetById(snippetId);
+    }
+
+    if (!snippet) {
+      return {
+        success: false,
+        reason: 'not_found',
+        message: 'Snippet not found'
+      };
+    }
+
+    const authorId = supabaseRow?.author_id ?? snippet.authorId;
+    if (authorId && authorId !== userId) {
+      return {
+        success: false,
+        reason: 'forbidden',
+        message: 'You can only delete your own snippets'
+      };
+    }
+
+    let deletedFromDatabase = false;
+
+    if (isSupabaseAdminEnabled() && supabaseRow) {
+      try {
+        const { data, error } = await supabaseAdmin!
+          .from('snippets')
+          .delete()
+          .eq('id', snippetId)
+          .select('id')
+          .maybeSingle();
+
+        if (error) {
+          console.error('deleteSnippetForUser - Supabase admin delete error:', error);
+          return {
+            success: false,
+            reason: 'error',
+            message: error.message || 'Failed to delete snippet'
+          };
+        }
+
+        if (!data) {
+          return {
+            success: false,
+            reason: 'not_found',
+            message: 'Snippet not found'
+          };
+        }
+
+        deletedFromDatabase = true;
+      } catch (err) {
+        console.error('deleteSnippetForUser - Supabase admin delete exception:', err);
+        return {
+          success: false,
+          reason: 'error',
+          message: err instanceof Error ? err.message : 'Failed to delete snippet'
+        };
+      }
+    } else if (!isSupabaseAdminEnabled() && isSupabaseEnabled()) {
+      try {
+        const { data, error } = await supabase!
+          .from('snippets')
+          .delete()
+          .eq('id', snippetId)
+          .eq('author_id', userId)
+          .select('id')
+          .maybeSingle();
+
+        if (error) {
+          console.error('deleteSnippetForUser - Supabase client delete error:', error);
+          return {
+            success: false,
+            reason: 'error',
+            message: error.message || 'Failed to delete snippet'
+          };
+        }
+
+        if (data) {
+          deletedFromDatabase = true;
+        } else {
+          return {
+            success: false,
+            reason: 'not_found',
+            message: 'Snippet not found'
+          };
+        }
+      } catch (err) {
+        console.error('deleteSnippetForUser - Supabase client delete exception:', err);
+        return {
+          success: false,
+          reason: 'error',
+          message: err instanceof Error ? err.message : 'Failed to delete snippet'
+        };
+      }
+    }
+
+    removeSnippetFromMemory(snippetId);
+
+    if (popularCache) {
+      popularCache = {
+        snippets: popularCache.snippets.filter(s => s.id !== snippetId),
+        timestamp: popularCache.timestamp
+      };
+    }
+
+    // If we have a persistent store and we failed to delete from it, treat as error
+    const hasPersistentStore = isSupabaseAdminEnabled() || isSupabaseEnabled();
+    if (hasPersistentStore && !deletedFromDatabase) {
+      console.warn('deleteSnippetForUser - Persistent store enabled but deletion not confirmed');
+      return {
+        success: false,
+        reason: 'error',
+        message: 'Failed to delete snippet from storage'
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Snippet deleted successfully',
+      snippet
+    };
+  } catch (error) {
+    console.error('deleteSnippetForUser - Unexpected error:', error);
+    return {
+      success: false,
+      reason: 'error',
+      message: error instanceof Error ? error.message : 'Failed to delete snippet'
+    };
+  }
+}
+
+function removeSnippetFromMemory(snippetId: string) {
+  if (memorySnippets.length === 0) {
+    return;
+  }
+
+  memorySnippets = memorySnippets.filter(snippet => snippet.id !== snippetId);
+  snippetCache.delete(snippetId);
 }
 
 // Simple memory cache for frequently accessed snippets

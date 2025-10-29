@@ -2,19 +2,24 @@
 
 import { CodeSnippet } from '@shared/api';
 import {
-    ArrowLeft,
-    Calendar,
-    Code2,
-    Copy,
-    Download,
-    ExternalLink,
-    Eye,
-    Share2,
-    Star,
-    User
+  ArrowLeft,
+  Calendar,
+  CheckCircle2,
+  Code2,
+  Copy,
+  Download,
+  ExternalLink,
+  Eye,
+  Lock,
+  ShoppingCart,
+  Share2,
+  Sparkles,
+  Star,
+  User
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import FavoriteButton from '../../../client/components/FavoriteButton';
 import SnippetCard from '../../../client/components/SnippetCard';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../client/components/ui/avatar';
@@ -35,6 +40,10 @@ export default function SnippetDetailPage({ params }: SnippetDetailPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [relatedSnippets, setRelatedSnippets] = useState<CodeSnippet[]>([]);
   const [copied, setCopied] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const purchaseSectionRef = useRef<HTMLDivElement | null>(null);
+  const purchaseIntent = searchParams?.get('purchase') === '1';
 
   // Demo snippet as fallback
   const demoSnippet: CodeSnippet = {
@@ -129,6 +138,12 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     loadSnippet();
   }, [params.id]);
 
+  useEffect(() => {
+    if (purchaseIntent && purchaseSectionRef.current) {
+      purchaseSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [purchaseIntent, snippet]);
+
   const loadSnippet = async () => {
     setLoading(true);
     setError(null);
@@ -181,6 +196,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   const copyToClipboard = async () => {
     if (!snippet) return;
+    if ((snippet.price ?? 0) > 0) {
+      return;
+    }
     
     try {
       await navigator.clipboard.writeText(snippet.code);
@@ -217,6 +235,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   const downloadSnippet = () => {
     if (!snippet) return;
+    if ((snippet.price ?? 0) > 0) {
+      return;
+    }
     
     const fileExtension = snippet.language.toLowerCase() === 'javascript' ? 'js' :
                          snippet.language.toLowerCase() === 'typescript' ? 'ts' :
@@ -283,6 +304,35 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   if (!snippet) return null;
 
+  const priceValue = snippet.price ?? 0;
+  const isPaidSnippet = priceValue > 0;
+  const priceLabel = priceValue <= 0
+    ? 'Free'
+    : priceValue % 1 === 0
+      ? `$${priceValue.toFixed(0)}`
+      : `$${priceValue.toFixed(2)}`;
+  const pricePillClasses = priceValue <= 0
+    ? 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 text-white shadow-emerald-200/60 dark:shadow-emerald-900/30'
+    : 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-amber-200/60 dark:shadow-amber-900/30';
+  const ratingLabel = (snippet.rating ?? 0) > 0
+    ? `${(snippet.rating ?? 0).toFixed(1)}/5`
+    : 'New';
+  const codePreview = useMemo(() => {
+    if (!snippet?.code) return '';
+    if (!isPaidSnippet) return snippet.code;
+    const lines = snippet.code.split('\n');
+    const previewLines = lines.slice(0, 8);
+    let preview = previewLines.join('\n');
+    if (lines.length > previewLines.length) {
+      preview += '\n\n// Purchase to unlock the full source code';
+    }
+    return preview;
+  }, [snippet?.code, isPaidSnippet]);
+
+  const handleBuyNow = () => {
+    router.push(`/snippet/${snippet.id}?purchase=1#purchase`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -297,45 +347,88 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             </Button>
           </div>
           
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold mb-2">{snippet.title}</h1>
-                  <p className="text-lg text-muted-foreground mb-4">{snippet.description}</p>
-                  
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="w-6 h-6">
-                        <AvatarImage src={`https://github.com/${snippet.author}.png`} />
-                        <AvatarFallback>
-                          {snippet.author.slice(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <Link 
-                        href={`/profile/${snippet.author}`}
-                        className="hover:text-primary transition-colors"
-                      >
-                        {snippet.author}
-                      </Link>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>{formatDate(snippet.createdAt)}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Download className="w-4 h-4" />
-                      <span>{snippet.downloads.toLocaleString()} downloads</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span>{snippet.rating}/5</span>
-                    </div>
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+            <div className="flex-1 space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h1 className="text-3xl font-bold mb-3 text-gray-900 dark:text-gray-50 flex items-center gap-2">
+                      <Sparkles className="h-6 w-6 text-primary" />
+                      {snippet.title}
+                    </h1>
+                  </div>
+                  <div className="hidden lg:flex flex-col items-end gap-3 min-w-[180px]">
+                    <span className={`px-4 py-2 rounded-full text-sm font-semibold shadow-lg ${pricePillClasses}`}>
+                      {priceLabel}
+                    </span>
+                    <span className="flex items-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                      <Star className="h-4 w-4 fill-current" />
+                      {ratingLabel}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {snippet.downloads.toLocaleString()} downloads
+                    </span>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-primary/10 bg-gradient-to-r from-primary/5 via-violet-500/5 to-emerald-500/5 p-5 shadow-sm">
+                  <p className="text-base leading-relaxed text-gray-700 dark:text-gray-200">
+                    {snippet.description}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    {isPaidSnippet ? (
+                      <Button onClick={handleBuyNow} className="bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white shadow-lg">
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Buy Now for {priceLabel}
+                      </Button>
+                    ) : (
+                      <Button onClick={downloadSnippet} className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white shadow-lg">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download Free
+                      </Button>
+                    )}
+                    <Button variant="outline" size="sm" onClick={shareSnippet}>
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Share
+                    </Button>
+                    <FavoriteButton 
+                      snippetId={snippet.id} 
+                      initialIsFavorited={false}
+                      showCount={true}
+                    />
                   </div>
                 </div>
               </div>
-              
-              <div className="flex flex-wrap gap-2 mb-6">
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={`https://github.com/${snippet.author}.png`} />
+                    <AvatarFallback>
+                      {snippet.author.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Link 
+                    href={`/profile/${snippet.author}`}
+                    className="hover:text-primary transition-colors font-medium"
+                  >
+                    {snippet.author}
+                  </Link>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>{formatDate(snippet.createdAt)}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Eye className="w-4 h-4" />
+                  <span>{snippet.downloads.toLocaleString()} downloads</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span>{ratingLabel}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
                 <Badge variant="outline">{snippet.language}</Badge>
                 {snippet.framework && (
                   <Badge variant="outline">{snippet.framework}</Badge>
@@ -343,26 +436,23 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
                 {snippet.tags.map(tag => (
                   <Badge key={tag} variant="secondary">{tag}</Badge>
                 ))}
-                <Badge variant={snippet.price === 0 ? 'default' : 'destructive'}>
-                  {snippet.price === 0 ? 'Free' : `$${snippet.price}`}
-                </Badge>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${pricePillClasses}`}>
+                  {priceLabel}
+                </span>
               </div>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <FavoriteButton 
-                snippetId={snippet.id} 
-                initialIsFavorited={false}
-                showCount={true}
-              />
-              <Button variant="outline" size="sm" onClick={shareSnippet}>
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
-              </Button>
-              <Button onClick={downloadSnippet}>
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
+
+            <div className="lg:hidden flex flex-col items-end gap-3">
+              <span className={`px-4 py-2 rounded-full text-sm font-semibold shadow-lg ${pricePillClasses}`}>
+                {priceLabel}
+              </span>
+              <span className="flex items-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                <Star className="h-4 w-4 fill-current" />
+                {ratingLabel}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {snippet.downloads.toLocaleString()} downloads
+              </span>
             </div>
           </div>
         </div>
@@ -383,29 +473,57 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">Source Code</CardTitle>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={copyToClipboard}
-                      disabled={copied}
-                    >
-                      {copied ? (
-                        <>
-                          <Eye className="w-4 h-4 mr-2" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4 mr-2" />
-                          Copy
-                        </>
-                      )}
-                    </Button>
+                    {isPaidSnippet ? (
+                      <Button
+                        size="sm"
+                        onClick={handleBuyNow}
+                        className="bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-md hover:shadow-lg"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Unlock Full Code
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={copyToClipboard}
+                        disabled={copied}
+                      >
+                        {copied ? (
+                          <>
+                            <Eye className="w-4 h-4 mr-2" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copy
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </CardHeader>
                   <CardContent className="p-0">
-                    <pre className="bg-muted/40 p-6 overflow-x-auto text-sm font-mono rounded-b-lg">
-                      <code className="language-typescript">{snippet.code}</code>
-                    </pre>
+                    <div className="relative">
+                      {isPaidSnippet && (
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background/85" />
+                      )}
+                      <pre className="bg-muted/40 p-6 overflow-x-auto text-sm font-mono rounded-b-lg">
+                        <code className="language-typescript">{codePreview}</code>
+                      </pre>
+                    </div>
+                    {isPaidSnippet && (
+                      <div className="border-t border-border bg-background/90 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <Lock className="h-4 w-4 text-primary" />
+                          <span>Purchase to unlock the complete source code, downloads, and copy access.</span>
+                        </div>
+                        <Button onClick={handleBuyNow} className="bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-md hover:shadow-lg">
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          Buy Now for {priceLabel}
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -455,7 +573,44 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             </Card>
             
             {/* Stats */}
-            <Card>
+              <Card ref={purchaseSectionRef} id="purchase" className="border-2 border-primary/20 shadow-lg shadow-primary/10">
+                <CardHeader className="space-y-1">
+                  <CardTitle className="text-lg">Purchase Access</CardTitle>
+                  <p className="text-sm text-muted-foreground">One-time purchase with lifetime access</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-4xl font-semibold text-gray-900 dark:text-gray-100">
+                    {priceLabel}
+                  </div>
+                  <Button
+                    className="w-full bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl"
+                    onClick={handleBuyNow}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Buy Now
+                  </Button>
+                  <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
+                      <span>Complete, unblurred source code download</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
+                      <span>Lifetime updates and future improvements</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
+                      <span>Commercial usage and modification rights</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
+                      <span>Direct author support for integration questions</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Statistics</CardTitle>
               </CardHeader>
@@ -468,7 +623,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
                   <span className="text-sm text-muted-foreground">Rating:</span>
                   <span className="font-medium flex items-center gap-1">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    {snippet.rating}/5
+                    {ratingLabel}
                   </span>
                 </div>
                 <div className="flex justify-between">

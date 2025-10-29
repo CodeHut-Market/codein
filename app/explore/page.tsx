@@ -26,19 +26,21 @@ const adaptCodeSnippetForRealTime = (snippet: CodeSnippet) => ({
   description: snippet.description,
   language: snippet.language,
   user_id: snippet.authorId,
+  rating: snippet.rating,
+  price: snippet.price,
   user: {
     username: snippet.author || 'Anonymous',
     display_name: snippet.author || 'Anonymous',
     avatar_url: undefined
   },
   views: snippet.views || snippet.downloads || 0,
-  likes: snippet.likes || snippet.rating || 0,
+  likes: snippet.likes || 0,
   downloads: snippet.downloads || 0,
   created_at: snippet.createdAt,
   updated_at: snippet.updatedAt,
   is_public: (snippet.visibility !== 'private'),
   tags: snippet.tags || []
-})
+});
 
 export default function ExplorePage() {
   const searchParams = useSearchParams()

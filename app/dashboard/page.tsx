@@ -178,7 +178,12 @@ export default function DashboardPage() {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-user-data': JSON.stringify({
+            id: user.id,
+            username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+            email: user.email
+          })
         },
         credentials: 'include'
       })

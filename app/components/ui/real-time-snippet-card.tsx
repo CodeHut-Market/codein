@@ -1,8 +1,9 @@
 "use client";
 
-import { Bookmark, Download, Eye, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { Bookmark, Download, Eye, Heart, MessageCircle, Share2, ShoppingCart, Star } from 'lucide-react';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../client/contexts/AuthContext';
 import { useRealTime } from '../../contexts/RealTimeContext';
 import { useOptimisticActions } from '../../hooks/useOptimisticActions';
@@ -21,6 +22,8 @@ interface RealTimeSnippetCardProps {
     description?: string;
     language: string;
     user_id: string;
+    price?: number;
+    rating?: number;
     user?: {
       username?: string;
       avatar_url?: string;
@@ -41,6 +44,7 @@ interface RealTimeSnippetCardProps {
   export const RealTimeSnippetCard = (props: RealTimeSnippetCardProps) => {
     const { snippet, showActions = true, compact = false, className = '' } = props;
     const { user } = useAuth();
+    const router = useRouter();
     const [showGuestModal, setShowGuestModal] = useState(false);
     const { getSnippetViews, getSnippetLikes, getSnippetDownloads, getSnippetComments, subscribeToSnippet, unsubscribeFromSnippet } = useRealTime();
     const { toggleLike, incrementView, incrementDownload } = useOptimisticActions();
@@ -48,6 +52,19 @@ interface RealTimeSnippetCardProps {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [hasViewed, setHasViewed] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const priceValue = useMemo(() => typeof snippet.price === 'number' ? snippet.price : 0, [snippet.price]);
+    const priceLabel = useMemo(() => {
+      if (priceValue <= 0) return 'Free';
+      return priceValue % 1 === 0 ? `$${priceValue.toFixed(0)}` : `$${priceValue.toFixed(2)}`;
+    }, [priceValue]);
+    const pricePillClasses = useMemo(
+      () => priceValue <= 0
+        ? 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 shadow-emerald-200/50 dark:shadow-emerald-900/30'
+        : 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 shadow-amber-200/50 dark:shadow-amber-900/30',
+      [priceValue]
+    );
+    const ratingValue = useMemo(() => typeof snippet.rating === 'number' ? snippet.rating : 0, [snippet.rating]);
+    const ratingLabel = useMemo(() => ratingValue > 0 ? ratingValue.toFixed(1) : 'New', [ratingValue]);
     useEffect(() => {
       subscribeToSnippet(snippet.id);
       return () => { unsubscribeFromSnippet(snippet.id); };
@@ -126,17 +143,39 @@ interface RealTimeSnippetCardProps {
         try { await navigator.share({ title: snippet.title, text: snippet.description, url }); } catch { navigator.clipboard.writeText(url); }
       } else { navigator.clipboard.writeText(url); }
     }, [snippet.id, snippet.title, snippet.description]);
+    const handleBuy = useCallback((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!user?.id) {
+        setShowGuestModal(true);
+        return;
+      }
+  router.push(`/snippet/${snippet.id}?purchase=1#purchase`);
+    }, [router, snippet.id, user?.id]);
     return (
       <Card className={cn("group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer border-2 border-gray-200 dark:border-gray-700 overflow-hidden text-gray-900 dark:text-gray-100", compact && "p-4", className)} onClick={handleView}>
         {user?.id ? (
           <Link href={`/snippet/${snippet.id}`} className="block">
             <CardHeader className={cn("space-y-1 border-b border-gray-100 dark:border-gray-800", compact && "pb-2")}> 
-              <div className="flex items-start justify-between">
-                <div className="space-y-1 flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-2 flex-1">
                   <CardTitle className={cn("group-hover:text-primary transition-colors text-gray-900 dark:text-gray-100", compact ? "text-base" : "text-lg")}>{snippet.title}</CardTitle>
-                  {snippet.description && (<CardDescription className={cn("line-clamp-2 text-gray-700 dark:text-gray-200", compact && "text-sm")}>{snippet.description}</CardDescription>)}
+                  {snippet.description && (
+                    <CardDescription className={cn("line-clamp-3 text-sm text-gray-700 dark:text-gray-200", compact && "text-xs")}> 
+                      {snippet.description}
+                    </CardDescription>
+                  )}
                 </div>
-                {!snippet.is_public && (<Badge variant="secondary" className="ml-2 flex-shrink-0">Private</Badge>)}
+                <div className="flex flex-col items-end gap-2 ml-1">
+                  <span className={cn("px-3 py-1 rounded-full text-xs font-semibold text-white shadow-md", pricePillClasses)}>
+                    {priceLabel}
+                  </span>
+                  <span className="flex items-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                    <Star className={cn("h-4 w-4", ratingValue > 0 ? "fill-current" : "stroke-current")}/>
+                    {ratingLabel}{ratingValue > 0 ? <span className="text-xs font-medium text-muted-foreground ml-1">/ 5</span> : null}
+                  </span>
+                  {!snippet.is_public && (<Badge variant="secondary" className="flex-shrink-0">Private</Badge>)}
+                </div>
               </div>
               <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
                 <Badge variant="outline" className="text-xs whitespace-nowrap flex-shrink-0">{snippet.language}</Badge>
@@ -150,31 +189,64 @@ interface RealTimeSnippetCardProps {
                 <span className="text-sm text-gray-700 dark:text-gray-200">{displayName}</span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(snippet.created_at).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1"><Eye size={14} /><span className="transition-all duration-300">{realTimeViews.toLocaleString()}</span></div>
                   <div className="flex items-center gap-1"><Heart size={14} className={isLiked ? "text-red-500 fill-red-500" : ""} /><span className="transition-all duration-300">{realTimeLikes.toLocaleString()}</span></div>
                   <div className="flex items-center gap-1"><Download size={14} /><span className="transition-all duration-300">{realTimeDownloads.toLocaleString()}</span></div>
                   {realTimeComments > 0 && (<div className="flex items-center gap-1"><MessageCircle size={14} /><span className="transition-all duration-300">{realTimeComments}</span></div>)}
                 </div>
-                {showActions && user && (<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLoading} className={cn("h-8 px-2", isLiked && "text-red-500 hover:text-red-600")}> <Heart size={14} className={isLiked ? "fill-current" : ""} /> </Button>
-                  <Button variant="ghost" size="sm" onClick={handleBookmark} disabled={isLoading} className={cn("h-8 px-2", isBookmarked && "text-yellow-500 hover:text-yellow-600")}> <Bookmark size={14} className={isBookmarked ? "fill-current" : ""} /> </Button>
-                  <Button variant="ghost" size="sm" onClick={handleDownload} disabled={isLoading} className="h-8 px-2"> <Download size={14} /> </Button>
-                  <Button variant="ghost" size="sm" onClick={handleShare} className="h-8 px-2"> <Share2 size={14} /> </Button>
-                </div>)}
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleBuy}
+                    className="relative overflow-hidden bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-transform duration-200 px-4"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Buy Now
+                  </Button>
+                  {showActions && user && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLoading} className={cn("h-8 px-2", isLiked && "text-red-500 hover:text-red-600")}>
+                        <Heart size={14} className={isLiked ? "fill-current" : ""} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleBookmark} disabled={isLoading} className={cn("h-8 px-2", isBookmarked && "text-yellow-500 hover:text-yellow-600")}>
+                        <Bookmark size={14} className={isBookmarked ? "fill-current" : ""} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleDownload} disabled={isLoading} className="h-8 px-2">
+                        <Download size={14} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleShare} className="h-8 px-2">
+                        <Share2 size={14} />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Link>
         ) : (
           <div className="block cursor-not-allowed select-none">
             <CardHeader className={cn("space-y-1 border-b border-gray-100 dark:border-gray-800", compact && "pb-2")}> 
-              <div className="flex items-start justify-between">
-                <div className="space-y-1 flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-2 flex-1">
                   <CardTitle className={cn("group-hover:text-primary transition-colors", compact ? "text-base" : "text-lg")}>{snippet.title}</CardTitle>
-                  {snippet.description && (<CardDescription className={cn("line-clamp-2", compact && "text-sm")}>{snippet.description}</CardDescription>)}
+                  {snippet.description && (
+                    <CardDescription className={cn("line-clamp-3 text-sm text-gray-700 dark:text-gray-200", compact && "text-xs")}>
+                      {snippet.description}
+                    </CardDescription>
+                  )}
                 </div>
-                {!snippet.is_public && (<Badge variant="secondary" className="ml-2 flex-shrink-0">Private</Badge>)}
+                <div className="flex flex-col items-end gap-2 ml-1">
+                  <span className={cn("px-3 py-1 rounded-full text-xs font-semibold text-white shadow-md", pricePillClasses)}>
+                    {priceLabel}
+                  </span>
+                  <span className="flex items-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                    <Star className={cn("h-4 w-4", ratingValue > 0 ? "fill-current" : "stroke-current")}/>
+                    {ratingLabel}{ratingValue > 0 ? <span className="text-xs font-medium text-muted-foreground ml-1">/ 5</span> : null}
+                  </span>
+                  {!snippet.is_public && (<Badge variant="secondary" className="flex-shrink-0">Private</Badge>)}
+                </div>
               </div>
               <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
                 <Badge variant="outline" className="text-xs whitespace-nowrap flex-shrink-0">{snippet.language}</Badge>
@@ -188,19 +260,39 @@ interface RealTimeSnippetCardProps {
                 <span className="text-sm text-muted-foreground">{displayName}</span>
                 <span className="text-xs text-muted-foreground">{new Date(snippet.created_at).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1"><Eye size={14} /><span className="transition-all duration-300">{realTimeViews.toLocaleString()}</span></div>
                   <div className="flex items-center gap-1"><Heart size={14} className={isLiked ? "text-red-500 fill-red-500" : ""} /><span className="transition-all duration-300">{realTimeLikes.toLocaleString()}</span></div>
                   <div className="flex items-center gap-1"><Download size={14} /><span className="transition-all duration-300">{realTimeDownloads.toLocaleString()}</span></div>
                   {realTimeComments > 0 && (<div className="flex items-center gap-1"><MessageCircle size={14} /><span className="transition-all duration-300">{realTimeComments}</span></div>)}
                 </div>
-                {showActions && user && (<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLoading} className={cn("h-8 px-2", isLiked && "text-red-500 hover:text-red-600")}> <Heart size={14} className={isLiked ? "fill-current" : ""} /> </Button>
-                  <Button variant="ghost" size="sm" onClick={handleBookmark} disabled={isLoading} className={cn("h-8 px-2", isBookmarked && "text-yellow-500 hover:text-yellow-600")}> <Bookmark size={14} className={isBookmarked ? "fill-current" : ""} /> </Button>
-                  <Button variant="ghost" size="sm" onClick={handleDownload} disabled={isLoading} className="h-8 px-2"> <Download size={14} /> </Button>
-                  <Button variant="ghost" size="sm" onClick={handleShare} className="h-8 px-2"> <Share2 size={14} /> </Button>
-                </div>)}
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleBuy}
+                    className="relative overflow-hidden bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-transform duration-200 px-4"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Buy Now
+                  </Button>
+                  {showActions && user && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="sm" onClick={handleLike} disabled={isLoading} className={cn("h-8 px-2", isLiked && "text-red-500 hover:text-red-600")}>
+                        <Heart size={14} className={isLiked ? "fill-current" : ""} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleBookmark} disabled={isLoading} className={cn("h-8 px-2", isBookmarked && "text-yellow-500 hover:text-yellow-600")}>
+                        <Bookmark size={14} className={isBookmarked ? "fill-current" : ""} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleDownload} disabled={isLoading} className="h-8 px-2">
+                        <Download size={14} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleShare} className="h-8 px-2">
+                        <Share2 size={14} />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </div>
