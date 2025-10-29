@@ -91,7 +91,7 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Footer Links */}
+                        {/* Footer Links */}
             {footerSections.map((section) => (
               <div key={section.title}>
                 <h3 className="font-semibold text-foreground mb-4 uppercase tracking-wide text-sm">
@@ -108,27 +108,25 @@ export default function Footer() {
                 </ul>
               </div>
             ))}
-          </div>
-        </div>
 
-        {/* Newsletter Signup - Moved below footer sections */}
-        <div className="pb-8 border-t border-border pt-8">
-          <div className="max-w-md mx-auto text-center lg:max-w-none lg:text-left">
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              Stay Updated
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Get the latest code snippets, tutorials, and community updates delivered to your inbox.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-              <button className="px-6 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
-                Subscribe
-              </button>
+            {/* Stay Updated Section - Inside grid */}
+            <div>
+              <h3 className="font-semibold text-foreground mb-4 uppercase tracking-wide text-sm">
+                Stay Updated
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Get the latest code snippets, tutorials, and community updates delivered to your inbox.
+              </p>
+              <div className="flex flex-col gap-2">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="px-4 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+                  Subscribe
+                </button>
+              </div>
             </div>
           </div>
         </div>
