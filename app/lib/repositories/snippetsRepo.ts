@@ -1312,6 +1312,88 @@ function handleTableMissing(err: any){
   return false;
 }
 
+function coerceToString(value: any): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (value == null) {
+    return '';
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => coerceToString(entry))
+      .filter((entry) => entry.length > 0)
+      .join('\n\n');
+  }
+
+  if (typeof value === 'object') {
+    const preferredKeys = ['summary', 'description', 'text', 'content', 'value'];
+    for (const key of preferredKeys) {
+      const inner = (value as any)[key];
+      if (typeof inner === 'string') {
+        return inner;
+      }
+      if (Array.isArray(inner)) {
+        const joined = inner
+          .map((entry) => coerceToString(entry))
+          .filter((entry) => entry.length > 0)
+          .join('\n\n');
+        if (joined.length > 0) {
+          return joined;
+        }
+      }
+    }
+
+    try {
+      const serialized = JSON.stringify(value);
+      return serialized === '{}' ? '' : serialized;
+    } catch {
+      return String(value);
+    }
+  }
+
+  return String(value);
+}
+
+function coerceToStringArray(value: any): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => {
+        if (typeof entry === 'string') {
+          return entry.trim();
+        }
+        if (entry && typeof entry === 'object') {
+          const label = entry.label ?? entry.name ?? entry.value;
+          if (typeof label === 'string') {
+            return label.trim();
+          }
+        }
+        return String(entry ?? '').trim();
+      })
+      .filter((entry) => entry.length > 0);
+  }
+
+  if (typeof value === 'string') {
+    return value
+      .split(/[,;]+/)
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0);
+  }
+
+  return [];
+}
+
+function coerceToNumber(value: any, fallback = 0): number {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : fallback;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 // Map DB row (supports snake_case) to CodeSnippet shape expected by app
 function mapRowToSnippet(row: any): CodeSnippet {
   // Ensure author is populated - fallback to fetching from profiles if needed
@@ -1324,20 +1406,20 @@ function mapRowToSnippet(row: any): CodeSnippet {
   
   return {
     id: row.id,
-    title: row.title,
-    code: row.code,
-    description: row.description || '',
-    price: Number(row.price || 0),
-    rating: Number(row.rating || 0),
+    title: coerceToString(row.title || 'Untitled Snippet'),
+    code: coerceToString(row.code ?? ''),
+    description: coerceToString(row.description ?? row.summary ?? ''),
+    price: coerceToNumber(row.price),
+    rating: coerceToNumber(row.rating),
     author: authorName,
     authorId: row.authorid || row.authorId || row.author_id || 'unknown',
-    tags: Array.isArray(row.tags) ? row.tags : [],
-    language: row.language,
+    tags: coerceToStringArray(row.tags),
+    language: coerceToString(row.language || 'Unknown'),
     framework: row.framework || undefined,
     category: row.category || undefined,
     visibility: row.visibility || 'public',
     allowComments: row.allow_comments !== false,
-    downloads: Number(row.downloads || 0),
+    downloads: coerceToNumber(row.downloads),
     createdAt: row.createdAt ?? row.created_at ?? new Date().toISOString(),
     updatedAt: row.updatedAt ?? row.updated_at ?? row.createdAt ?? row.created_at ?? new Date().toISOString(),
   };
