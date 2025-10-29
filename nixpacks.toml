@@ -1,12 +1,15 @@
 [phases.setup]
-nixPkgs = ['bun']
-aptPkgs = ['build-essential']
+# Use the Node.js runtime from nixpkgs instead of installing bun.
+# This avoids pulling many extra packages at build time and matches
+# this repo's `package.json` scripts which use `next`/npm.
+nixPkgs = ["nodejs"]
+aptPkgs = []
 
 [phases.install]
-cmds = ["bun install"]
+cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["bun run build"]
+cmds = ["npm run build"]
 
 [start]
-cmd = "bun run start"
+cmd = "npm run start"

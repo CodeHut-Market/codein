@@ -1,0 +1,18 @@
+# Enforce UTF-8 and LF line endings for source files to avoid encoding-related CI failures
+* text=auto
+
+# Force common text files to UTF-8 in the working tree
+*.ts    text eol=lf working-tree-encoding=UTF-8
+*.tsx   text eol=lf working-tree-encoding=UTF-8
+*.js    text eol=lf working-tree-encoding=UTF-8
+*.json  text eol=lf working-tree-encoding=UTF-8
+*.css   text eol=lf working-tree-encoding=UTF-8
+*.d.ts  text eol=lf working-tree-encoding=UTF-8
+README.md text eol=lf working-tree-encoding=UTF-8
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
