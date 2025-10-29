@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { isSupabaseEnabled, supabase } from '../supabaseClient';
-import { PostgrestError, PostgrestQueryBuilder } from '@supabase/postgrest-js';
+import { PostgrestError, PostgrestQueryBuilder } from '@supabase/supabase-js';
 
 export interface NotificationItem { id: string; title: string; message: string; read: boolean; createdAt: string; userId?: string; }
 

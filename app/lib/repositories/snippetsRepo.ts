@@ -662,6 +662,26 @@ export interface DeleteSnippetResult {
   snippet?: CodeSnippet;
 }
 
+interface DbSnippet {
+  id: string;
+  title: string;
+  code: string;
+  description: string;
+  price: number;
+  rating: number;
+  author: string;
+  author_id: string;
+  tags: string[];
+  language: string;
+  framework?: string;
+  category?: string;
+  downloads: number;
+  created_at: string;
+  updated_at: string;
+  visibility?: 'public' | 'private' | 'unlisted';
+  allow_comments?: boolean;
+}
+
 export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnippet>{
   const now = new Date().toISOString();
   const snippet: CodeSnippet = {
@@ -693,7 +713,7 @@ export async function createSnippet(input: CreateSnippetInput): Promise<CodeSnip
       const hasVisibilityColumn = await checkVisibilityColumnExists();
       
       // Map camelCase to snake_case for database with conditional fields
-      const dbSnippet: any = {
+      const dbSnippet: Partial<DbSnippet> = {
         id: snippet.id,
         title: snippet.title,
         code: snippet.code,
@@ -1032,7 +1052,7 @@ function getFallbackSnippets(opts: ListSnippetsOptions): CodeSnippet[] {
 export async function deleteSnippetForUser(snippetId: string, userId: string): Promise<DeleteSnippetResult> {
   try {
     let snippet: CodeSnippet | null = null;
-    let supabaseRow: any = null;
+    let supabaseRow: CodeSnippet | null = null;
 
     if (isSupabaseAdminEnabled()) {
       try {
@@ -1243,7 +1263,7 @@ export async function getSnippetById(id: string): Promise<CodeSnippet | null>{
         return null;
       }
       
-      const snippet = mapRowToSnippet(data as any);
+      const snippet = mapRowToSnippet(data as CodeSnippet);
       
       // Cache for future requests
       snippetCache.set(id, { snippet, timestamp: now });
@@ -1303,7 +1323,7 @@ export async function listPopular(limit = 6): Promise<CodeSnippet[]>{
 }
 
 // Defensive helper for missing table situations reused by list/create if extended later
-function handleTableMissing(err: any){
+function handleTableMissing(err: { code: string }){
   if(!err) return;
   if(err.code === 'PGRST205'){
     // Table not in schema cache – likely not migrated yet. Silent fallback.
@@ -1312,7 +1332,7 @@ function handleTableMissing(err: any){
   return false;
 }
 
-function coerceToString(value: any): string {
+function coerceToString(value: unknown): string {
   if (typeof value === 'string') {
     return value;
   }
@@ -1331,7 +1351,7 @@ function coerceToString(value: any): string {
   if (typeof value === 'object') {
     const preferredKeys = ['summary', 'description', 'text', 'content', 'value'];
     for (const key of preferredKeys) {
-      const inner = (value as any)[key];
+      const inner = (value as Record<string, unknown>)[key];
       if (typeof inner === 'string') {
         return inner;
       }
@@ -1357,7 +1377,7 @@ function coerceToString(value: any): string {
   return String(value);
 }
 
-function coerceToStringArray(value: any): string[] {
+function coerceToStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value
       .map((entry) => {
@@ -1385,7 +1405,7 @@ function coerceToStringArray(value: any): string[] {
   return [];
 }
 
-function coerceToNumber(value: any, fallback = 0): number {
+function coerceToNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number') {
     return Number.isFinite(value) ? value : fallback;
   }
@@ -1394,8 +1414,33 @@ function coerceToNumber(value: any, fallback = 0): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+interface SnippetRow {
+  id: string;
+  title: string;
+  code: string;
+  description: string;
+  price: number;
+  rating: number;
+  author: string;
+  author_id: string;
+  tags: string[];
+  language: string;
+  framework?: string;
+  category?: string;
+  downloads: number;
+  created_at: string;
+  updated_at: string;
+  visibility?: 'public' | 'private' | 'unlisted';
+  allow_comments?: boolean;
+  summary?: string;
+  authorid?: string;
+  authorId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Map DB row (supports snake_case) to CodeSnippet shape expected by app
-function mapRowToSnippet(row: any): CodeSnippet {
+function mapRowToSnippet(row: SnippetRow): CodeSnippet {
   // Ensure author is populated - fallback to fetching from profiles if needed
   let authorName = row.author;
   
