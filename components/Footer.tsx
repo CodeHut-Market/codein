@@ -56,11 +56,11 @@ export default function Footer() {
   return (
     <footer className="bg-background border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main Footer Content */}
+                {/* Main Footer Content */}
         <div className="py-12">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
             {/* Brand Section */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-2">
               <Link href="/" className="flex items-center space-x-2 mb-4">
                 <Code className="h-8 w-8 text-primary" />
                 <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
@@ -111,8 +111,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="py-8 border-t border-border">
+        {/* Newsletter Signup - Moved below footer sections */}
+        <div className="pb-8 border-t border-border pt-8">
           <div className="max-w-md mx-auto text-center lg:max-w-none lg:text-left">
             <h3 className="text-lg font-semibold text-foreground mb-2">
               Stay Updated
