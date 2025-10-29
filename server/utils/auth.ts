@@ -15,6 +15,7 @@ export interface JWTPayload {
   username: string;
   email: string;
   role: "user" | "admin" | "moderator";
+  type?: "refresh";
   iat?: number;
   exp?: number;
 }

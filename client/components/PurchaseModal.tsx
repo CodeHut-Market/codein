@@ -161,7 +161,7 @@ export default function PurchaseModal({
             </DialogTitle>
             <DialogDescription>
               Your payment has been processed successfully. You now have access
-              to "{snippet.title}".
+              to &quot;{snippet.title}&quot;.
             </DialogDescription>
           </DialogHeader>
 

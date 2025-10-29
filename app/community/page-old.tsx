@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ArrowRight,
+  ArrowUp,
   Bookmark,
   Calendar,
+  Clock,
   Code,
   Crown,
   Eye,
@@ -17,6 +19,7 @@ import {
   Globe,
   Heart,
   MessageCircle,
+  MessageSquare,
   Search,
   Sparkles,
   Star,
@@ -30,6 +33,7 @@ import { useState } from 'react'
 export default function CommunityPage() {
   const [selectedTab, setSelectedTab] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
 
   const featuredMembers = [
     {

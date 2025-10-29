@@ -255,7 +255,7 @@ export default function PrivacyPolicy() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                Children's Privacy
+                Children&apos;s Privacy
               </h2>
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg">
                 <p className="text-yellow-800 dark:text-yellow-200 font-semibold mb-2">
@@ -278,7 +278,7 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="list-disc pl-6 mb-4 text-gray-700 dark:text-gray-300 space-y-1">
                 <li>Posting the new Privacy Policy on this page</li>
-                <li>Updating the "Last updated" date</li>
+                <li>Updating the &quot;Last updated&quot; date</li>
                 <li>Sending email notifications for material changes</li>
                 <li>Displaying prominent notices on our platform</li>
               </ul>

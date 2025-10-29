@@ -51,6 +51,7 @@
   },
   "include": [
     "client/**/*",
+    "client/types/razorpay.d.ts",
     "app/**/*",
     "server/**/*",
     "shared/**/*",

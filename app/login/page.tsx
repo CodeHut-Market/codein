@@ -233,7 +233,7 @@ export default function LoginPage() {
 						<div className="text-center space-y-2">
 							<Link href="/reset-password" className="text-sm font-sans text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">Forgot your password?</Link>
 							<div className="text-sm font-sans text-gray-600 dark:text-gray-400">
-								Don't have an account?{" "}
+								Don&apos;t have an account?{" "}
 								<Link href="/signup" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors font-medium">
 									Sign up here
 								</Link>

@@ -107,7 +107,7 @@ export default function ComingSoonPage() {
           </div>
         </div>
         <h1 className="text-4xl font-bold mb-4">
-          We're Working on {feature.charAt(0).toUpperCase() + feature.slice(1)}
+          We&apos;re Working on {feature.charAt(0).toUpperCase() + feature.slice(1)}
         </h1>
         <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
           This feature is currently in development as part of our roadmap to make CodeHut 
@@ -136,7 +136,7 @@ export default function ComingSoonPage() {
             Development Roadmap
           </CardTitle>
           <CardDescription>
-            Here's what we're working on to make CodeHut even better
+            Here&apos;s what we&apos;re working on to make CodeHut even better
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -183,7 +183,7 @@ export default function ComingSoonPage() {
         <CardContent className="text-center">
           <div className="max-w-md mx-auto">
             <p className="text-muted-foreground mb-6">
-              Join our development updates to get notified when features you're interested in become available.
+              Join our development updates to get notified when features you&apos;re interested in become available.
             </p>
             <div className="space-y-4">
               <Button className="w-full" asChild>
@@ -207,7 +207,7 @@ export default function ComingSoonPage() {
       <div className="text-center mt-12 p-6 bg-muted/50 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">Available Now</h3>
         <p className="text-muted-foreground mb-4">
-          While we work on these exciting features, explore what's already available:
+          While we work on these exciting features, explore what&apos;s already available:
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Button variant="outline" size="sm" asChild>

@@ -48,7 +48,7 @@ export async function searchInternetForCode(
     console.log('[Tavily] Search query:', searchQuery);
 
     // Search using Tavily LangChain tool
-    const searchResults = await tavilySearch.invoke(searchQuery);
+    const searchResults = await (tavilySearch as any)._call(searchQuery);
     
     console.log('[Tavily] Raw search results:', searchResults);
 

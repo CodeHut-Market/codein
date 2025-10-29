@@ -239,7 +239,7 @@ fontFamily: {
                   </TabsContent>
                   <TabsContent value="spacing" className="space-y-4">
                     <p className="text-muted-foreground">
-                      All components use Tailwind's spacing scale, which can be customized:
+                      All components use Tailwind&apos;s spacing scale, which can be customized:
                     </p>
                     <CodeHighlighter
                       code={`// Custom spacing in tailwind.config.js

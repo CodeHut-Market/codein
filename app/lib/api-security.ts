@@ -29,11 +29,11 @@ export { withSecurity(GET) as GET };
 
 // Utility for common API responses
 export const ApiResponse = {
-  success: (data: any, status: number = 200) => {
+  success: <T>(data: T, status: number = 200) => {
     return NextResponse.json({ success: true, data }, { status });
   },
   
-  error: (message: string, status: number = 400, details?: any) => {
+  error: (message: string, status: number = 400, details?: Record<string, unknown>) => {
     return NextResponse.json({ 
       success: false, 
       error: message,

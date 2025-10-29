@@ -167,7 +167,7 @@ export default function SignupPage() {
 
               {plan === 'free' && (
                 <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                  <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">What's included with Free:</h4>
+                  <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">What&apos;s included with Free:</h4>
                   <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
                     <li className="flex items-center"><Check className="w-3 h-3 mr-2" />5 component previews per month</li>
                     <li className="flex items-center"><Check className="w-3 h-3 mr-2" />Basic documentation access</li>

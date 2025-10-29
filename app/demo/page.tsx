@@ -27,7 +27,24 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 // Enhanced demo data with modern examples
-const demoSnippets = [
+interface DemoSnippet {
+  id: number;
+  title: string;
+  description: string;
+  language: string;
+  author: string;
+  avatar: string;
+  views: number;
+  likes: number;
+  downloads: number;
+  rating: number;
+  tags: string[];
+  category: string;
+  featured: boolean;
+  code: string;
+}
+
+const demoSnippets: DemoSnippet[] = [
   {
     id: 1,
     title: "React Authentication Hook",
@@ -662,13 +679,13 @@ export default function DemoPage() {
     }
   }
 
-  const runCode = (snippet: any) => {
+  const runCode = (snippet: DemoSnippet) => {
     // In a real app, this would execute the code in a sandbox
     console.log('Running code for:', snippet.title)
     alert(`Code execution demo for: ${snippet.title}\n\nIn a real environment, this would run in a secure sandbox.`)
   }
 
-  const handleDownloadSnippet = (snippet: any) => {
+  const handleDownloadSnippet = (snippet: DemoSnippet) => {
     // Create a downloadable file
     const element = document.createElement('a')
     const fileType = snippet.language.toLowerCase() === 'typescript' ? 'ts' : 
@@ -684,7 +701,7 @@ export default function DemoPage() {
     document.body.removeChild(element)
   }
 
-  const handleAddToFavorites = (snippet: any) => {
+  const handleAddToFavorites = (snippet: DemoSnippet) => {
     // In a real app, this would make an API call to add to favorites
     // For demo purposes, we'll redirect to the favorites page
     alert(`Added "${snippet.title}" to favorites!\n\nRedirecting to favorites page...`)
@@ -953,7 +970,7 @@ export default function DemoPage() {
                   </div>
 
                   {/* Code Content */}
-                  <Tabs value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
+                  <Tabs value={viewMode} onValueChange={(value: "preview" | "code") => setViewMode(value)}>
                     <TabsContent value="preview" className="space-y-4">
                       <div className="relative">
                         <div className="absolute top-4 right-4 z-10 flex gap-2">

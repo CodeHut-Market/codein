@@ -301,7 +301,7 @@ export default function SignupPage() {
                 <User className="w-8 h-8 text-primary" />
               </div>
               <h2 className="text-2xl font-bold">Create Your Account</h2>
-              <p className="text-muted-foreground">Let's start with the basics</p>
+              <p className="text-muted-foreground">Let&apos;s start with the basics</p>
             </div>
 
             <div className="space-y-4">
@@ -798,8 +798,8 @@ export default function SignupPage() {
               <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
                 <Rocket className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-2xl font-bold">You're Almost Ready!</h2>
-              <p className="text-muted-foreground">Just a few more details and you're all set</p>
+              <h2 className="text-2xl font-bold">You&apos;re Almost Ready!</h2>
+              <p className="text-muted-foreground">Just a few more details and you&apos;re all set</p>
             </div>
 
             <div className="space-y-4">

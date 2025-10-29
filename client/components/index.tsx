@@ -1,6 +1,6 @@
 "use client"
 
-import OverviewStats from "./overview-stats"
+import { OverviewStats } from "./overview-stats"
 import ContentChart from "./content-chart"
 import RecentPosts from "./recent-posts"
 import PopularArticles from "./popular-articles"

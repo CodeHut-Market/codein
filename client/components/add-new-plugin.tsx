@@ -440,7 +440,7 @@ export function AddNewPlugin() {
                 <div>
                   <h4 className="font-medium mb-1 text-xs">Kích hoạt plugin</h4>
                   <p className="text-gray-600 dark:text-gray-400 text-xs">
-                    Sau khi cài đặt thành công, vào tab "Plugins đã cài" để kích hoạt
+                    Sau khi cài đặt thành công, vào tab &quot;Plugins đã cài&quot; để kích hoạt
                   </p>
                 </div>
               </div>

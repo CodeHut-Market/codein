@@ -24,7 +24,7 @@ export default function SecurityPolicy() {
                 Our Commitment to Security
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                CodeIn takes security seriously and is committed to protecting our users' data and privacy. 
+                CodeIn takes security seriously and is committed to protecting our users&apos; data and privacy. 
                 We implement industry-standard security measures and continuously monitor and improve our security posture.
               </p>
             </section>
@@ -114,7 +114,7 @@ export default function SecurityPolicy() {
                   <div className="flex items-start space-x-3">
                     <span className="flex-shrink-0 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
                     <p className="text-gray-700 dark:text-gray-300">
-                      <strong>Allow time:</strong> We'll respond within 24 hours and provide updates every 48 hours
+                      <strong>Allow time:</strong> We&apos;ll respond within 24 hours and provide updates every 48 hours
                     </p>
                   </div>
                 </div>
@@ -122,7 +122,7 @@ export default function SecurityPolicy() {
 
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                 <p className="text-yellow-800 dark:text-yellow-200">
-                  <strong>Please do not:</strong> Publicly disclose the vulnerability before we've had a chance to address it, 
+                  <strong>Please do not:</strong> Publicly disclose the vulnerability before we&apos;ve had a chance to address it, 
                   access user data, or perform destructive actions.
                 </p>
               </div>

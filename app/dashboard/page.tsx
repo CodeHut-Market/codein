@@ -67,10 +67,22 @@ import AchievementsSystem from '../components/dashboard/AchievementsSystem'
 import EnhancedQuickActions from '../components/dashboard/EnhancedQuickActions'
 import { RealTimeDashboardStats } from '../components/dashboard/RealTimeDashboardStats'
 
+interface UserSnippet {
+  id: string;
+  title: string;
+  language: string;
+  views: number | null;
+  likes: number | null;
+  downloads: number | null;
+  createdAt: string;
+  tags: string[];
+  visibility: string;
+}
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [userSnippets, setUserSnippets] = useState<any[]>([])
+  const [userSnippets, setUserSnippets] = useState<UserSnippet[]>([])
   const [stats, setStats] = useState({
     totalSnippets: 0,
     publicSnippets: 0,

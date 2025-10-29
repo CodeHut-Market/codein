@@ -4,11 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from "../components/ui/button";
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 export default function PricingPage() {
   const [loading, setLoading] = useState(false);

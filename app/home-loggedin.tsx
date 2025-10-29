@@ -14,6 +14,9 @@ function ThemeSwitcher() {
 }
 import { supabase } from "@/lib/supabaseClient";
 
+import { User } from "@supabase/supabase-js";
+import { CodeSnippet } from "@shared/api";
+
 function QuickAction({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
   return (
     <Link href={href} className="flex flex-col items-center justify-center p-4 rounded-xl bg-gradient-to-br from-indigo-500/20 via-sky-400/10 to-cyan-300/10 hover:bg-indigo-500/30 transition-colors shadow-md">
@@ -24,8 +27,8 @@ function QuickAction({ href, icon, label }: { href: string; icon: React.ReactNod
 }
 
 export default function LoggedInHome() {
-  const [user, setUser] = useState<any>(null);
-  const [snippets, setSnippets] = useState<any[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [snippets, setSnippets] = useState<CodeSnippet[]>([]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {

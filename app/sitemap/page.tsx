@@ -149,7 +149,7 @@ export default function Sitemap() {
                   🔍 Search & Discovery
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 text-sm">
-                  Can't find what you're looking for? Use our search functionality or browse by categories. 
+                  Can&apos;t find what you&apos;re looking for? Use our search functionality or browse by categories. 
                   Most pages also have breadcrumb navigation to help you understand your location within the site.
                 </p>
               </div>

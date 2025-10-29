@@ -35,9 +35,10 @@ export default function DashboardTestPage() {
       } else {
         setIsLoading(false)
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Dashboard initialization error:', err)
-      setError(err.message)
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(errorMessage)
       setIsLoading(false)
     }
   }, [])

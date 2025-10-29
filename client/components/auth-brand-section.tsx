@@ -74,8 +74,8 @@ export function AuthBrandSection() {
 
         <div className="mt-12 pt-8 border-t border-slate-700">
           <p className="text-slate-400 text-sm">
-            "CMS Full Form has transformed how we manage our content. The intuitive interface and powerful features make
-            it a joy to use."
+            &quot;CMS Full Form has transformed how we manage our content. The intuitive interface and powerful features make
+            it a joy to use.&quot;
           </p>
           <div className="flex items-center mt-4">
             <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center mr-3">

@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Badge } from "../ui/badge"
-import { TrendingUp, TrendingDown, Eye, Download, Heart, Activity } from 'lucide-react'
+import { TrendingUp, TrendingDown, Eye, Download, Heart, Activity, LucideIcon } from 'lucide-react'
 import { format, subDays, eachDayOfInterval, parseISO, isWithinInterval } from 'date-fns'
 
 interface AnalyticsData {
@@ -29,12 +29,21 @@ interface Snippet {
   downloads?: number
   likes?: number
   createdAt: string
-  [key: string]: any
 }
 
 interface AnalyticsChartProps {
   userId: string
   snippets?: Snippet[]
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: {
+    color: string;
+    name: string;
+    value: number;
+  }[];
+  label?: string;
 }
 
 export default function AnalyticsChart({ userId, snippets = [] }: AnalyticsChartProps) {
@@ -157,7 +166,7 @@ export default function AnalyticsChart({ userId, snippets = [] }: AnalyticsChart
   const TrendIndicator = ({ trend, label, icon: Icon, color }: {
     trend: TrendData
     label: string
-    icon: any
+    icon: LucideIcon
     color: string
   }) => (
     <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -186,12 +195,12 @@ export default function AnalyticsChart({ userId, snippets = [] }: AnalyticsChart
     </div>
   )
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
           <p className="font-medium">{label}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {entry.name}: {entry.value}
             </p>

@@ -1,5 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, User } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { CodeSnippet } from '@/../../../../shared/api';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -14,16 +15,11 @@ interface UserMetadata {
   description?: string;
   avatar_url?: string;
   picture?: string;
-  [key: string]: any;
 }
 
 // Type definition for Supabase user
-interface SupabaseUser {
-  id: string;
-  email?: string;
-  user_metadata?: UserMetadata;
-  created_at?: string;
-  [key: string]: any;
+interface SupabaseUser extends User {
+  user_metadata: UserMetadata;
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
@@ -59,7 +55,7 @@ export async function GET(
     }
 
     // Find user by username in user metadata
-    const user: SupabaseUser | undefined = users.users.find((u: any) => 
+    const user: SupabaseUser | undefined = users.users.find((u: SupabaseUser) => 
       u.user_metadata?.username === username || 
       u.user_metadata?.user_name === username ||
       u.user_metadata?.full_name === username ||
@@ -75,7 +71,7 @@ export async function GET(
 
     // Fetch user's snippets (you might need to implement this based on your data structure)
     // For now, returning empty array
-    const snippets: any[] = [];
+    const snippets: CodeSnippet[] = [];
 
     // Build user response
     const userMetadata = user.user_metadata || {};

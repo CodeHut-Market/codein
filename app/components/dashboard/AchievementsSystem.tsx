@@ -23,7 +23,8 @@ import {
   Sparkles,
   Rocket,
   Lock,
-  CheckCircle
+  CheckCircle,
+  LucideIcon
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../../lib/utils';
@@ -47,6 +48,12 @@ interface Achievement {
   hidden?: boolean;
 }
 
+interface BadgeRequirement {
+  metric: string;
+  current: number;
+  required: number;
+}
+
 interface Badge {
   id: string;
   name: string;
@@ -57,7 +64,7 @@ interface Badge {
   level: number;
   max_level: number;
   progress_to_next: number;
-  requirements_current_level: any[];
+  requirements_current_level: BadgeRequirement[];
 }
 
 interface UserStats {
@@ -271,7 +278,7 @@ export default function AchievementsSystem() {
   }, []);
 
   const getIconComponent = (iconName: string, size = 24) => {
-    const icons: { [key: string]: any } = {
+    const icons: { [key: string]: LucideIcon } = {
       Code, Trophy, Crown, Star, Zap, Target, Users, Heart, Download, Eye,
       MessageSquare, TrendingUp, Shield, Flame, Sparkles, Rocket, Award
     };

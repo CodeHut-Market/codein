@@ -270,7 +270,7 @@ export default function ExplorePage() {
           </form>
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>Found {totalCount} snippets</span>
-            <span>Showing results for "{searchQuery || 'all snippets'}"</span>
+            <span>Showing results for &apos;{searchQuery || 'all snippets'}&apos;</span>
           </div>
         </CardContent>
       </Card>
@@ -427,7 +427,7 @@ export default function ExplorePage() {
       {snippets.length > 0 && currentPage >= totalPages && (
         <div className="text-center py-8">
           <p className="text-muted-foreground">
-            🎉 You've seen all {totalCount} snippets! 
+            🎉 You&apos;ve seen all {totalCount} snippets!
             <span className="block mt-1 text-sm">
               Try adjusting your filters to discover more content.
             </span>

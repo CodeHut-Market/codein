@@ -117,9 +117,9 @@ export default function TermsOfService() {
               </div>
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                 <p className="text-yellow-800 dark:text-yellow-200 font-semibold">
-                  ⚖️ Legal Notice: Unauthorized copying, reproduction, or use of CodeIn's intellectual property 
+                  ⚖️ Legal Notice: Unauthorized copying, reproduction, or use of CodeIn&apos;s intellectual property 
                   is strictly prohibited and may result in immediate legal action, including claims for damages, 
-                  injunctive relief, and attorney's fees.
+                  injunctive relief, and attorney&apos;s fees.
                 </p>
               </div>
             </section>

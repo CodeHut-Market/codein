@@ -139,15 +139,15 @@ export default function FavoritesPage() {
         language: fav.snippet.language,
         tags: fav.snippet.tags || [],
         author: fav.snippet.profiles?.username || 'Unknown',
-        authorId: (fav.snippet as any).author_id || fav.snippet.authorId,
+        authorId: fav.snippet.authorId,
         downloads: fav.snippet.downloads || 0,
-        likes: (fav.snippet as any).likes || 0,
-        views: (fav.snippet as any).views || 0,
+        likes: fav.snippet.likes || 0,
+        views: fav.snippet.views || 0,
         rating: 4.5, // TODO: Calculate from actual ratings
         price: 0, // TODO: Get from actual pricing data
         framework: fav.snippet.language, // TODO: Map to actual framework
-        createdAt: (fav.snippet as any).created_at || fav.snippet.createdAt,
-        updatedAt: (fav.snippet as any).updated_at || fav.snippet.updatedAt,
+        createdAt: fav.snippet.createdAt,
+        updatedAt: fav.snippet.updatedAt,
       }));
       
       setFavorites(formattedFavorites);

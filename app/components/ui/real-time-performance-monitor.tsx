@@ -16,6 +16,14 @@ interface PerformanceMetrics {
   lastUpdateTime: Date;
 }
 
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
+}
+
 export const RealTimePerformanceMonitor: React.FC = () => {
   const { connectionState } = useRealTime();
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
@@ -33,11 +41,11 @@ export const RealTimePerformanceMonitor: React.FC = () => {
   useEffect(() => {
     const startTime = performance.now();
     let updateCount = 0;
-    const startMemory = (performance as any).memory?.usedJSHeapSize || 0;
+    const startMemory = (performance as PerformanceWithMemory).memory?.usedJSHeapSize || 0;
     
     const interval = setInterval(() => {
       const currentTime = performance.now();
-      const currentMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      const currentMemory = (performance as PerformanceWithMemory).memory?.usedJSHeapSize || 0;
       
       setMetrics(prev => ({
         ...prev,

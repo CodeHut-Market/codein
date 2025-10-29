@@ -111,14 +111,16 @@ export async function POST(req: NextRequest) {
       internetSearched: result.internetSearched,
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Plagiarism] Unexpected error:', error);
-    console.error('[Plagiarism] Error stack:', error.stack);
-    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('[Plagiarism] Error stack:', errorStack);
+
     return NextResponse.json({ 
       error: 'Plagiarism detection failed',
-      message: error.message || 'Unknown error occurred',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? errorStack : undefined
     }, { status: 500 });
   }
 }

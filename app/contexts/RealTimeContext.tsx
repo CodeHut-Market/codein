@@ -184,8 +184,27 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, delay);
   }, [connectionState.reconnectAttempts]);
   
-  // Database event handlers
-  const handleSnippetUpdate = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
+  interface Snippet {
+  id: string;
+  views: number;
+  likes: number;
+  downloads: number;
+}
+
+interface SnippetLike {
+  snippet_id: string;
+}
+
+interface Follow {
+  followed_id: string;
+}
+
+interface SnippetComment {
+  snippet_id: string;
+}
+
+// Database event handlers
+  const handleSnippetUpdate = useCallback((payload: RealtimePostgresChangesPayload<Snippet>) => {
     const { new: newRecord, old: oldRecord, eventType } = payload;
     
     if (eventType === 'UPDATE' && newRecord && oldRecord) {
@@ -221,7 +240,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
   
-  const handleLikeUpdate = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
+  const handleLikeUpdate = useCallback((payload: RealtimePostgresChangesPayload<SnippetLike>) => {
     const { new: newRecord, old: oldRecord, eventType } = payload;
     
     if (eventType === 'INSERT' && newRecord) {
@@ -243,7 +262,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
   
-  const handleFollowUpdate = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
+  const handleFollowUpdate = useCallback((payload: RealtimePostgresChangesPayload<Follow>) => {
     const { new: newRecord, old: oldRecord, eventType } = payload;
     
     if (eventType === 'INSERT' && newRecord) {
@@ -265,7 +284,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
   
-  const handleCommentUpdate = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
+  const handleCommentUpdate = useCallback((payload: RealtimePostgresChangesPayload<SnippetComment>) => {
     const { new: newRecord, old: oldRecord, eventType } = payload;
     
     if (eventType === 'INSERT' && newRecord) {

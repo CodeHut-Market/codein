@@ -1,12 +1,10 @@
 "use client";
 
-import { Session, User } from '@supabase/supabase-js';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { supabase } from '../app/lib/supabaseClient';
+import { CustomUser } from '../types/supabase';
 
 // Auth context interface
 interface AuthContextType {
-  user: User | null;
+  user: CustomUser | null;
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, metadata?: any) => Promise<{ data: any; error: any }>;
@@ -20,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Auth provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<CustomUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-      setUser(session?.user ?? null);
+      setUser((session?.user as CustomUser) ?? null);
       setLoading(false);
     };
 
@@ -48,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser((session?.user as CustomUser) ?? null);
         setLoading(false);
 
         // Optional: Handle specific auth events

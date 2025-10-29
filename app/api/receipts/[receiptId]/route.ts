@@ -73,8 +73,21 @@ export async function GET(request: NextRequest, { params }: { params: { receiptI
   }
 }
 
+interface ReceiptData {
+  id: string;
+  date: string;
+  customerEmail: string;
+  customerName: string;
+  plan: string;
+  amount: number;
+  subscriptionId: string;
+  paymentMethod: string;
+  billingPeriod: string;
+  nextBilling: string;
+}
+
 // Generate HTML receipt for better formatting
-function generateHTMLReceipt(receiptData: any): string {
+function generateHTMLReceipt(receiptData: ReceiptData): string {
   const currentDate = new Date().toLocaleDateString();
   const currentTime = new Date().toLocaleTimeString();
   
@@ -147,7 +160,7 @@ function generateHTMLReceipt(receiptData: any): string {
 }
 
 // Generate a working PDF with proper structure
-function generateWorkingPDF(receiptData: any): Buffer {
+function generateWorkingPDF(receiptData: ReceiptData): Buffer {
   const currentDate = new Date().toLocaleDateString();
   const currentTime = new Date().toLocaleTimeString();
   

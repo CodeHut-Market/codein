@@ -10,6 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../components/ui/textarea';
 import { useToast } from '../hooks/useToast';
 
+interface RecentSnippet {
+  title: string;
+  language: string;
+  author: string;
+  created_at: string;
+  code?: string;
+}
+
 interface DatabaseStatus {
   status: string;
   message: string;
@@ -18,7 +26,7 @@ interface DatabaseStatus {
       count: number;
       accessible: boolean;
       error: string | null;
-      recentData: any[];
+      recentData: RecentSnippet[];
     };
     notifications: {
       count: number;
@@ -42,11 +50,19 @@ interface TestSnippet {
   description: string;
 }
 
+interface UploadResult {
+  error?: string;
+  snippet?: {
+    id: string;
+    createdAt: string;
+  };
+}
+
 export default function DatabaseTestPage() {
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState<any>(null);
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const { success, error } = useToast();
 
   // Test snippet form

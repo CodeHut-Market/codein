@@ -2,9 +2,54 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getMemorySnippetsDebugInfo } from '../../../lib/repositories/snippetsRepo';
 import { isSupabaseEnabled, supabase } from '../../../lib/supabaseClient';
 
+interface RecentSnippet {
+  id: string;
+  title: string;
+  author: string;
+  authorId: string;
+  createdAt: string;
+}
+
+interface VisibilityCounts {
+  public: number;
+  private: number;
+  unlisted: number;
+  null: number;
+  undefined: number;
+  other: number;
+}
+
+interface VisibilityDetail {
+  id: string;
+  title: string;
+  visibility: string;
+}
+
+interface DebugResults {
+  supabaseEnabled: boolean;
+  timestamp: string;
+  memoryInfo: {
+    count: number;
+    ids: string[];
+    titles: string[];
+  };
+  connectionError?: Error;
+  connectionStatus?: 'FAILED' | 'OK';
+  visibilityColumnExists?: boolean;
+  visibilityError?: Error;
+  visibilityException?: string;
+  snippetsQueryError?: Error;
+  totalSnippetsInDb?: number;
+  recentSnippets?: RecentSnippet[];
+  visibilityCounts?: VisibilityCounts;
+  visibilityDetails?: VisibilityDetail[];
+  visibilityStatsError?: string;
+  databaseError?: string;
+}
+
 export async function GET(req: NextRequest) {
   try {
-    const results: any = {
+    const results: DebugResults = {
       supabaseEnabled: isSupabaseEnabled(),
       timestamp: new Date().toISOString(),
       memoryInfo: getMemorySnippetsDebugInfo()

@@ -104,7 +104,7 @@ export default function ReceiptViewPage() {
           <Receipt className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
           <h1 className="text-2xl font-bold mb-2">Receipt Not Found</h1>
           <p className="text-muted-foreground mb-6">
-            The receipt you're looking for could not be found.
+            The receipt you&apos;re looking for could not be found.
           </p>
           <Button asChild>
             <Link href="/ui-library">

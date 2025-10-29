@@ -96,12 +96,13 @@ export async function POST(req: NextRequest) {
       },
     }, { status: 201 });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error uploading snippet via curl:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
       { 
         error: 'Failed to upload snippet',
-        message: error.message || 'Internal server error'
+        message: errorMessage
       },
       { status: 500 }
     );

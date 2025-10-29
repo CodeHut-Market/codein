@@ -1,4 +1,5 @@
 "use client";
+import { Notification } from "@/../../shared/api";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Bell, Menu } from "lucide-react";
@@ -21,7 +22,7 @@ export function Navbar() {
     // fetch notifications to compute unread badge
     fetch('/api/notifications', { cache: 'no-store'}).then(r=> r.json()).then(d=> {
       const list = d.notifications || [];
-      setUnread(list.filter((n:any)=> !n.read).length);
+      setUnread(list.filter((n: Notification)=> !n.read).length);
     }).catch(()=>{});
   },[]);
 

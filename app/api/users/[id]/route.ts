@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { CodeSnippet } from '@/../../../../shared/api';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -46,7 +47,7 @@ export async function GET(
 
     // Fetch user's snippets (you might need to implement this based on your data structure)
     // For now, returning empty array
-    const snippets: any[] = [];
+    const snippets: CodeSnippet[] = [];
 
     // Build user response
     const userResponse = {

@@ -11,11 +11,6 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Download, ShoppingCart, Check, AlertCircle } from "lucide-react";
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 interface RazorpayBuyNowProps {
   snippet: {

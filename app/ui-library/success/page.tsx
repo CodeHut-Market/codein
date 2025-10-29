@@ -238,7 +238,7 @@ export default function SubscriptionSuccessPage() {
         {/* Next Steps */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>What's Next?</CardTitle>
+            <CardTitle>What&apos;s Next?</CardTitle>
             <CardDescription>Get the most out of your subscription</CardDescription>
           </CardHeader>
           <CardContent>

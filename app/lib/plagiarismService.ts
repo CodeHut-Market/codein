@@ -239,7 +239,7 @@ export async function detectPlagiarism(
       message,
     };
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Plagiarism detection error:', error);
     // On error, default to PASS but log the issue
     return {

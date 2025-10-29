@@ -215,16 +215,16 @@ class DataValidator:
         if (response.ok) {
           const data = await response.json()
           // Map favorites to snippet format (API returns 'snippets' not 'snippet')
-          const favoriteSnippets = data.favorites?.map((fav: any) => {
+          const favoriteSnippets = data.favorites?.map((fav: FavoriteItem) => {
             const snippet = fav.snippets || fav.snippet
             return {
               ...snippet,
               // Ensure all required fields exist
               author: snippet.author || 'Unknown',
-              authorId: snippet.author_id || snippet.authorId,
-              createdAt: snippet.created_at || snippet.createdAt,
-              updatedAt: snippet.updated_at || snippet.updatedAt,
-              allowComments: snippet.allow_comments ?? snippet.allowComments ?? true,
+              authorId: snippet.authorId,
+              createdAt: snippet.createdAt,
+              updatedAt: snippet.updatedAt,
+              allowComments: snippet.allowComments ?? true,
             }
           }).filter(Boolean) || []
           setFavorites(favoriteSnippets)
@@ -345,7 +345,7 @@ class DataValidator:
 
     // Apply sorting
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any
+      let aValue: string | number, bValue: string | number
       
       switch (sortBy) {
         case "title":
@@ -634,7 +634,7 @@ class DataValidator:
                 </SelectContent>
               </Select>
               
-              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <Select value={sortBy} onValueChange={(value: "date" | "title" | "price" | "rating" | "downloads") => setSortBy(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

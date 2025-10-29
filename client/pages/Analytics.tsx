@@ -384,232 +384,232 @@ export default function Analytics() {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            label={({ name, percent }) =>
-                              `${name} ${(percent * 100).toFixed(0)}%`
-                            }
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {languageData.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
-
-                  {/* Top Tags Bar Chart */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Popular Tags</CardTitle>
-                      <CardDescription>
-                        Most used tags across snippets
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={topTagsData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="tag" />
-                          <YAxis />
-                          <Tooltip />
-                          <Bar dataKey="count" fill="#82ca9d" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Language Stats */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Language Statistics</CardTitle>
-                    <CardDescription>
-                      Detailed breakdown by programming language
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {languageData.map((lang, index) => (
-                        <div
-                          key={lang.name}
-                          className="flex items-center justify-between p-3 rounded-lg border"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-4 h-4 rounded-full"
-                              style={{
-                                backgroundColor: COLORS[index % COLORS.length],
-                              }}
-                            />
-                            <span className="font-medium">{lang.name}</span>
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span>{lang.value} snippets</span>
-                            <span>
-                              {(
-                                (lang.value / stats.overview.totalSnippets) *
-                                100
-                              ).toFixed(1)}
-                              %
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="performance" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Top Performing Snippets */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Top Performing Snippets</CardTitle>
-                      <CardDescription>
-                        Highest rated and most downloaded
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {stats.popularSnippets.map(
-                          (snippet: any, index: number) => (
-                            <div
-                              key={snippet.id}
-                              className="flex items-center gap-3 p-3 rounded-lg border"
-                            >
-                              <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-semibold text-sm">
-                                {index + 1}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-gray-900 truncate">
-                                  {snippet.title}
-                                </h4>
-                                <p className="text-sm text-gray-600">
-                                  by {snippet.author}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-3 text-sm">
-                                <div className="flex items-center gap-1 text-yellow-600">
-                                  <Star className="w-4 h-4" />
-                                  <span>{snippet.rating}</span>
-                                </div>
-                                <div className="flex items-center gap-1 text-blue-600">
-                                  <Download className="w-4 h-4" />
-                                  <span>{snippet.downloads}</span>
-                                </div>
-                              </div>
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Performance Metrics */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Performance Metrics</CardTitle>
-                      <CardDescription>
-                        Key performance indicators
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-6">
-                        <div>
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm font-medium">
-                              Average Rating
-                            </span>
-                            <span className="text-lg font-bold">
-                              {stats.overview.averageRating}
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-yellow-400 h-2 rounded-full"
-                              style={{
-                                width: `${(stats.overview.averageRating / 5) * 100}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm font-medium">
-                              Average Price
-                            </span>
-                            <span className="text-lg font-bold">
-                              ${stats.overview.averagePrice}
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-green-400 h-2 rounded-full"
-                              style={{
-                                width: `${Math.min((stats.overview.averagePrice / 20) * 100, 100)}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm font-medium">
-                              Purchase Rate
-                            </span>
-                            <span className="text-lg font-bold">
-                              {(
-                                (stats.overview.totalPurchases /
-                                  stats.overview.totalSnippets) *
-                                100
-                              ).toFixed(1)}
-                              %
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-blue-400 h-2 rounded-full"
-                              style={{
-                                width: `${(stats.overview.totalPurchases / stats.overview.totalSnippets) * 100}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="insights" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Market Insights */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Market Insights</CardTitle>
-                      <CardDescription>
-                        Key trends and opportunities
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                          <h4 className="font-semibold text-blue-900 mb-2">
-                            Most Popular Language
-                          </h4>
-                          <p className="text-blue-800 text-sm">
-                            {languageData[0]?.name} leads with{" "}
-                            {languageData[0]?.value} snippets
-                          </p>
+                                                        label={({ name, percent }) =>
+                                                          `${name} ${(Number(percent) * 100).toFixed(0)}%`
+                                                        }
+                                                        outerRadius={80}
+                                                        fill="#8884d8"
+                                                        dataKey="value"
+                                                      >
+                                                        {languageData.map((entry, index) => (
+                                                          <Cell
+                                                            key={`cell-${index}`}
+                                                            fill={COLORS[index % COLORS.length]}
+                                                          />
+                                                        ))}</Pie>
+                                                      <Tooltip />
+                                                    </PieChart>
+                                                  </ResponsiveContainer>
+                                                </CardContent>
+                                              </Card>
+                            
+                                              {/* Top Tags Bar Chart */}
+                                              <Card>
+                                                <CardHeader>
+                                                  <CardTitle>Popular Tags</CardTitle>
+                                                  <CardDescription>
+                                                    Most used tags across snippets
+                                                  </CardDescription>
+                                                </CardHeader>
+                                                <CardContent>
+                                                  <ResponsiveContainer width="100%" height={300}>
+                                                    <BarChart data={topTagsData}>
+                                                      <CartesianGrid strokeDasharray="3 3" />
+                                                      <XAxis dataKey="tag" />
+                                                      <YAxis />
+                                                      <Tooltip />
+                                                      <Bar dataKey="count" fill="#82ca9d" />
+                                                    </BarChart>
+                                                  </ResponsiveContainer>
+                                                </CardContent>
+                                              </Card>
+                                            </div>
+                            
+                                            {/* Language Stats */}
+                                            <Card>
+                                              <CardHeader>
+                                                <CardTitle>Language Statistics</CardTitle>
+                                                <CardDescription>
+                                                  Detailed breakdown by programming language
+                                                </CardDescription>
+                                              </CardHeader>
+                                              <CardContent>
+                                                <div className="space-y-4">
+                                                  {languageData.map((lang, index) => (
+                                                    <div
+                                                      key={lang.name}
+                                                      className="flex items-center justify-between p-3 rounded-lg border"
+                                                    >
+                                                      <div className="flex items-center gap-3">
+                                                        <div
+                                                          className="w-4 h-4 rounded-full"
+                                                          style={{
+                                                            backgroundColor: COLORS[index % COLORS.length],
+                                                          }}
+                                                        />
+                                                        <span className="font-medium">{lang.name}</span>
+                                                      </div>
+                                                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                                                        <span>{String(lang.value)} snippets</span>
+                                                        <span>
+                                                          {(
+                                                            (Number(lang.value) /
+                                                              stats.overview.totalSnippets) *
+                                                            100
+                                                          ).toFixed(1)}
+                                                          %
+                                                        </span>
+                                                      </div>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </CardContent>
+                                            </Card>
+                                          </TabsContent>
+                            
+                                          <TabsContent value="performance" className="space-y-6">
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                              {/* Top Performing Snippets */}
+                                              <Card>
+                                                <CardHeader>
+                                                  <CardTitle>Top Performing Snippets</CardTitle>
+                                                  <CardDescription>
+                                                    Highest rated and most downloaded
+                                                  </CardDescription>
+                                                </CardHeader>
+                                                <CardContent>
+                                                  <div className="space-y-4">
+                                                    {stats.popularSnippets.map(
+                                                      (snippet: any, index: number) => (
+                                                        <div
+                                                          key={snippet.id}
+                                                          className="flex items-center gap-3 p-3 rounded-lg border"
+                                                        >
+                                                          <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-semibold text-sm">
+                                                            {index + 1}
+                                                          </div>
+                                                          <div className="flex-1 min-w-0">
+                                                            <h4 className="font-medium text-gray-900 truncate">
+                                                              {snippet.title}
+                                                            </h4>
+                                                            <p className="text-sm text-gray-600">
+                                                              by {snippet.author}
+                                                            </p>
+                                                          </div>
+                                                          <div className="flex items-center gap-3 text-sm">
+                                                            <div className="flex items-center gap-1 text-yellow-600">
+                                                              <Star className="w-4 h-4" />
+                                                              <span>{snippet.rating}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1 text-blue-600">
+                                                              <Download className="w-4 h-4" />
+                                                              <span>{snippet.downloads}</span>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      ),
+                                                    )}
+                                                  </div>
+                                                </CardContent>
+                                              </Card>
+                            
+                                              {/* Performance Metrics */}
+                                              <Card>
+                                                <CardHeader>
+                                                  <CardTitle>Performance Metrics</CardTitle>
+                                                  <CardDescription>
+                                                    Key performance indicators
+                                                  </CardDescription>
+                                                </CardHeader>
+                                                <CardContent>
+                                                  <div className="space-y-6">
+                                                    <div>
+                                                      <div className="flex justify-between items-center mb-2">
+                                                        <span className="text-sm font-medium">
+                                                          Average Rating
+                                                        </span>
+                                                        <span className="text-lg font-bold">
+                                                          {stats.overview.averageRating}
+                                                        </span>
+                                                      </div>
+                                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                          className="bg-yellow-400 h-2 rounded-full"
+                                                          style={{
+                                                            width: `${(stats.overview.averageRating / 5) * 100}%`,
+                                                          }}
+                                                        />
+                                                      </div>
+                                                    </div>
+                            
+                                                    <div>
+                                                      <div className="flex justify-between items-center mb-2">
+                                                        <span className="text-sm font-medium">
+                                                          Average Price
+                                                        </span>
+                                                        <span className="text-lg font-bold">
+                                                          ${stats.overview.averagePrice}
+                                                        </span>
+                                                      </div>
+                                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                          className="bg-green-400 h-2 rounded-full"
+                                                          style={{
+                                                            width: `${Math.min((stats.overview.averagePrice / 20) * 100, 100)}%`,
+                                                          }}
+                                                        />
+                                                      </div>
+                                                    </div>
+                            
+                                                    <div>
+                                                      <div className="flex justify-between items-center mb-2">
+                                                        <span className="text-sm font-medium">
+                                                          Purchase Rate
+                                                        </span>
+                                                        <span className="text-lg font-bold">
+                                                          {(
+                                                            (stats.overview.totalPurchases /
+                                                              stats.overview.totalSnippets) *
+                                                            100
+                                                          ).toFixed(1)}
+                                                          %
+                                                        </span>
+                                                      </div>
+                                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                          className="bg-blue-400 h-2 rounded-full"
+                                                          style={{
+                                                            width: `${(stats.overview.totalPurchases / stats.overview.totalSnippets) * 100}%`,
+                                                          }}
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </CardContent>
+                                              </Card>
+                                            </div>
+                                          </TabsContent>
+                            
+                                          <TabsContent value="insights" className="space-y-6">
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                              {/* Market Insights */}
+                                              <Card>
+                                                <CardHeader>
+                                                  <CardTitle>Market Insights</CardTitle>
+                                                  <CardDescription>
+                                                    Key trends and opportunities
+                                                  </CardDescription>
+                                                </CardHeader>
+                                                <CardContent>
+                                                  <div className="space-y-4">
+                                                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                                      <h4 className="font-semibold text-blue-900 mb-2">
+                                                        Most Popular Language
+                                                      </h4>
+                                                      <p className="text-blue-800 text-sm">
+                                                        {languageData[0]?.name} leads with{" "}
+                                                        {String(languageData[0]?.value)} snippets
+                                                      </p>
                         </div>
 
                         <div className="p-4 bg-green-50 rounded-lg border border-green-200">

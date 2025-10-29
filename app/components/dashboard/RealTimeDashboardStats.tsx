@@ -87,6 +87,16 @@ const StatCard: React.FC<StatCardProps> = ({
   );
 };
 
+interface UserSnippet {
+  id: string;
+  title: string;
+  views: number | null;
+  likes: number | null;
+  downloads: number | null;
+  created_at: string;
+  is_public: boolean;
+}
+
 export const RealTimeDashboardStats: React.FC = () => {
   const { user } = useAuth();
   const { 
@@ -110,7 +120,7 @@ export const RealTimeDashboardStats: React.FC = () => {
   });
   
   const [isLoading, setIsLoading] = useState(true);
-  const [userSnippets, setUserSnippets] = useState<any[]>([]);
+  const [userSnippets, setUserSnippets] = useState<UserSnippet[]>([]);
   
   // Subscribe to real-time updates for current user
   useEffect(() => {
