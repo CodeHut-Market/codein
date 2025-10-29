@@ -91,7 +91,7 @@ export function SiteFooter() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         {/* grid: sections + compact newsletter in second row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
           {footerSections.map((section) => (
             <div key={section.title} className="space-y-1">
               <h3 className="text-[11px] font-semibold text-foreground uppercase">

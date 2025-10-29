@@ -56,11 +56,11 @@ export default function Footer() {
   return (
     <footer className="bg-background border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Main Footer Content */}
-        <div className="py-12">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
+                 {/* Main Footer Content */}
+                 <div className="py-12">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:grid-rows-2">
             {/* Brand Section */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-1 lg:row-span-2">
               <Link href="/" className="flex items-center space-x-2 mb-4">
                 <Code className="h-8 w-8 text-primary" />
                 <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
@@ -68,10 +68,10 @@ export default function Footer() {
                 </span>
               </Link>
               <p className="text-muted-foreground mb-6 max-w-md">
-                Build. Share. Ship. A comprehensive platform for developers to discover, 
+                Build. Share. Ship. A comprehensive platform for developers to discover,
                 share, and monetize code snippets with the global community.
               </p>
-              
+
               {/* Contact Info */}
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
@@ -109,23 +109,25 @@ export default function Footer() {
               </div>
             ))}
 
-            {/* Stay Updated Section - Inside grid */}
-            <div>
-              <h3 className="font-semibold text-foreground mb-4 uppercase tracking-wide text-sm">
-                Stay Updated
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Get the latest code snippets, tutorials, and community updates delivered to your inbox.
-              </p>
-              <div className="flex flex-col gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="px-4 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-                <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
-                  Subscribe
-                </button>
+            {/* Stay Updated Section - Moved to second row, spanning 4 columns */}
+            <div className="lg:col-span-4 lg:col-start-2 lg:row-start-2 mt-8">
+              <div className="bg-accent/50 rounded-lg p-6 max-w-md ml-auto">
+                <h3 className="font-semibold text-foreground mb-3 uppercase tracking-wide text-sm">
+                  Stay Updated
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Get the latest code snippets, tutorials, and community updates delivered to your inbox.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="px-4 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                  <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+                    Subscribe
+                  </button>
+                </div>
               </div>
             </div>
           </div>
