@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 "use client";
 
 import { Bookmark, Download, Eye, Heart, MessageCircle, Share2, ShoppingCart, Star } from 'lucide-react';
@@ -52,6 +58,7 @@ interface RealTimeSnippetCardProps {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [hasViewed, setHasViewed] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [paymentLoading, setPaymentLoading] = useState(false);
     const priceValue = useMemo(() => typeof snippet.price === 'number' ? snippet.price : 0, [snippet.price]);
     const priceLabel = useMemo(() => {
       if (priceValue <= 0) return 'Free';
@@ -143,15 +150,52 @@ interface RealTimeSnippetCardProps {
         try { await navigator.share({ title: snippet.title, text: snippet.description, url }); } catch { navigator.clipboard.writeText(url); }
       } else { navigator.clipboard.writeText(url); }
     }, [snippet.id, snippet.title, snippet.description]);
-    const handleBuy = useCallback((e: React.MouseEvent) => {
+    const handlePayment = useCallback(async (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       if (!user?.id) {
         setShowGuestModal(true);
         return;
       }
-  router.push(`/snippet/${snippet.id}?purchase=1#purchase`);
-    }, [router, snippet.id, user?.id]);
+      setPaymentLoading(true);
+      try {
+        const res = await fetch('/api/razorpay', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ amount: priceValue }),
+        });
+        const order = await res.json();
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'CodeHut',
+          description: `Purchase of ${snippet.title}`,
+          order_id: order.id,
+          handler: async function (response: any) {
+            alert('Payment successful!');
+          },
+          prefill: {
+            name: user.user_metadata.full_name || 'Anonymous',
+            email: user.email,
+          },
+          notes: {
+            snippet_id: snippet.id,
+          },
+          theme: {
+            color: '#3399cc',
+          },
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } catch (error) {
+        console.error('Payment failed:', error);
+        alert('Payment failed. Please try again.');
+      }
+      setPaymentLoading(false);
+    }, [user, snippet, priceValue]);
     return (
       <Card className={cn("group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer border-2 border-gray-200 dark:border-gray-700 overflow-hidden text-gray-900 dark:text-gray-100", compact && "p-4", className)} onClick={handleView}>
         {user?.id ? (
@@ -186,24 +230,18 @@ interface RealTimeSnippetCardProps {
             <CardContent className={cn("space-y-4", compact && "space-y-2")}> 
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6"><AvatarImage src={snippet.user?.avatar_url} /><AvatarFallback className="text-xs">{displayName.charAt(0).toUpperCase()}</AvatarFallback></Avatar>
-                <span className="text-sm text-gray-700 dark:text-gray-200">{displayName}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(snippet.created_at).toLocaleDateString()}</span>
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1"><Eye size={14} /><span className="transition-all duration-300">{realTimeViews.toLocaleString()}</span></div>
-                  <div className="flex items-center gap-1"><Heart size={14} className={isLiked ? "text-red-500 fill-red-500" : ""} /><span className="transition-all duration-300">{realTimeLikes.toLocaleString()}</span></div>
-                  <div className="flex items-center gap-1"><Download size={14} /><span className="transition-all duration-300">{realTimeDownloads.toLocaleString()}</span></div>
-                  {realTimeComments > 0 && (<div className="flex items-center gap-1"><MessageCircle size={14} /><span className="transition-all duration-300">{realTimeComments}</span></div>)}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
+                <Button
                     size="sm"
-                    onClick={handleBuy}
+                    onClick={handlePayment}
+                    disabled={paymentLoading}
                     className="relative overflow-hidden bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-transform duration-200 px-4"
                   >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Buy Now
+                    {paymentLoading ? 'Processing...' : (
+                      <>
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Buy Now
+                      </>
+                    )}
                   </Button>
                   {showActions && user && (
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
