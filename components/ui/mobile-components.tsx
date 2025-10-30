@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { X, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 
@@ -43,7 +43,7 @@ export function BottomSheet({
     };
   }, [isOpen]);
 
-  const handleDragEnd = (event: any, info: any) => {
+  const handleDragEnd = (event: MouseEvent | TouchEvent, info: PanInfo) => {
     setIsDragging(false);
     
     if (info.velocity.y > 500 || info.offset.y > 100) {

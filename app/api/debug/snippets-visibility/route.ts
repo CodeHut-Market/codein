@@ -47,7 +47,7 @@ interface DebugResults {
   databaseError?: string;
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const results: DebugResults = {
       supabaseEnabled: isSupabaseEnabled(),
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
 
     try {
       // Test basic connection with minimal query
-      const { data: connectionTest, error: connError } = await supabase!
+      const { error: connError } = await supabase!
         .from('snippets')
         .select('id')
         .limit(1);
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
 
       // Test visibility column existence
       try {
-        const { data: visibilityTest, error: visError } = await supabase!
+        const { error: visError } = await supabase!
           .from('snippets')
           .select('visibility')
           .limit(1);

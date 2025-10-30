@@ -5,6 +5,12 @@ import Link from 'next/link';
 import { Button } from "../components/ui/button";
 
 
+interface RazorpayPaymentResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
 export default function PricingPage() {
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +35,7 @@ export default function PricingPage() {
         name: 'CodeHut',
         description: 'Test Transaction',
         order_id: order.id,
-        handler: async function (response: any) {
+        handler: async function (response: RazorpayPaymentResponse) {
           alert('Payment successful!');
           // You can handle the successful payment here
           // e.g., save the transaction details to your database

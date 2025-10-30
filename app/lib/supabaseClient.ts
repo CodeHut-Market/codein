@@ -142,7 +142,7 @@ export const authHelpers = {
   },
 
   // Enhanced sign up with validation
-  signUp: async (email: string, password: string, metadata?: Record<string, any>) => {
+  signUp: async (email: string, password: string, metadata?: Record<string, unknown>) => {
     if (!supabase) return { error: { message: 'Supabase not initialized' } };
     
     // Basic email validation
@@ -220,7 +220,7 @@ export const authHelpers = {
 // Security monitoring helper
 export const securityHelpers = {
   // Log security events (placeholder for production logging)
-  logSecurityEvent: (eventType: string, details?: Record<string, any>) => {
+  logSecurityEvent: (eventType: string, details?: Record<string, unknown>) => {
     if (process.env.NODE_ENV === 'development') {
       console.log(`Security Event: ${eventType}`, details);
     }

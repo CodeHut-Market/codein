@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isSupabaseAdminEnabled, isSupabaseEnabled, supabase } from '../../lib/supabaseClient';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log('Debug endpoint - checking environment');
     
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     if (isSupabaseEnabled() && supabase) {
       try {
         console.log('Testing database connection');
-        const { data, error } = await supabase.from('snippets').select('count').limit(1);
+        const { error } = await supabase.from('snippets').select('count').limit(1);
         if (error) {
           console.error('Database test error:', error);
           dbConnectionTest = { success: false, error: error.message };

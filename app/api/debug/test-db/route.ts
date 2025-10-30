@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isSupabaseEnabled, supabase } from '../../../lib/supabaseClient';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     if (!isSupabaseEnabled()) {
       return NextResponse.json({ 
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
     // Test basic connection
     console.log('Testing Supabase connection...');
-    const { data: connectionTest, error: connectionError } = await supabase!
+    const { error: connectionError } = await supabase!
       .from('snippets')
       .select('count')
       .limit(1);

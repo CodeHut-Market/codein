@@ -82,7 +82,7 @@ export function Typography({
   return (
     <Component
       className={cn(typographyVariants({ variant, weight, align, spacing }), className)}
-      {...(props as any)}
+      {...props}
     >
       {children}
     </Component>
@@ -168,7 +168,7 @@ export function ResponsiveText({
   );
 
   return (
-    <Component className={responsiveClasses} {...(props as any)}>
+    <Component className={responsiveClasses} {...props}>
       {children}
     </Component>
   );

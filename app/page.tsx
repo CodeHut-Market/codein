@@ -2,8 +2,10 @@
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 
+import { User } from "@supabase/supabase-js";
+
 export default function LandingPage(){
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
     import("@/lib/supabaseClient").then(({ supabase }) => {
       supabase.auth.getUser().then(({ data }) => {

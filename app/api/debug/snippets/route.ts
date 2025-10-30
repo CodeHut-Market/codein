@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getMemorySnippetsDebugInfo } from '../../../lib/repositories/snippetsRepo';
 import { isSupabaseEnabled } from '../../../lib/supabaseClient';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Get memory snippets debug info
     const memoryInfo = getMemorySnippetsDebugInfo();

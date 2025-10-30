@@ -38,8 +38,8 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    document.addEventListener('focusin', handleFocusChange as any);
-    return () => document.removeEventListener('focusin', handleFocusChange as any);
+    document.addEventListener('focusin', handleFocusChange);
+    return () => document.removeEventListener('focusin', handleFocusChange);
   }, [focusedElement]);
 
   const trapFocus = useCallback((container: HTMLElement) => {
@@ -66,11 +66,10 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    container.addEventListener('keydown', handleKeyDown as any);
-    firstElement?.focus();
+    container.addEventListener('keydown', handleKeyDown as EventListener);
 
     return () => {
-      container.removeEventListener('keydown', handleKeyDown as any);
+      container.removeEventListener('keydown', handleKeyDown as EventListener);
     };
   }, []);
 
@@ -177,7 +176,7 @@ export function AccessibleButton({
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleClick(e as any);
+      handleClick(new MouseEvent('click', { bubbles: true }) as unknown as React.MouseEvent<HTMLButtonElement>);
     }
   }, [handleClick]);
 
@@ -263,8 +262,8 @@ export function AccessibleModal({
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown as any);
-      return () => document.removeEventListener('keydown', handleKeyDown as any);
+      document.addEventListener('keydown', handleKeyDown as EventListener);
+      return () => document.removeEventListener('keydown', handleKeyDown as EventListener);
     }
   }, [isOpen, closeOnEscape, onClose]);
 

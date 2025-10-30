@@ -1,7 +1,4 @@
-// API Security Middleware
-// Addresses: API exposure security, rate limiting, input validation
-
-import { createClient } from '@supabase/supabase-js';
+import { createClient, User } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Rate limiting store (in production, use Redis or similar)
@@ -85,7 +82,7 @@ export function checkRateLimit(identifier: string, maxRequests: number, windowMs
 }
 
 // Input validation and sanitization
-export function validateAndSanitizeInput(data: any): { isValid: boolean; errors: string[]; sanitized?: any } {
+export function validateAndSanitizeInput(data: unknown): { isValid: boolean; errors: string[]; sanitized?: unknown } {
   const errors: string[] = [];
   
   if (!data) {
@@ -93,7 +90,7 @@ export function validateAndSanitizeInput(data: any): { isValid: boolean; errors:
   }
   
   // Deep clone to avoid mutating original data
-  let sanitized: any;
+  let sanitized: unknown;
   
   try {
     sanitized = JSON.parse(JSON.stringify(data));
@@ -103,7 +100,7 @@ export function validateAndSanitizeInput(data: any): { isValid: boolean; errors:
   }
   
   // Recursive validation and sanitization
-  function sanitizeRecursive(obj: any, path: string = '', depth: number = 0): any {
+  function sanitizeRecursive(obj: unknown, path: string = '', depth: number = 0): unknown {
     // Prevent infinite recursion
     if (depth > 10) {
       errors.push(`Data too deeply nested at path: ${path}`);
@@ -137,7 +134,7 @@ export function validateAndSanitizeInput(data: any): { isValid: boolean; errors:
     }
     
     if (typeof obj === 'object' && obj !== null) {
-      const sanitizedObj: any = {};
+      const sanitizedObj: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(obj)) {
         // Sanitize object keys
         const sanitizedKey = key.replace(/[^\w\-_]/g, '').substring(0, 100);
@@ -193,7 +190,7 @@ export function validateCORS(request: NextRequest): boolean {
 // Authentication validation
 export async function validateAuthentication(request: NextRequest): Promise<{
   isValid: boolean;
-  user: any;
+  user: User | null;
   error?: string;
 }> {
   try {
@@ -364,7 +361,7 @@ export const securityUtils = {
   },
   
   // Log security events
-  logSecurityEvent: (event: string, details: Record<string, any>) => {
+  logSecurityEvent: (event: string, details: Record<string, unknown>) => {
     if (process.env.NODE_ENV === 'development') {
       console.log(`[SECURITY] ${event}:`, details);
     }

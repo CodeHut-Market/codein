@@ -173,7 +173,7 @@ export default function ActivityFeed({ currentUserId }: ActivityFeedProps) {
         (payload) => {
           console.log('New activity:', payload)
           // Add new activity to the top of the list
-          const newActivity = payload.new as any
+          const newActivity = payload.new as ActivityItem
           setActivities(prev => [newActivity, ...prev.slice(0, 9)])
         }
       )

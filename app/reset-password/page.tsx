@@ -54,7 +54,7 @@ export default function ResetPasswordPage() {
 			// You would implement the actual reset logic here
 			// For now, just show a success message
 			setMessage("If an account with that email exists, we've sent you a password reset link.");
-		} catch (error: any) {
+		} catch (error: unknown) {
 			setError("Failed to send reset email. Please try again.");
 		} finally {
 			setIsLoading(false);
@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
 			setTimeout(() => {
 				router.push('/login');
 			}, 2000);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			setError("Failed to update password. Please try again.");
 		} finally {
 			setIsLoading(false);

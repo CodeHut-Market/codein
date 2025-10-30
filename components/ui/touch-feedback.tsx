@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import React, { useState, useCallback, useRef } from "react";
 
 // Inline haptic feedback utility
@@ -368,7 +368,7 @@ export function SwipeableItem({
   const [swipeX, setSwipeX] = useState(0);
   const [isSwipeActive, setIsSwipeActive] = useState(false);
 
-  const handleDragEnd = useCallback((event: any, info: any) => {
+  const handleDragEnd = useCallback((event: MouseEvent | TouchEvent, info: PanInfo) => {
     const threshold = 80;
     
     if (info.offset.x > threshold && leftAction) {
@@ -383,7 +383,7 @@ export function SwipeableItem({
     setIsSwipeActive(false);
   }, [leftAction, rightAction]);
 
-  const handleDrag = useCallback((event: any, info: any) => {
+  const handleDrag = useCallback((event: MouseEvent | TouchEvent, info: PanInfo) => {
     setSwipeX(info.offset.x);
     setIsSwipeActive(Math.abs(info.offset.x) > 10);
   }, []);

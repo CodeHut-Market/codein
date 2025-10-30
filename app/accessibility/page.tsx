@@ -224,8 +224,7 @@ export default function AccessibilityStatement() {
                 Feedback and Support
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mb-6">
-                We welcome feedback about the accessibility of CodeIn. If you encounter any accessibility barriers 
-                or have suggestions for improvement, please don't hesitate to contact us.
+                We welcome feedback about the accessibility of CodeIn. If you encounter any accessibility barriers or have suggestions for improvement, please don&apos;t hesitate to contact us.
               </p>
 
               <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">

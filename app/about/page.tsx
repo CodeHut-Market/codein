@@ -13,7 +13,7 @@ export default function About() {
             About CodeHut
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            We're building the world's largest platform for developers to discover, share, and monetize code snippets.
+            We&apos;re building the world&apos;s largest platform for developers to discover, share, and monetize code snippets.
           </p>
         </div>
       </section>

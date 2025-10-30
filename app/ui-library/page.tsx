@@ -31,6 +31,22 @@ import { Progress } from "../components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 
 
+import { LucideIcon } from 'lucide-react';
+
+interface FeaturedComponent {
+  name: string;
+  category: string;
+  description: string;
+  icon: LucideIcon;
+  preview: boolean;
+  downloads: number;
+  likes: number;
+  price: string;
+  gradient: string;
+  features: string[];
+  code: string;
+}
+
 export default function UILibraryShowcase() {
   const [activeTab, setActiveTab] = useState('components')
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
@@ -38,7 +54,7 @@ export default function UILibraryShowcase() {
   const [previewComponent, setPreviewComponent] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedComponent, setSelectedComponent] = useState<any>(null)
+  const [selectedComponent, setSelectedComponent] = useState<FeaturedComponent | null>(null)
 
   useEffect(() => {
     const timer = setInterval(() => {

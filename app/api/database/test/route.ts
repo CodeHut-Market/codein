@@ -9,12 +9,12 @@ export async function GET() {
   try {
     // Test 1: Check if snippets table exists
     console.log('Testing table existence...');
-    const { data: tableData, error: tableError } = await supabase
+    const { error: tableError } = await supabase
       .from('snippets')
       .select('*')
       .limit(1);
     
-    let tableExists = !tableError;
+    const tableExists = !tableError;
     console.log('Table exists:', tableExists);
     if (tableError) {
       console.log('Table error:', tableError);
@@ -28,7 +28,7 @@ export async function GET() {
       if (!schemaError) {
         schemaInfo = schemaData;
       }
-    } catch (e) {
+    } catch {
       console.log('Schema query not available');
     }
 

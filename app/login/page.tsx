@@ -70,11 +70,11 @@ export default function LoginPage() {
 				// Redirect to dashboard
 				router.push('/dashboard');
 			}
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error('Login error:', error);
 			
 			// Handle specific error messages
-			const errorMessage = error.message || 'Failed to sign in. Please check your credentials.';
+			const errorMessage = error instanceof Error ? error.message : 'Failed to sign in. Please check your credentials.';
 			
 			if (errorMessage.includes('Invalid login credentials')) {
 				setAuthError("Invalid email or password. Please check your credentials and try again.");
@@ -103,9 +103,10 @@ export default function LoginPage() {
 
 			console.log(`${provider} OAuth initiated successfully`);
 			// Don't clear loading here - let the auth state change handle it
-		} catch(e: any){
+		} catch(e: unknown){
 			console.error(`${provider} OAuth sign-in failed:`, e);
-			setAuthError(e.message || `${provider} sign-in failed`);
+			const errorMessage = e instanceof Error ? e.message : `${provider} sign-in failed`;
+			setAuthError(errorMessage);
 			setOauthLoading(null);
 		}
 	}
