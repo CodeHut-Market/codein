@@ -22,6 +22,8 @@ import { Badge } from './badge';
 import { Button } from './button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000"; // Fallback for development
+
 interface RealTimeSnippetCardProps {
   snippet: {
     id: string;
@@ -195,7 +197,7 @@ interface RealTimeSnippetCardProps {
           requestHeaders.Authorization = `Bearer ${authToken}`;
         }
 
-        const orderResponse = await fetch('/api/payments/create-order', {
+        const orderResponse = await fetch(`${BACKEND_URL}/api/payments/create-order`, {
           method: 'POST',
           headers: requestHeaders,
           body: JSON.stringify({ snippetId: snippet.id }),
@@ -253,7 +255,7 @@ interface RealTimeSnippetCardProps {
                 verifyHeaders.Authorization = `Bearer ${authToken}`;
               }
 
-              const verifyResponse = await fetch('/api/payments/verify', {
+              const verifyResponse = await fetch(`${BACKEND_URL}/api/payments/verify`, {
                 method: 'POST',
                 headers: verifyHeaders,
                 body: JSON.stringify({
