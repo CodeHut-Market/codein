@@ -30,7 +30,7 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
 
   // Track focus changes
   useEffect(() => {
-    const handleFocusChange = (e: FocusEvent) => {
+    const handleFocusChange = (e: Event) => {
       const target = e.target as HTMLElement;
       if (target && target !== focusedElement) {
         setFocusedElement(target);
@@ -50,9 +50,9 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        if (e.shiftKey) {
+    const handleKeyDown = (e: Event) => {
+      if ((e as any).key === 'Tab') {
+        if ((e as any).shiftKey) {
           if (document.activeElement === firstElement) {
             e.preventDefault();
             lastElement?.focus();
@@ -66,10 +66,10 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    container.addEventListener('keydown', handleKeyDown as EventListener);
+    container.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      container.removeEventListener('keydown', handleKeyDown as EventListener);
+      container.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -255,15 +255,15 @@ export function AccessibleModal({
 
   // Keyboard handling
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && closeOnEscape) {
+    const handleKeyDown = (e: Event) => {
+      if ((e as any).key === 'Escape' && closeOnEscape) {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown as EventListener);
-      return () => document.removeEventListener('keydown', handleKeyDown as EventListener);
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
     }
   }, [isOpen, closeOnEscape, onClose]);
 

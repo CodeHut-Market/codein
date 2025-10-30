@@ -36,7 +36,11 @@ interface DebugResults {
   connectionError?: Error;
   connectionStatus?: 'FAILED' | 'OK';
   visibilityColumnExists?: boolean;
-  visibilityError?: Error;
+  visibilityError?: {
+    code?: string;
+    message: string;
+    details?: string;
+  };
   visibilityException?: string;
   snippetsQueryError?: Error;
   totalSnippetsInDb?: number;
@@ -87,7 +91,7 @@ export async function GET() {
         if (visError) {
           results.visibilityColumnExists = false;
           results.visibilityError = {
-            code: visError.code,
+            code: visError.code || 'UNKNOWN',
             message: visError.message,
             details: visError.details
           };

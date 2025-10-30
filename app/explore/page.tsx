@@ -20,8 +20,6 @@ import { useEffect, useState } from 'react'
 import Script from 'next/script'
 import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
 
-import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
-
 // Adapter function to convert CodeSnippet to format expected by RealTimeSnippetCard
 const adaptCodeSnippetForRealTime = (snippet: CodeSnippet) => ({
   id: snippet.id,
