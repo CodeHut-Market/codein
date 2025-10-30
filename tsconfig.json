@@ -9,6 +9,7 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
+    "types": ["node"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -58,12 +59,12 @@
     "app/lib/**/*",
     "hooks/**/*",
     "components/**/*",
-    "vite.config.ts",
-    "vite.config.server.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "vite.config.ts",
+    "vite.config.server.ts"
   ]
 }
