@@ -27,7 +27,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { toast } from '../../../client/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface QuickAction {
   id: string;

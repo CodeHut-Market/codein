@@ -21,6 +21,10 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import FavoriteButton from '../../../client/components/FavoriteButton';
+import { useAuth } from '../../../client/contexts/AuthContext';
+import { RazorpayOptions, RazorpayPaymentResponse } from '@/types/razorpay';
+import { useToast } from '@/hooks/use-toast';
+import { useRazorpay } from '@/hooks/use-razorpay';
 import SnippetCard from '../../../client/components/SnippetCard';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../client/components/ui/avatar';
 import { Badge } from '../../../client/components/ui/badge';
@@ -40,6 +44,10 @@ export default function SnippetDetailPage({ params }: SnippetDetailPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [relatedSnippets, setRelatedSnippets] = useState<CodeSnippet[]>([]);
   const [copied, setCopied] = useState(false);
+  const { user, token } = useAuth();
+  const { toast } = useToast();
+  const { ensureRazorpay } = useRazorpay();
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const purchaseSectionRef = useRef<HTMLDivElement | null>(null);
@@ -333,8 +341,158 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     ? `${(snippet.rating ?? 0).toFixed(1)}/5`
     : 'New';
 
-  const handleBuyNow = () => {
-    router.push(`/snippet/${snippet.id}?purchase=1#purchase`);
+  const handleBuyNow = async () => {
+    if (!snippet) {
+      return;
+    }
+
+    if (!user?.id) {
+      const redirectUrl = encodeURIComponent(`/snippet/${snippet.id}?purchase=1`);
+      router.push(`/login?redirect=${redirectUrl}`);
+      return;
+    }
+
+    setPaymentLoading(true);
+
+    try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'x-user-data': JSON.stringify({ id: user.id, email: user.email }),
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const orderResponse = await fetch('/api/payments/create-order', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ snippetId: snippet.id }),
+      });
+
+      if (!orderResponse.ok) {
+        const errorBody = await orderResponse.json().catch(() => ({}));
+        throw new Error(errorBody.error || 'Unable to start checkout.');
+      }
+
+      const order = await orderResponse.json();
+      const isDemoCheckout = Boolean(order.demo);
+
+      const ready = await ensureRazorpay();
+      if (!ready || typeof window === 'undefined' || !window.Razorpay) {
+        throw new Error('Razorpay checkout SDK is not loaded yet. Please wait a moment and try again.');
+      }
+
+      const checkout = new window.Razorpay({
+        key: order.key,
+        amount: order.amount,
+        currency: order.currency ?? 'INR',
+        name: 'CodeHut',
+        description: `Purchase of ${snippet.title}`,
+        order_id: order.id,
+        prefill: {
+          name: user.username || 'Anonymous',
+          email: user.email,
+        },
+        notes: {
+          snippet_id: snippet.id,
+          buyer_id: user.id,
+          mode: isDemoCheckout ? 'demo' : 'live',
+        },
+        theme: {
+          color: '#3399cc',
+        },
+        handler: async (paymentResponse: RazorpayPaymentResponse) => {
+          try {
+            if (isDemoCheckout) {
+              toast({
+                title: 'Demo payment completed',
+                description: 'This was a simulated checkout. Configure Razorpay keys for live payments.',
+              });
+              await loadSnippet();
+              return;
+            }
+
+            const verifyHeaders: Record<string, string> = {
+              'Content-Type': 'application/json',
+              'x-user-data': JSON.stringify({ id: user.id, email: user.email }),
+            };
+
+            if (token) {
+              verifyHeaders.Authorization = `Bearer ${token}`;
+            }
+
+            const verifyResponse = await fetch('/api/payments/verify', {
+              method: 'POST',
+              headers: verifyHeaders,
+              body: JSON.stringify({
+                ...paymentResponse,
+                snippetId: snippet.id,
+              }),
+            });
+
+            if (!verifyResponse.ok) {
+              const verifyError = await verifyResponse.json().catch(() => ({}));
+              throw new Error(verifyError.error || 'Payment verification failed.');
+            }
+
+            toast({
+              title: 'Payment successful',
+              description: 'You now have access to the full snippet.',
+            });
+            await loadSnippet();
+          } catch (verifyError) {
+            console.error('Payment verification failed', verifyError);
+            toast({
+              title: 'Payment verification failed',
+              description: verifyError instanceof Error ? verifyError.message : 'Please contact support.',
+              variant: 'destructive',
+            });
+          } finally {
+            setPaymentLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setPaymentLoading(false);
+            if (isDemoCheckout) {
+              toast({
+                title: 'Checkout closed',
+                description: 'Demo payment was cancelled before completion.',
+                variant: 'destructive',
+              });
+            }
+          },
+        },
+      } as RazorpayOptions);
+
+      checkout.on?.('payment.failed', (failure) => {
+        console.error('Payment failed:', failure);
+        toast({
+          title: 'Payment failed',
+          description: failure?.error?.description || 'Please try again with a different payment method.',
+          variant: 'destructive',
+        });
+        setPaymentLoading(false);
+      });
+
+      checkout.open();
+
+      if (isDemoCheckout) {
+        toast({
+          title: 'Demo checkout mode',
+          description: 'Using Razorpay test gateway. Use card 4111 1111 1111 1111, any future expiry, CVV 111 to simulate a payment.',
+        });
+      }
+    } catch (error) {
+      console.error('Payment failed:', error);
+      toast({
+        title: 'Payment failed',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
+      });
+      setPaymentLoading(false);
+    }
   };
 
   return (
@@ -380,9 +538,13 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
                   </p>
                   <div className="mt-4 flex flex-wrap items-center gap-3">
                     {isPaidSnippet ? (
-                      <Button onClick={handleBuyNow} className="bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white shadow-lg">
+                      <Button
+                        onClick={handleBuyNow}
+                        disabled={paymentLoading}
+                        className="bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white shadow-lg"
+                      >
                         <ShoppingCart className="h-4 w-4 mr-2" />
-                        Buy Now for {priceLabel}
+                        {paymentLoading ? 'Processing...' : `Buy Now for ${priceLabel}`}
                       </Button>
                     ) : (
                       <Button onClick={downloadSnippet} className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white shadow-lg">
@@ -481,10 +643,11 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
                       <Button
                         size="sm"
                         onClick={handleBuyNow}
+                        disabled={paymentLoading}
                         className="bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-md hover:shadow-lg"
                       >
                         <ShoppingCart className="h-4 w-4 mr-2" />
-                        Unlock Full Code
+                        {paymentLoading ? 'Processing...' : 'Unlock Full Code'}
                       </Button>
                     ) : (
                       <Button
@@ -589,9 +752,10 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
                   <Button
                     className="w-full bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 text-white shadow-lg hover:shadow-xl"
                     onClick={handleBuyNow}
+                    disabled={paymentLoading}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" />
-                    Buy Now
+                    {paymentLoading ? 'Processing...' : 'Buy Now'}
                   </Button>
                   <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 space-y-3 text-sm text-muted-foreground">
                     <div className="flex items-start gap-3">

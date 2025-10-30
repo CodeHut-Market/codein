@@ -10,6 +10,8 @@ import Link from 'next/link';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '../../../client/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useRazorpay } from '@/hooks/use-razorpay';
 import { useRealTime } from '../../contexts/RealTimeContext';
 import { useOptimisticActions } from '../../hooks/useOptimisticActions';
 import { supabase } from '../../lib/supabaseClient';
@@ -47,8 +49,10 @@ interface RealTimeSnippetCardProps {
   className?: string;
 }
   export const RealTimeSnippetCard = (props: RealTimeSnippetCardProps) => {
-    const { snippet, showActions = true, compact = false, className = '' } = props;
-    const { user } = useAuth();
+  const { snippet, showActions = true, compact = false, className = '' } = props;
+  const { user, token } = useAuth();
+  const { toast } = useToast();
+  const { ensureRazorpay } = useRazorpay();
     
     const [showGuestModal, setShowGuestModal] = useState(false);
     const { getSnippetViews, getSnippetLikes, getSnippetDownloads, getSnippetComments, subscribeToSnippet, unsubscribeFromSnippet } = useRealTime();
@@ -152,50 +156,175 @@ interface RealTimeSnippetCardProps {
     const handlePayment = useCallback(async (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
+
+      if (!snippet?.id) {
+        return;
+      }
+
       if (!user?.id) {
         setShowGuestModal(true);
         return;
       }
+
       setPaymentLoading(true);
+
       try {
-        const res = await fetch('/api/razorpay', {
+        let authToken = token;
+        if (!authToken && supabase) {
+          const { data } = await supabase.auth.getSession();
+          authToken = data.session?.access_token ?? null;
+        }
+
+        if (!authToken) {
+          toast({
+            title: 'Authentication required',
+            description: 'Please sign in again before completing your purchase.',
+            variant: 'destructive',
+          });
+          setShowGuestModal(true);
+          setPaymentLoading(false);
+          return;
+        }
+
+        const requestHeaders: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'x-user-data': JSON.stringify({ id: user.id, email: user.email }),
+        };
+
+        if (authToken) {
+          requestHeaders.Authorization = `Bearer ${authToken}`;
+        }
+
+        const orderResponse = await fetch('/api/payments/create-order', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ amount: priceValue }),
+          headers: requestHeaders,
+          body: JSON.stringify({ snippetId: snippet.id }),
         });
-        const order = await res.json();
-        const options: RazorpayOptions = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+
+        if (!orderResponse.ok) {
+          const errorBody = await orderResponse.json().catch(() => ({}));
+          throw new Error(errorBody.error || 'Unable to start checkout.');
+        }
+
+        const order = await orderResponse.json();
+        const isDemoCheckout = Boolean(order.demo);
+
+        const ready = await ensureRazorpay();
+        if (!ready || typeof window === 'undefined' || !window.Razorpay) {
+          throw new Error('Razorpay checkout SDK is not loaded yet. Please wait a moment and try again.');
+        }
+
+        const checkout = new window.Razorpay({
+          key: order.key,
           amount: order.amount,
-          currency: order.currency,
+          currency: order.currency ?? 'INR',
           name: 'CodeHut',
           description: `Purchase of ${snippet.title}`,
           order_id: order.id,
-          handler: (response: RazorpayPaymentResponse) => {
-            alert('Payment successful!');
-            console.log('Payment successful!', response);
-          },
           prefill: {
-            name: user.user_metadata.full_name || 'Anonymous',
+            name: user.username || 'Anonymous',
             email: user.email,
           },
           notes: {
             snippet_id: snippet.id,
+            buyer_id: user.id,
+            mode: isDemoCheckout ? 'demo' : 'live',
           },
           theme: {
             color: '#3399cc',
           },
-        };
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-      } catch (error) { 
+          handler: async (paymentResponse: RazorpayPaymentResponse) => {
+            try {
+              if (isDemoCheckout) {
+                toast({
+                  title: 'Demo payment completed',
+                  description: 'This was a simulated checkout. Configure Razorpay keys for live payments.',
+                });
+                await incrementDownload(snippet.id);
+                return;
+              }
+
+              const verifyHeaders: Record<string, string> = {
+                'Content-Type': 'application/json',
+                'x-user-data': JSON.stringify({ id: user.id, email: user.email }),
+              };
+
+              if (authToken) {
+                verifyHeaders.Authorization = `Bearer ${authToken}`;
+              }
+
+              const verifyResponse = await fetch('/api/payments/verify', {
+                method: 'POST',
+                headers: verifyHeaders,
+                body: JSON.stringify({
+                  ...paymentResponse,
+                  snippetId: snippet.id,
+                }),
+              });
+
+              if (!verifyResponse.ok) {
+                const verifyError = await verifyResponse.json().catch(() => ({}));
+                throw new Error(verifyError.error || 'Payment verification failed.');
+              }
+
+              toast({
+                title: 'Payment successful',
+                description: 'You now have access to the full snippet.',
+              });
+              await incrementDownload(snippet.id);
+            } catch (verifyError) {
+              console.error('Payment verification failed', verifyError);
+              toast({
+                title: 'Payment verification failed',
+                description: verifyError instanceof Error ? verifyError.message : 'Please contact support.',
+                variant: 'destructive',
+              });
+            } finally {
+              setPaymentLoading(false);
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              setPaymentLoading(false);
+              if (isDemoCheckout) {
+                toast({
+                  title: 'Checkout closed',
+                  description: 'Demo payment was cancelled before completion.',
+                  variant: 'destructive',
+                });
+              }
+            },
+          },
+        } as RazorpayOptions);
+
+        checkout.on?.('payment.failed', (failure) => {
+          console.error('Payment failed:', failure);
+          toast({
+            title: 'Payment failed',
+            description: failure?.error?.description || 'Please try again with a different payment method.',
+            variant: 'destructive',
+          });
+          setPaymentLoading(false);
+        });
+
+        checkout.open();
+
+        if (isDemoCheckout) {
+          toast({
+            title: 'Demo checkout mode',
+            description: 'Using Razorpay test gateway. Use card 4111 1111 1111 1111, any future expiry, CVV 111 to simulate a payment.',
+          });
+        }
+      } catch (error) {
         console.error('Payment failed:', error);
-        alert('Payment failed. Please try again.');
+        toast({
+          title: 'Payment failed',
+          description: error instanceof Error ? error.message : 'Please try again.',
+          variant: 'destructive',
+        });
+        setPaymentLoading(false);
       }
-      setPaymentLoading(false);
-    }, [user, snippet, priceValue]);
+  }, [token, user, snippet, incrementDownload, toast, supabase, ensureRazorpay]);
     return (
       <Card className={cn("group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer border-2 border-gray-200 dark:border-gray-700 overflow-hidden text-gray-900 dark:text-gray-100", compact && "p-4", className)} onClick={handleView}>
         {user?.id ? (

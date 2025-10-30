@@ -47,6 +47,16 @@ The application will automatically create tables when started if they don't exis
 
 ## ⚙️ Environment Configuration
 
+### Demo mode (no live keys yet)
+
+If you want to preview the Razorpay checkout without configuring live/test keys yet, the app now boots in **demo mode** automatically. In this mode:
+
+- Clicking **Buy Now** opens the Razorpay checkout modal with test payment options.
+- Use the sample card `4111 1111 1111 1111`, any future expiry, CVV `111`, and OTP `123456` to simulate a success flow.
+- The `/api/payments/verify` endpoint short-circuits and marks the purchase as successful without contacting Razorpay servers.
+
+To customise the demo banner text, set `NEXT_PUBLIC_RAZORPAY_DEMO_KEY` (defaults to `rzp_test_1DP5mmOlF5G5ag`). When you are ready for real transactions, add `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `NEXT_PUBLIC_RAZORPAY_KEY_ID` to switch the app into live/test mode automatically.
+
 ### 1. Backend Environment Variables
 
 Create or update `.env` file in the root directory:
@@ -71,7 +81,7 @@ JWT_SECRET=your_jwt_secret_here
 
 ### 2. Frontend Environment Variables
 
-Create `client/.env` file:
+Create `client/.env` file (for the legacy Vite client) and update your Next.js `.env.local`:
 
 ```env
 # Razorpay Configuration for Frontend
@@ -79,6 +89,9 @@ VITE_RAZORPAY_KEY_ID=rzp_test_your_key_id_here
 
 # API Base URL (optional)
 VITE_API_BASE_URL=http://localhost:8080
+
+# Next.js App Router (current dashboard)
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_your_key_id_here
 ```
 
 **⚠️ Important:**
@@ -204,7 +217,7 @@ Content-Type: application/json
 ### 2. Verify Payment
 
 ```http
-POST /api/payments/verify-payment
+POST /api/payments/verify
 Content-Type: application/json
 
 {
