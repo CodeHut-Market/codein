@@ -17,6 +17,9 @@ import {
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Script from 'next/script'
+import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
+
 import { RealTimeSnippetCard } from '../components/ui/real-time-snippet-card'
 
 // Adapter function to convert CodeSnippet to format expected by RealTimeSnippetCard
@@ -56,6 +59,7 @@ export default function ExplorePage() {
   const [selectedLanguage, setSelectedLanguage] = useState('all')
   const [sortBy, setSortBy] = useState('trending')
   const [featuredSnippets, setFeaturedSnippets] = useState<CodeSnippet[]>([])
+  const [razorpayScriptLoaded, setRazorpayScriptLoaded] = useState(false)
 
   useEffect(() => {
     // Reset pagination when filters change
@@ -434,6 +438,13 @@ export default function ExplorePage() {
           </p>
         </div>
       )}
+
+      <Script
+        id="razorpay-checkout-script"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        onLoad={() => setRazorpayScriptLoaded(true)}
+        strategy="lazyOnload"
+      />
     </div>
   )
 }
