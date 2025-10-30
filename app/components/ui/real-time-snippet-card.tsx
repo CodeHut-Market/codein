@@ -197,11 +197,20 @@ interface RealTimeSnippetCardProps {
           requestHeaders.Authorization = `Bearer ${authToken}`;
         }
 
-        const orderResponse = await fetch(`${BACKEND_URL}/api/payments/create-order`, {
-          method: 'POST',
-          headers: requestHeaders,
-          body: JSON.stringify({ snippetId: snippet.id }),
-        });
+        let orderResponse;
+        try {
+          orderResponse = await fetch(`${BACKEND_URL}/api/payments/create-order`, {
+            method: 'POST',
+            headers: requestHeaders,
+            body: JSON.stringify({ snippetId: snippet.id }),
+          });
+        } catch (fetchError) {
+          // Check if the error is due to ad blocker or network issue
+          if (fetchError instanceof TypeError && fetchError.message === 'Failed to fetch') {
+            throw new Error('Request blocked. Please disable ad blocker or check your browser extensions and try again.');
+          }
+          throw fetchError;
+        }
 
         if (!orderResponse.ok) {
           const errorBody = await orderResponse.json().catch(() => ({}));
