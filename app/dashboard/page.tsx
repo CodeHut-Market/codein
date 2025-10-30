@@ -652,7 +652,10 @@ export default function DashboardPage() {
               ...snippet,
               description: `Sample description for ${snippet.title}`,
               createdAt: new Date(snippet.createdAt),
-              updatedAt: new Date(snippet.createdAt)
+              updatedAt: new Date(snippet.createdAt),
+              visibility: (snippet.visibility === 'public' || snippet.visibility === 'private' 
+                ? snippet.visibility 
+                : 'public') as 'public' | 'private'
             }))}
             onFilteredResults={(results) => console.log('Filtered results:', results)}
           />

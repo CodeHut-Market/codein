@@ -842,8 +842,8 @@ export async function listSnippets(options?: ListSnippetsOptions | string): Prom
   // OPTIMIZED SUPABASE QUERY - Single query execution
   if(isSupabaseEnabled()){
     try {
-      // Build optimized select query - fetch snippets first, then get authors separately
-      const selectColumns = 'id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at,visibility';
+      // Build optimized select query - fetch snippets with code column
+      const selectColumns = 'id,title,description,code,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at,visibility';
       let q = supabase!.from('snippets').select(selectColumns);
       
       // Batch filter application for better performance
@@ -1097,7 +1097,7 @@ export async function deleteSnippetForUser(snippetId: string, userId: string): P
       };
     }
 
-    const authorId = supabaseRow?.author_id ?? snippet.authorId;
+    const authorId = supabaseRow?.authorId ?? (snippet as any).author_id ?? snippet.authorId;
     if (authorId && authorId !== userId) {
       return {
         success: false,
@@ -1263,7 +1263,7 @@ export async function getSnippetById(id: string): Promise<CodeSnippet | null>{
         return null;
       }
       
-      const snippet = mapRowToSnippet(data as CodeSnippet);
+      const snippet = mapRowToSnippet(data as SnippetRow);
       
       // Cache for future requests
       snippetCache.set(id, { snippet, timestamp: now });
@@ -1294,10 +1294,10 @@ export async function listPopular(limit = 6): Promise<CodeSnippet[]>{
   
   if(isSupabaseEnabled()){
     try {
-      // Optimized query with specific columns and single order
+      // Optimized query with specific columns including code
       const { data, error } = await supabase!
         .from('snippets')
-        .select('id,title,description,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at,visibility')
+        .select('id,title,description,code,price,rating,author,author_id,tags,language,framework,category,downloads,created_at,updated_at,visibility')
         .order('downloads', { ascending: false })
         .order('created_at', { ascending: false }) // Secondary sort for ties
         .limit(limit * 2); // Fetch more for cache

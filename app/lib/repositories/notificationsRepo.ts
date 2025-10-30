@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { isSupabaseEnabled, supabase } from '../supabaseClient';
-import { PostgrestError, PostgrestQueryBuilder } from '@supabase/supabase-js';
+import { PostgrestError } from '@supabase/supabase-js';
 
 export interface NotificationItem { id: string; title: string; message: string; read: boolean; createdAt: string; userId?: string; }
 
@@ -56,7 +56,7 @@ async function queryNotifications(userId?: string, attempt = 0): Promise<Notific
   const userCols = ['user_id', 'userId', 'userid'];
 
   for(const ucol of userCols){
-    let query: PostgrestQueryBuilder<NotificationRow> = supabase!.from('notifications').select('*');
+    let query = supabase!.from('notifications').select('*');
     try {
       query = query.order(orderCol, { ascending: false }).eq(ucol, targetUser);
     } catch { /* ignore method chain errors */ }

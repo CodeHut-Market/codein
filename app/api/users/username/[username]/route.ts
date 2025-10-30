@@ -1,6 +1,6 @@
 import { createClient, User } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
-import { CodeSnippet } from '@/../../../../shared/api';
+import { CodeSnippet } from '@shared/api';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
